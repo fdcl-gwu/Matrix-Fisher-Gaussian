@@ -1,15 +1,22 @@
 function [  ] = SO3RealDistThreePara(  )
+addpath('Matrix-Fisher-Distribution');
 
-% Parameters
+% parameters
 n1 = 1;
-n2 = 3;
-p = 3;
 
-Miu1 = 0;
-Miu2 = mat2vec(eye(3));
-Sigma1 = 1;
-K = eye(3)*10;
-PReduced = [0,0.7,0]/sqrt(10);  % should be changed
+Miu = 0;
+Sigma = 1;
+F = 10*eye(3);
+PReduced = [0.7,0,0]/sqrt(10);
+
+% intermediate parameters
+[U,S,V] = psvd(F);
+M = U*V';
+K = V*S*V';
+Miu2 = mat2vec(M);
+Sigma2Inv = [K,zeros(3),zeros(3)
+             zeros(3),K,zeros(3)
+             zeros(3),zeros(3),K];
 
 % tangent space
 t3 = vec2mat(Miu2)*[0, -1, 0
@@ -29,22 +36,17 @@ Rt = [t1';t2';t3';n'];
 
 P = [PReduced,zeros(1,6)]*Rt;
 
-% intermediate parameters
-Sigma2 = [K^-1,zeros(3),zeros(3)
-          zeros(3),K^-1,zeros(3)
-          zeros(3),zeros(3),K^-1];
-F = vec2mat(Miu2)*K;
-
-Miuc = @(x2)Miu1+P*Sigma2^-1*(x2-Miu2);
-Sigmac = Sigma1-P*Sigma2^-1*P';
+% other intermediate parameters
+Miuc = @(R)Miu+P*Sigma2Inv*(mat2vec(R)-Miu2);
+Sigmac = Sigma-P*Sigma2Inv*P';
 
 % Normalizing constant
 c1 = 1/sqrt((2*pi)^n1*det(Sigmac));
-c2 = 1;  % should be changed
+c2 = pdf_MF_normal([S(1,1),S(2,2),S(3,3)]);
 
 % density
-f = @(x1,x2)1/c1*exp(-1/2*(x1-Miuc(x2))'*Sigmac^-1*(x1-Miuc(x2)))*...
-    1/c2*exp(trace(F'*vec2mat(x2)));
+f = @(x1,R)1/c1*exp(-1/2*(x1-Miuc(R))'*Sigmac^-1*(x1-Miuc(R)))*...
+    1/c2*exp(trace(F*R'));
 
 % spherical grid
 Nt1 = 100;
@@ -62,7 +64,7 @@ x1 = linspace(-1,1,Nx1);
 % color map
 c = zeros(Nt1,Nt2,Nx1);
 for nx1 = 1:Nx1
-    fRot = @(x2)f(x1(nx1),mat2vec(x2));
+    fRot = @(R)f(x1(nx1),R);
     c(:,:,nx1) = plotRotDist(theta1,theta2,fRot);
 end
 cmax = max(max(max(c)));
@@ -75,6 +77,8 @@ for nx1 = 1:Nx1
     view([1,1,1]);
     caxis([0,cmax]);
 end
+
+rmpath('Matrix-Fisher-Distribution');
 
 end
 
