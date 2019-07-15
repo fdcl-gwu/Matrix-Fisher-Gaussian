@@ -1,4 +1,4 @@
-function [ c ] = plotRotDist( theta1, theta2, f )
+function [ c ] = plotO3Dist( theta1, theta2, f )
 % f is the density function handle
 % s1, s2, s3 are coordinates on the ball
 
@@ -31,32 +31,26 @@ parfor nt1 = 1:Nt1
             ortAxisGrid(:,:,nt3) = RAxis(:,:,nt3)*ortAxes;
         end
         
-        R1 = zeros(3,3,Nt3);
-        R2 = zeros(3,3,Nt3);
-        R3 = zeros(3,3,Nt3);
+        R1 = zeros(3,3,Nt3*2);
+        R2 = zeros(3,3,Nt3*2);
+        R3 = zeros(3,3,Nt3*2);
         for nt3 = 1:Nt3
             R1(:,:,nt3) = [axis,ortAxisGrid(:,:,nt3)];
-            if det(R1(:,:,nt3))<0
-                R1(:,:,nt3) = [axis,flip(ortAxisGrid(:,:,nt3),2)];
-            end
+            R1(:,:,nt3+Nt3) = [axis,flip(ortAxisGrid(:,:,nt3),2)];
             
             R2(:,:,nt3) = [ortAxisGrid(:,1,nt3),axis,...
                 ortAxisGrid(:,2,nt3)];
-            if det(R2(:,:,nt3))<0
-                R2(:,:,nt3) = [ortAxisGrid(:,2,nt3),axis,...
+            R2(:,:,nt3+Nt3) = [ortAxisGrid(:,2,nt3),axis,...
                     ortAxisGrid(:,1,nt3)];
-            end
             
             R3(:,:,nt3) = [ortAxisGrid(:,:,nt3),axis];
-            if det(R3(:,:,nt3))<0
-                R3(:,:,nt3) = [flip(ortAxisGrid(:,:,nt3),2),axis];
-            end
+            R3(:,:,nt3+Nt3) = [flip(ortAxisGrid(:,:,nt3),2),axis];
         end
         
-        for nt3 = 1:Nt3
-            f1(nt1,nt2) = f1(nt1,nt2)+f(R1(:,:,nt3))*(2*pi)/Nt3;
-            f2(nt1,nt2) = f2(nt1,nt2)+f(R2(:,:,nt3))*(2*pi)/Nt3;
-            f3(nt1,nt2) = f3(nt1,nt2)+f(R3(:,:,nt3))*(2*pi)/Nt3;
+        for nt3 = 1:2*Nt3
+            f1(nt1,nt2) = f1(nt1,nt2)+f(R1(:,:,nt3))*(2*pi)/Nt3/2;
+            f2(nt1,nt2) = f2(nt1,nt2)+f(R2(:,:,nt3))*(2*pi)/Nt3/2;
+            f3(nt1,nt2) = f3(nt1,nt2)+f(R3(:,:,nt3))*(2*pi)/Nt3/2;
         end
     end
 end
