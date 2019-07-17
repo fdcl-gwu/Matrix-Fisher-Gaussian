@@ -56,7 +56,7 @@ while nf > eps && NITER < MAX_ITER
     % polynomial line search: three-point parabolic method
     N_SUBITER=0;
     
-    while norm(f_stack(end)) > (1-alpha*lambda)*norm(f) && NSUB_ITER < MAX_ITER 
+    while norm(f_stack(end)) > (1-alpha*lambda)*norm(f) && N_SUBITER < MAX_ITER 
         
         N_SUBITER=N_SUBITER+1;
         if length(lambda_stack) < 3
@@ -89,7 +89,7 @@ end
 
 FVAL=f_trial;
 
-if NITER == MAX_ITER || NSUB_ITER == MAX_ITER
+if NITER == MAX_ITER || N_SUBITER == MAX_ITER
     disp('Warning: MAX iteration reached');
 end
 

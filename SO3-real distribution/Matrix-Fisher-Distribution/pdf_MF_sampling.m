@@ -14,9 +14,7 @@ B(4,4)=trace(S);
 
 R=zeros(3,3,N);
 for i=1:N
-    q4=x(4,i);
-    q=x(1:3,i);
-    R(:,:,i)=(q4^2-q'*q)*eye(3)+2*q*q'+2*q4*hat(q);
+    R(:,:,i)=QuatToRM([x(4,i);x(1:3,i)]);
     R(:,:,i)=U*R(:,:,i)*V';
 end
 
