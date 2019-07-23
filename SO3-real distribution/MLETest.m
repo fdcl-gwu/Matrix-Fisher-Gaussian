@@ -4,37 +4,34 @@ addpath('..\rotation3d');
 
 % parameters
 N = 1;
-Ns = 100;
+Ns = 100000;
 
 Miu = 0;
 Sigma = 1;
 U = expRM([0,0,0]);
 V = expRM([-0.3,0.9,0.5]);
-S = diag([25,5,5]);
-PReduced = [0.7,0.7,0.7]/sqrt(25);
+S = diag([25,25,-25]);
+F = U*S*V';
+PReduced = [0.5,0.5,0.5]/sqrt(25);
 
 % intermediate parameters
+[U,S,V] = usvd(F,true);
 M = U*V';
 K = V*S*V';
-F = M*K;
 Miu2 = mat2vec(M);
 Sigma2Inv = [K,zeros(3),zeros(3)
              zeros(3),K,zeros(3)
              zeros(3),zeros(3),K];
 
 % tangent space
-Omega3 = [0, -1, 0
-          1, 0, 0
-          0, 0, 0]/sqrt(2);
-Omega2 = [0, 0, 1
-          0, 0, 0
-          -1, 0, 0]/sqrt(2);
-Omega1 = [0, 0, 0
-          0, 0, -1
-          0, 1, 0]/sqrt(2);
-t1 = mat2vec(M*Omega1);
-t2 = mat2vec(M*Omega2);
-t3 = mat2vec(M*Omega3);
+[U0,~,V0] = usvd(F,false);
+M0 = U0*V0';
+Omega1 = skew(V0*[1;0;0]);
+Omega2 = skew(V0*[0;1;0]);
+Omega3 = skew(V0*[0;0;1]);
+t1 = mat2vec(M0*Omega1)/sqrt(2);
+t2 = mat2vec(M0*Omega2)/sqrt(2);
+t3 = mat2vec(M0*Omega3)/sqrt(2);
 n = null([t1';t2';t3']);
 Rt = [t1';t2';t3';n'];
 

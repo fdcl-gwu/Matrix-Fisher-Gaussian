@@ -19,24 +19,21 @@ for ns = 1:Ns
 end
 
 % Matrix Fisher part
-[Us,Ds,Vs] = psvd(ER);
+[Us,Ds,Vs] = usvd(ER,true);
 Ss = pdf_MF_M2S(diag(Ds));
-M = Us*Vs';
-K = Vs*diag(Ss)*Vs';
+[U,S,V] = usvd(Us*diag(Ss)*Vs',true);
+M = U*V';
+K = V*S*V';
 
 % tangent space
-Omega3 = [0, -1, 0
-          1, 0, 0
-          0, 0, 0]/sqrt(2);
-Omega2 = [0, 0, 1
-          0, 0, 0
-          -1, 0, 0]/sqrt(2);
-Omega1 = [0, 0, 0
-          0, 0, -1
-          0, 1, 0]/sqrt(2);
-t1 = mat2vec(M*Omega1);
-t2 = mat2vec(M*Omega2);
-t3 = mat2vec(M*Omega3);
+[U0,S0,V0] = usvd(M*K,false);
+M0 = U0*V0';
+Omega1 = skew(V0*[1;0;0]);
+Omega2 = skew(V0*[0;1;0]);
+Omega3 = skew(V0*[0;0;1]);
+t1 = mat2vec(M0*Omega1)/sqrt(2);
+t2 = mat2vec(M0*Omega2)/sqrt(2);
+t3 = mat2vec(M0*Omega3)/sqrt(2);
 n = null([t1';t2';t3']);
 Rt = [t1';t2';t3';n'];
 

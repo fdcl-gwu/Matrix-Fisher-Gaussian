@@ -2,7 +2,10 @@ function [ c ] = plotSO3Dist( theta1, theta2, f )
 % f is the density function handle
 % s1, s2, s3 are coordinates on the ball
 
-addpath('..\rotation3d');
+pathCell = regexp(path, pathsep, 'split');
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
+    addpath('..\rotation3d');
+end
 
 Nt1 = length(theta1);
 Nt2 = length(theta2);
@@ -65,7 +68,10 @@ toc;
 % colormap
 c = f1+f2+f3;
 
-rmpath('..\rotation3d');
+
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
+    rmpath('..\rotation3d');
+end
 
 end
 
