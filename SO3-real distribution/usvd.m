@@ -1,5 +1,9 @@
 function [ U, S, V ] = usvd( F, positive )
 
+if ~exist('positive','var')
+    positive = false;
+end
+
 [U,S,V]=svd(F);
 
 for i = 1:3

@@ -15,12 +15,12 @@ Miu = 0;
 Sigma = 1;
 U = expRM([0.2,0.3,0.4]);
 V = expRM([-0.1,0.5,0.7]);
-S = diag([25,10,0.01]);
+S = diag([25,10,-5]);
 F = U*S*V';
-PReduced = [0,0.7,0]/sqrt(25);
+PTilde = [0,0,0.7]/sqrt(25);
 
 % intermediate parameters
-[U,S,V] = usvd(F,true);
+[U,S,V] = usvd(F);
 M = U*V';
 K = V*S*V';
 Miu2 = mat2vec(M);
@@ -38,7 +38,7 @@ t3 = mat2vec(M*Omega3)/sqrt(2);
 n = null([t1';t2';t3']);
 Rt = [t1';t2';t3';n'];
 
-P = [PReduced,zeros(1,6)]*Rt;
+P = [PTilde,zeros(1,6)]*Rt;
 
 % other intermediate parameters
 Miuc = @(R)Miu+P*Sigma2Inv*(mat2vec(R)-Miu2);
@@ -74,14 +74,12 @@ end
 cmax = max(max(max(c)));
 
 % plot Matrix Fisher
-[Un,~,Vn] = usvd(F,false);
-Mn = Un*Vn';
 for nx1 = 1:Nx1
     figure; hold on;
     surf(s1,s2,s3,c(:,:,nx1),'LineStyle','none');
-    plot3([0,Mn(1,1)*1.1],[0,Mn(2,1)*1.1],[0,Mn(3,1)*1.1],'b');
-    plot3([0,Mn(1,2)*1.1],[0,Mn(2,2)*1.1],[0,Mn(3,2)*1.1],'r');
-    plot3([0,Mn(1,3)*1.1],[0,Mn(2,3)*1.1],[0,Mn(3,3)*1.1],'y');
+    plot3([0,M(1,1)*1.1],[0,M(2,1)*1.1],[0,M(3,1)*1.1],'b');
+    plot3([0,M(1,2)*1.1],[0,M(2,2)*1.1],[0,M(3,2)*1.1],'r');
+    plot3([0,M(1,3)*1.1],[0,M(2,3)*1.1],[0,M(3,3)*1.1],'y');
     
     plot3([0,U(1,1)*1.1],[0,U(2,1)*1.1],[0,U(3,1)*1.1],'b');
     plot3([0,U(1,2)*1.1],[0,U(2,2)*1.1],[0,U(3,2)*1.1],'r');
@@ -109,9 +107,9 @@ for i = 1:3
     n = zeros(3,1);
     for nt1 = 1:Nt1
         n(i) = theta1(nt1);
-        MiuLinear(nt1,i) = Miuc(Mn*expRM(Vn*n));
+        MiuLinear(nt1,i) = Miuc(M*expRM(V*n));
         for nx1 = 1:Nx1
-            fLinear(nx1,nt1,i) = f(x1(nx1),Mn*expRM(Vn*n));
+            fLinear(nx1,nt1,i) = f(x1(nx1),M*expRM(V*n));
         end
     end
 end
