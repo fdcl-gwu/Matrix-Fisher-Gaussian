@@ -1,4 +1,4 @@
-function [ Miu, Sigma, PTilde, U, S, V, P ] = SO3RealMLE( x, R )
+function [ Miu, Sigma, PTilde, UO, SO, VO, invariant1, invariant2 ] = SO3RealMLE( x, R )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
 N = size(x,1);
@@ -14,28 +14,27 @@ for ns = 1:Ns
 end
 
 % Matrix Fisher part
-[Up,Dp,Vp] = usvd(ER,true);
-Sp = diag(pdf_MF_M2S(diag(Dp)));
-[U,S,V] = usvd(Up*Sp*Vp');
+[UO,DO,VO] = usvd(ER,true);
+SO = diag(pdf_MF_M2S(diag(DO)));
 
 % tangent space
-M = U*V';
-Omega1 = skew(V*[1;0;0]);
-Omega2 = skew(V*[0;1;0]);
-Omega3 = skew(V*[0;0;1]);
-t1 = mat2vec(M*Omega1)/sqrt(2);
-t2 = mat2vec(M*Omega2)/sqrt(2);
-t3 = mat2vec(M*Omega3)/sqrt(2);
+MO = UO*VO';
+Omega1 = skew(VO*[1;0;0]);
+Omega2 = skew(VO*[0;1;0]);
+Omega3 = skew(VO*[0;0;1]);
+t1 = mat2vec(MO*Omega1)/sqrt(2);
+t2 = mat2vec(MO*Omega2)/sqrt(2);
+t3 = mat2vec(MO*Omega3)/sqrt(2);
 n = null([t1';t2';t3']);
 Rt = [t1';t2';t3';n'];
 
 % f(eta)
 fEta = zeros(3,Ns);
 for ns = 1:Ns
-    expEta = U'*R(:,:,ns)*V;
-    fEta(1,ns) = trace(S*expEta'*skew([1,0,0]))/sqrt(2);
-    fEta(2,ns) = trace(S*expEta'*skew([0,1,0]))/sqrt(2);
-    fEta(3,ns) = trace(S*expEta'*skew([0,0,1]))/sqrt(2);
+    expEta = UO'*R(:,:,ns)*VO;
+    fEta(1,ns) = trace(SO*expEta'*skew([1,0,0]))/sqrt(2);
+    fEta(2,ns) = trace(SO*expEta'*skew([0,1,0]))/sqrt(2);
+    fEta(3,ns) = trace(SO*expEta'*skew([0,0,1]))/sqrt(2);
 end
 
 % other empirical moments
@@ -53,10 +52,18 @@ PTilde = covxfEta*covfEtafEta^-1;
 P = [PTilde,zeros(1,6)]*Rt;
 
 % Gaussian part
-SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
+SigmaTilde2Inv = diag([SO(2,2)+SO(3,3),SO(1,1)+SO(3,3),SO(1,1)+SO(2,2)])/2;
 Miu = Ex-PTilde*EfEta;
 Sigma = covxx-covxfEta*covfEtafEta^-1*covxfEta'+...
     PTilde*SigmaTilde2Inv*PTilde';
+
+% invariants
+K = VO*SO*VO';
+Sigma2Inv = [K,zeros(3),zeros(3)
+    zeros(3),K,zeros(3)
+    zeros(3),zeros(3),K];
+invariant1 = Sigma-P*Sigma2Inv*P';
+invariant2 = P*Sigma2Inv;
 
 end
 

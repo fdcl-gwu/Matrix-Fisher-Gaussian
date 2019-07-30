@@ -13,28 +13,29 @@ n1 = 1;
 
 Miu = 0;
 Sigma = 1;
-U = expRM([0.2,0.3,0.4]);
-V = expRM([-0.1,0.5,0.7]);
-S = diag([25,10,-5]);
-F = U*S*V';
+USO = expRM([0,0,0]);
+VSO = expRM([0,0,0]);
+SSO = diag([25,10,-5]);
 PTilde = [0,0,0.7]/sqrt(25);
 
 % intermediate parameters
-[U,S,V] = usvd(F);
-M = U*V';
-K = V*S*V';
-Miu2 = mat2vec(M);
-Sigma2Inv = [K,zeros(3),zeros(3)
-             zeros(3),K,zeros(3)
-             zeros(3),zeros(3),K];
+F = USO*SSO*VSO';
+[UO,SO,VO] = usvd(F,true);
+MSO = USO*VSO';
+MO = UO*VO';
+KO = VO*SO*VO';
+Miu2 = mat2vec(MO);
+Sigma2Inv = [KO,zeros(3),zeros(3)
+             zeros(3),KO,zeros(3)
+             zeros(3),zeros(3),KO];
 
 % tangent space
-Omega1 = skew(V*[1;0;0]);
-Omega2 = skew(V*[0;1;0]);
-Omega3 = skew(V*[0;0;1]);
-t1 = mat2vec(M*Omega1)/sqrt(2);
-t2 = mat2vec(M*Omega2)/sqrt(2);
-t3 = mat2vec(M*Omega3)/sqrt(2);
+Omega1 = skew(VO*[1;0;0]);
+Omega2 = skew(VO*[0;1;0]);
+Omega3 = skew(VO*[0;0;1]);
+t1 = mat2vec(MO*Omega1)/sqrt(2);
+t2 = mat2vec(MO*Omega2)/sqrt(2);
+t3 = mat2vec(MO*Omega3)/sqrt(2);
 n = null([t1';t2';t3']);
 Rt = [t1';t2';t3';n'];
 
@@ -46,7 +47,7 @@ Sigmac = Sigma-P*Sigma2Inv*P';
 
 % Normalizing constant
 c1 = 1/sqrt((2*pi)^n1*det(Sigmac));
-c2 = pdf_MF_normal([S(1,1),S(2,2),S(3,3)]);
+c2 = pdf_MF_normal([SSO(1,1),SSO(2,2),SSO(3,3)]);
 
 % density
 f = @(x1,R)1/c1*exp(-1/2*(x1-Miuc(R))'*Sigmac^-1*(x1-Miuc(R)))*...
@@ -77,16 +78,16 @@ cmax = max(max(max(c)));
 for nx1 = 1:Nx1
     figure; hold on;
     surf(s1,s2,s3,c(:,:,nx1),'LineStyle','none');
-    plot3([0,M(1,1)*1.1],[0,M(2,1)*1.1],[0,M(3,1)*1.1],'b');
-    plot3([0,M(1,2)*1.1],[0,M(2,2)*1.1],[0,M(3,2)*1.1],'r');
-    plot3([0,M(1,3)*1.1],[0,M(2,3)*1.1],[0,M(3,3)*1.1],'y');
+    plot3([0,MSO(1,1)*1.1],[0,MSO(2,1)*1.1],[0,MSO(3,1)*1.1],'b');
+    plot3([0,MSO(1,2)*1.1],[0,MSO(2,2)*1.1],[0,MSO(3,2)*1.1],'r');
+    plot3([0,MSO(1,3)*1.1],[0,MSO(2,3)*1.1],[0,MSO(3,3)*1.1],'y');
     
-    plot3([0,U(1,1)*1.1],[0,U(2,1)*1.1],[0,U(3,1)*1.1],'b');
-    plot3([0,U(1,2)*1.1],[0,U(2,2)*1.1],[0,U(3,2)*1.1],'r');
-    plot3([0,U(1,3)*1.1],[0,U(2,3)*1.1],[0,U(3,3)*1.1],'y');
-    scatter3(U(1,1)*1.1,U(2,1)*1.1,U(3,1)*1.1,[],'b');
-    scatter3(U(1,2)*1.1,U(2,2)*1.1,U(3,2)*1.1,[],'r');
-    scatter3(U(1,3)*1.1,U(2,3)*1.1,U(3,3)*1.1,[],'y');
+    plot3([0,USO(1,1)*1.1],[0,USO(2,1)*1.1],[0,USO(3,1)*1.1],'b');
+    plot3([0,USO(1,2)*1.1],[0,USO(2,2)*1.1],[0,USO(3,2)*1.1],'r');
+    plot3([0,USO(1,3)*1.1],[0,USO(2,3)*1.1],[0,USO(3,3)*1.1],'y');
+    scatter3(USO(1,1)*1.1,USO(2,1)*1.1,USO(3,1)*1.1,[],'b');
+    scatter3(USO(1,2)*1.1,USO(2,2)*1.1,USO(3,2)*1.1,[],'r');
+    scatter3(USO(1,3)*1.1,USO(2,3)*1.1,USO(3,3)*1.1,[],'y');
     axis equal;
     view([1,1,1]);
     caxis([0,cmax]);
@@ -107,9 +108,9 @@ for i = 1:3
     n = zeros(3,1);
     for nt1 = 1:Nt1
         n(i) = theta1(nt1);
-        MiuLinear(nt1,i) = Miuc(M*expRM(V*n));
+        MiuLinear(nt1,i) = Miuc(MSO*expRM(VSO*n));
         for nx1 = 1:Nx1
-            fLinear(nx1,nt1,i) = f(x1(nx1),M*expRM(V*n));
+            fLinear(nx1,nt1,i) = f(x1(nx1),MSO*expRM(VSO*n));
         end
     end
 end
@@ -138,13 +139,6 @@ end
 function [ vec ] = mat2vec( mat )
 
 vec = [mat(1,:)'; mat(2,:)'; mat(3,:)'];
-
-end
-
-
-function [ mat ] = vec2mat( vec )
-
-mat = [vec(1:3)'; vec(4:6)'; vec(7:9)'];
 
 end
 

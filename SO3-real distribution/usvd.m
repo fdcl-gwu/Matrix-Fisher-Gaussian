@@ -15,8 +15,8 @@ for i = 1:3
 end
 
 if positive
-    V=V*diag([1 1 det(U)]);
-    U=U*diag([1 1 det(U)]);
+    U=U*diag([1 1 det(V)]);
+    V=V*diag([1 1 det(V)]);
 else
     S=S*diag([1 1 det(U*V)]);
     U=U*diag([1 1 det(U)]);
