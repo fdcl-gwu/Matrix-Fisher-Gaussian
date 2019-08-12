@@ -1,0 +1,144 @@
+\documentclass[12pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Filtering with Matrix Fisher-Gaussian distribution on $\mathbb{R}^N\times\mathrm{SO}(3)$\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\begin{document}
+
+\maketitle
+
+\section{Matrix Fisher-Gaussian distribution}
+The Matrix Fisher-Gaussian distribution is defined as follows:
+\begin{definition}
+	$(\bm{x},\mathbf{R})\in\mathbb{R}^N\times\mathrm{SO}(3)$ follows Matrix Fisher-Gaussian distribution with parameters $\bm{\mu}\in\mathbb{R}^N$, $\mathbf{\Sigma}\in\mathbb{R}^{N\times N}$, $\mathbf{U},\mathbf{V}\in\mathrm{SO}(3)$, $\mathbf{S}=\mathrm{diag}(s_1,s_2,s_3)\in\mathbb{R}^{3\times 3}$ and $\mathbf{P}\in\mathbb{R}^{N\times 3}$ if and only if it has density function:
+	\begin{equation} \label{eqn:MFG}
+		f(\bm{x},\mathbf{R};\bm{\mu},\mathbf{\Sigma},\mathbf{V},\mathbf{S},\mathbf{U},\mathbf{P}) = \frac{1}{c(\mathbf{F})\sqrt{(2\pi)^N|\mathbf{\Sigma}_c|}} \mathrm{exp}\left\{-\frac{1}{2}(\bm{x}-\bm{\mu}_c)^T\mathbf{\Sigma}_c^{-1}(\bm{x}-\bm{\mu}_c)\right\} \mathrm{etr}\left\{\mathbf{F}\mathbf{R}^T\right\}.
+	\end{equation}
+	In the above equation, $\mathbf{F}=\mathbf{U}\mathbf{S}\mathbf{V}^T$,
+	\begin{equation}
+		\bm{\mu}_c = \bm{\mu}+\mathbf{P}g(\mathbf{R}) \triangleq \bm{\mu}+\frac{1}{\sqrt{2}}\mathbf{P}\begin{bmatrix}
+			\mathrm{tr}(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_1) \\
+			\mathrm{tr}(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_2) \\
+			\mathrm{tr}(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_3)
+		\end{bmatrix},
+	\end{equation}
+	and
+	\begin{equation}
+		\mathbf{\Sigma}_c = \mathbf{\Sigma}-\mathbf{P}\mathbf{\Sigma}_\mathcal{M}^{-1}\mathbf{P}^T \triangleq \mathbf{\Sigma}-\frac{1}{2}\mathbf{P}\mathrm{diag}(s_2+s_3,s_1+s_3,s_1+s_2)\mathbf{P}^T.
+	\end{equation}
+	This distribution is denoted as $\mathcal{MG}(\bm{\mu},\mathbf{\Sigma},\mathbf{P},\mathbf{U},\mathbf{S},\mathbf{V})$.
+\end{definition}
+
+The maximum likelihood of the Matrix Fisher Gaussian distribution is given by the following theorem.
+\begin{theorem}
+	\label{thm:MLE}
+	Let $\mathrm{E}_s(\mathbf{R}) = \sum_{n=1}^{N_s}w_n\mathbf{R}_n$ be the sample mean of the rotation matrices, and $\mathbf{U}_s\mathbf{D}_s\mathbf{V}_s^T=\mathrm{E}_s(\mathbf{R})$ be its proper singular value decomposition (unique almost surely), then the maximum likelihood estimation for the Matrix Fisher part is:
+	\begin{equation} \label{eqn:MLEMatrixFisher}
+		\hat{\mathbf{U}} = \mathbf{U}_s, \qquad \hat{\mathbf{V}} = \mathbf{V}_s, \qquad d_i = \frac{1}{c(\hat{\mathbf{S}})}\frac{\partial c(\hat{\mathbf{S}})}{\partial \hat{s}_i},
+	\end{equation}
+	where $\mathrm{diag}(d_1,\ d_2,\ d_3) = \mathbf{D}_s$.
+	Then use $\hat{\mathbf{U}}$ and $\hat{\mathbf{V}}$ to define $g(\mathbf{R}_n)$, and the following sample moments:
+	\begin{align*}
+		&\mathrm{E}_s(\bm{x}) = \sum_{n=1}^{N_s}w_n\bm{x}_n, \qquad \mathrm{cov}_s(\bm{x},\bm{x}) = \sum_{n=1}^{N_s}w_n\bm{x}_n\bm{x}_n^T-\mathrm{E}_s(\bm{x})\mathrm{E}_s(\bm{x})^T, \\
+		&\mathrm{E}_s(g(\mathbf{R})) = \sum_{n=1}^{N_s}w_ng(\mathbf{R}_n), \qquad \mathrm{cov}_s(g(\mathbf{R}),g(\mathbf{R})) = \sum_{n=1}^{N_s}w_ng(\mathbf{R}_n)g(\mathbf{R}_n)^T-\mathrm{E}_s(g(\mathbf{R}))\mathrm{E}_s(g(\mathbf{R}))^T, \\
+		&\mathrm{cov}_s(\bm{x},g(\mathbf{R})) = \sum_{n=1}^{N_s}w_n\bm{x}_ng(\mathbf{R}_n)^T-\mathrm{E}_s(\bm{x})\mathrm{E}_s(g(\mathbf{R}))^T.
+	\end{align*}
+	Then the maximum likelihood estimation for the correlation part is:
+	\begin{equation} \label{eqn:MLEP}
+		\hat{\mathbf{P}} = \mathrm{cov}_s(\bm{x},g(\mathbf{R}))\mathrm{cov}_s(g(\mathbf{R}),g(\mathbf{R}))^{-1}
+	\end{equation}
+	The maximum likelihood estimation for the Gaussian part is:
+	\begin{align}
+		\label{eqn:MLEGaussian}
+		&\hat{\bm{\mu}} = \mathrm{E}_s(\bm{x}) - \hat{\mathbf{P}}\mathrm{E}_s(g(\mathbf{R})), \nonumber \\
+		&\hat{\mathbf{\Sigma}} = \mathrm{cov}_s(\bm{x},\bm{x}) - \hat{\mathbf{P}}\mathrm{cov}_s(\bm{x},g(\mathbf{R}))^T + \hat{\mathbf{P}}\hat{\mathbf{\Sigma}}_\mathcal{M}^{-1}\hat{\mathbf{P}}^T,
+	\end{align}
+	where $\hat{\mathbf{\Sigma}}_\mathcal{M}^{-1} = \frac{1}{2}\mathrm{diag}(\hat{s}_2+\hat{s}_3,\ \hat{s}_1+\hat{s}_3,\ \hat{s}_1+\hat{s}_2)$.
+\end{theorem}
+
+
+\section{Sigma point selection}
+In order to select sigma points from a Matrix Fisher-Gaussian distribution, it is easier to first apply a change of variable to transform the distribution so that it aligns with its principal axes.
+\begin{theorem}
+	If $(\bm{x},\mathbf{R})$ follows $\mathcal{MG}(\bm{\mu},\mathbf{\Sigma},\mathbf{P},\mathbf{U},\mathbf{S},\mathbf{V})$, then $\bm{y}=\mathbf{\Sigma}_c^{-1/2}\left(\bm{x}-\bm{\mu}-\mathbf{P}g(\mathbf{R})\right)$, $\mathbf{Q} = \mathbf{U}^T\mathbf{R}\mathbf{V}$ follows $\mathcal{MG}(\bm{0},\mathbf{I},\mathbf{0},\mathbf{I},\mathbf{S},\mathbf{I})$.
+\end{theorem}
+\begin{proof}
+	After the change of variable, the product measure on $\mathbb{R}^N\times\mathrm{SO}(3)$ has relationship $\mathrm{d}\bm{y}\mathrm{d}\mathbf{Q} = \left|\mathbf{\Sigma}_c^{-1/2}\right|\mathrm{d}\bm{x}\mathrm{d}\mathbf{R}$.
+	Then the induced probability measure becomes
+	\begin{equation}
+		f(\bm{x},\mathbf{R})\mathrm{d}\bm{x}\mathrm{d}\mathbf{R} = \frac{1}{c(\mathbf{S})\sqrt{(2\pi)^N}}\mathrm{exp}(-\frac{1}{2}\bm{y}^T\bm{y})\mathrm{etr}(\mathbf{S}\mathbf{Q}^T)\mathrm{d}\bm{y}\mathrm{d}\mathbf{Q},
+	\end{equation}
+	which proves the result.
+\end{proof}
+
+With this canonical form of Matrix Fisher-Gaussian distribution, we can select sigma points analogously to a multivariate Gaussian distribution, and then check whether the resulting selections have the same maximum likelihood estimation as the original distribution.
+The sigma points and weights are selected according to the following definition.
+\begin{definition}
+	Let $w_G$, $w_M$, $w_0$ be three parameters such that they sum to one.
+	Define
+	\begin{equation}
+		\begin{matrix}
+			(\bm{y}_{1,2},\mathbf{Q}_{1,2}) = \left(\left[\pm\sqrt{\frac{N}{w_G}},0,\ldots,0\right]^T,\mathbf{I}_{3\times 3}\right) \\
+			\vdots \\
+			(\bm{y}_{2N-1,2N},\mathbf{Q}_{2N-1,2N}) = \left(\left[0,\ldots,0,\pm\sqrt{\frac{N}{w_G}}\right]^T,\mathbf{I}_{3\times 3}\right) \\
+			(\bm{y}_{2N+1,2N+2},\mathbf{Q}_{2N+1,2N+2}) = \left(\left[0,\ldots,0\right]^T,\mathrm{exp}(\pm\theta_1\hat{\bm{e}}_1)\right) \\
+			(\bm{y}_{2N+3,2N+4},\mathbf{Q}_{2N+3,2N+4}) = \left(\left[0,\ldots,0\right]^T,\mathrm{exp}(\pm\theta_2\hat{\bm{e}}_2)\right) \\
+			(\bm{y}_{2N+5,2N+6},\mathbf{Q}_{2N+5,2N+6}) = \left(\left[0,\ldots,0\right]^T,\mathrm{exp}(\pm\theta_3\hat{\bm{e}}_3)\right) \\
+			(\bm{y}_{2N+7},\mathbf{Q}_{2N+7}) = \left(\left[0,\ldots,0\right]^T,\mathbf{I}_{3\times 3}\right) \\
+		\end{matrix}
+	\end{equation}
+	as the $2N+7$ canonical sigma points with weights $\frac{w_G}{2N}$ for the pairs along the Guassian principal axes, $w_{Mi},\ i=1,2,3$ for the pairs along the Matrix Fisher principal axes, and $w_0$ for the one at the origin.
+	$\theta_i$, $w_{Mi}$ are chosen according to the rules from Matrix Fisher distribution.
+	The sigma points for the original distribution are $\mathbf{R}_n = \mathbf{U}\mathbf{Q}_n\mathbf{V}^T$ and $\bm{x}_n = \mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)$ for $n=1,\ldots,2N+7$.
+\end{definition}
+
+It can be seen the sigma points are designed to capture the dispersion of the distribution along each principal axis, and this selection is validated by the following theorem.
+\begin{theorem}
+	The maximum likelihood estimation of the parameters from the sigma points are the same as those of the distribution from which the sigma points are selected.
+\end{theorem}
+\begin{proof}
+	From the development of unscented transform of the Matrix Fisher distribution, we can conclude $\hat{\mathbf{U}}=\mathbf{U}$, $\hat{\mathbf{S}}=\mathbf{S}$, and $\hat{\mathbf{U}}=\mathbf{U}$.
+	The sample covariance between $\bm{x}$ and $g(\mathbf{R})$ can be calculated as
+	\begin{align} \label{eqn:UnscentedP}
+		\mathrm{cov}_s&(\bm{x},g(\mathbf{R})) = \sum_{n=1}^{2N+7}w_n\bm{x}_ng(\mathbf{R}_n)^T - \left(\sum_{n=1}^{2N+7}w_n\bm{x}_n\right)\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)^T \nonumber \\
+		&=\sum_{n=1}^{2N+7}w_n\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}\right)g(\mathbf{R}_n)^T - \left(\sum_{n=1}^{2N+7}w_n\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}\right)\right)\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)^T \nonumber \\
+		&\qquad + \mathbf{P}\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)g(\mathbf{R}_n)^T - \mathbf{P}\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)^T \nonumber \\
+		&=\mathbf{\Sigma}_c^{1/2}\sum_{n=1}^{2N+7}w_n\bm{y}_ng(\mathbf{R}_n)^T - \mathbf{\Sigma}_c^{1/2}\left(\sum_{n=1}^{2N+7}w_n\bm{y}_n\right)\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)^T + \mathbf{P}\mathrm{cov}_s(g(\mathbf{R}),g(\mathbf{R})) \nonumber \\
+		&=\mathbf{P}\mathrm{cov}_s(g(\mathbf{R}),g(\mathbf{R})).
+	\end{align}
+	The first term in the second from last line vanishes because $\bm{y}_n$ and $g(\mathbf{R}_n)$ are supported on non-intersecting indices, the second term vanishes because the sample mean of $\bm{y}$ is zero.
+	Substituting \eqref{eqn:UnscentedP} into \eqref{eqn:MLEP} proves $\hat{\mathbf{P}} = \mathbf{P}$.
+	
+	Then for the Gaussian part we have
+	\begin{align}
+		\hat{\bm{\mu}} &= \sum_{n=1}^{2N+7}w_n\bm{x}_n-\hat{\mathbf{P}}\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n) \nonumber \\
+		&= \sum_{n=1}^{2N+7}w_n\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right) - \mathbf{P}\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n) \nonumber \\
+		&= \bm{\mu},
+	\end{align}
+	Also, calculating the sample covariance of $\bm{x}$ yields 
+	\begin{align} \label{eqn:UnscentedSigmac}
+		\mathrm{cov}_s(\bm{x},\bm{x}) &= \sum_{n=1}^{2N+7}w_n\bm{x}_n\bm{x}_n^T - \left(\sum_{n=1}^{2N+7}w_n\bm{x}_n\right)\left(\sum_{n=1}^{2N+7}w_n\bm{x}_n\right)^T \nonumber \\
+		&= \sum_{n=1}^{2N+7}w_n\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)^T \nonumber \\
+		&\qquad -\left(\sum_{n=1}^{2N+7}w_n\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)\right)\left(\sum_{n=1}^{2N+7}w_n\left(\mathbf{\Sigma}_c^{1/2}\bm{y}_n+\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)\right)^T \nonumber \\
+		&= \mathbf{\Sigma}_c^{1/2}\left(\sum_{n=1}^{2N+7}w_n\bm{y}_n\bm{y}_n^T\right)\mathbf{\Sigma}_c^{1/2} + \sum_{n=1}^{2N+7}w_n\left(\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)\left(\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)^T \nonumber \\
+		&\qquad -\left(\sum_{n=1}^{2N+7}w_n\left(\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)\right)\left(\sum_{n=1}^{2N+7}w_n\left(\bm{\mu}+\mathbf{P}g(\mathbf{R}_n)\right)\right)^T \nonumber \\
+		&= \mathbf{\Sigma}_c + \mathbf{P}\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)g(\mathbf{R}_n)^T - \left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)\left(\sum_{n=1}^{2N+7}w_ng(\mathbf{R}_n)\right)^T\right)\mathbf{P}^T \nonumber \\
+		&= \mathbf{\Sigma}_c + \mathbf{P}\mathrm{cov}_s(g(\mathbf{R}),g(\mathbf{R}))\mathbf{P}^T.
+	\end{align}
+	Substituting \eqref{eqn:UnscentedSigmac} in the second equation of \eqref{eqn:MLEGaussian} proves $\hat{\mathbf{\Sigma}} = \mathbf{\Sigma}$.
+\end{proof}
+
+\end{document}
+

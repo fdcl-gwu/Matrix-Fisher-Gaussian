@@ -212,30 +212,30 @@ The Matrix Fisher-Gaussian distribution is defined on a nonlinear manifold, so i
 However, combining Theorem \ref{thm:PTildeRange} and the next theorem, we can show it in some way resembles a six dimensional Gaussian distribution.
 \begin{theorem} \label{thm:Miuc}
 	$\bm{\mu}_c = \bm{\mu} + \frac{1}{\sqrt{2}}\tilde{\mathbf{P}}\begin{bmatrix}
-		\mathrm{tr}\left(\mathbf{S}\mathrm{exp}(\hat{\bm{\eta}})^T\hat{\bm{e}}_1\right) \\
-		\mathrm{tr}\left(\mathbf{S}\mathrm{exp}(\hat{\bm{\eta}})^T\hat{\bm{e}}_2\right) \\
-		\mathrm{tr}\left(\mathbf{S}\mathrm{exp}(\hat{\bm{\eta}})^T\hat{\bm{e}}_3\right)
-	\end{bmatrix}^T \triangleq \bm{\mu}+\tilde{\mathbf{P}}f(\bm{\eta})$.
+		\mathrm{tr}\left(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_1\right) \\
+		\mathrm{tr}\left(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_2\right) \\
+		\mathrm{tr}\left(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_3\right)
+	\end{bmatrix} \triangleq \bm{\mu}+\tilde{\mathbf{P}}f(\mathbf{R})$.
 \end{theorem}
 \begin{proof}
 	\begin{equation}
 		\bm{\mu}_c = \bm{\mu} + \tilde{\mathbf{P}}\begin{bmatrix}
 		\bm{t}_1 & \bm{t}_2 & \bm{t}_3
-		\end{bmatrix}^T\mathbf{\Sigma}_2^{-1} \mathrm{vec}\left(\mathrm{exp}(\widehat{\mathbf{V}\bm{\eta}})^T\mathbf{V}\mathbf{U}^T-\mathbf{V}\mathbf{U}^T\right),
+		\end{bmatrix}^T\mathbf{\Sigma}_2^{-1} \mathrm{vec}\left(\mathbf{R}^T-\mathbf{V}\mathbf{U}^T\right),
 	\end{equation}
 	and 
 	\begin{equation}
 		\begin{split}
-			&\bm{t}_i^T\mathbf{\Sigma}_2^{-1}\mathrm{vec}\left(\mathrm{exp}(\widehat{\mathbf{V}\bm{\eta}})^T\mathbf{V}\mathbf{U}^T-\mathbf{V}\mathbf{U}^T\right) \\
-			= &\frac{1}{\sqrt{2}}\mathrm{tr}\left\{\mathbf{U}\mathbf{V}^T\widehat{\mathbf{V}\bm{e}_i}\mathbf{K}\left(\mathrm{exp}(\widehat{\mathbf{V}\bm{\eta}})^T\mathbf{V}\mathbf{U}^T-\mathbf{V}\mathbf{U}^T\right)\right\} \\
-			= &\frac{1}{\sqrt{2}}\mathrm{tr}\left\{\mathbf{V}\hat{\bm{e}}_i\mathbf{V}^T\mathbf{V}\mathbf{S}\mathbf{V}^T\left(\mathbf{V}\mathrm{exp}(\hat{\bm{\eta}})^T\mathbf{V}^T+\mathbf{I}\right)\right\} \\
-			= &\frac{1}{\sqrt{2}}\mathrm{tr}\left(\mathbf{S}\mathrm{exp}(\hat{\bm{\eta}})^T\hat{\bm{e}}_i + \mathbf{S}\hat{\bm{e}}_i\right),
+			&\bm{t}_i^T\mathbf{\Sigma}_2^{-1}\mathrm{vec}\left(\mathbf{R}^T-\mathbf{V}\mathbf{U}^T\right) \\
+			= &\frac{1}{\sqrt{2}}\mathrm{tr}\left\{\mathbf{U}\mathbf{V}^T\widehat{\mathbf{V}\bm{e}_i}\mathbf{K}\left(\mathbf{R}^T-\mathbf{V}\mathbf{U}^T\right)\right\} \\
+			= &\frac{1}{\sqrt{2}}\mathrm{tr}\left\{\mathbf{U}\hat{\bm{e}}_i\mathbf{S}\mathbf{V}^T\mathbf{R}^T+\mathbf{U}\hat{\bm{e}}_i\mathbf{S}\mathbf{U}^T\right\} \\
+			= &\frac{1}{\sqrt{2}}\mathrm{tr}\left(\mathbf{S}\mathbf{V}^T\mathbf{R}^T\mathbf{U}\hat{\bm{e}}_i + \mathbf{S}\hat{\bm{e}}_i\right),
 		\end{split}
 	\end{equation}
 	where the second term vanishes.
 \end{proof}
 
-Compared to \eqref{eqn:linearApprox}, the nice linear term $\sqrt{2}\tilde{\mathbf{\Sigma}}_2^{-1}\bm{\eta}$ is replaced by the nonlinear term $f(\bm{\eta})$, which is the consequence of the non-linearity of SO(3).
+Compared to \eqref{eqn:linearApprox}, the nice linear term $\sqrt{2}\tilde{\mathbf{\Sigma}}_2^{-1}\bm{\eta}$ is replaced by the nonlinear term $f(\mathbf{R})$, which is the consequence of the non-linearity of SO(3).
 Because of the non-uniqueness of singular value decomposition when $\mathbf{F}\mathbf{F}^T$ has repeated eigenvalues, the parameters of Matrix Fisher-Gaussian distribution is sometimes redundant.
 For example, when $\mathbf{F} = s_1\mathbf{I}$, $\mathbf{V}$ can be arbitrary, and $\tilde{\mathbf{P}}$ can be defined with respect to different $\mathbf{V}$.
 However, if $\tilde{\mathbf{P}}$ is chosen carefully such that $\mathbf{P}$ stays the same, the distribution is unchanged.
@@ -269,20 +269,20 @@ Then the maximum likelihood estimator of the parameters of Matrix Fisher-Gaussia
 		\hat{\mathbf{U}} = \mathbf{U}_s, \qquad \hat{\mathbf{V}} = \mathbf{V}_s, \qquad d_i = \frac{1}{c(\hat{\mathbf{S}})}\frac{\partial c(\hat{\mathbf{S}})}{\partial \hat{s}_i},
 	\end{equation}
 	where $\mathrm{diag}(d_1,\ d_2,\ d_3) = \mathbf{D}_s$.
-	Then define $\mathrm{exp}(\bm{\eta}_n) = \hat{\mathbf{U}}^T\mathbf{R}_n\hat{\mathbf{V}}$ for $n=1,\ldots,N_s$, and the following sample moments:
+	Then use $\hat{\mathbf{U}}$ and $\hat{\mathbf{V}}$ to define $f(\mathbf{R}_n)$, and the following sample moments:
 	\begin{align*}
 		&\mathrm{E}_s(\bm{x}) = \sum_{n=1}^{N_s}w_n\bm{x}_n, \qquad \mathrm{cov}_s(\bm{x},\bm{x}) = \sum_{n=1}^{N_s}w_n\bm{x}_n\bm{x}_n^T-\mathrm{E}_s(\bm{x})\mathrm{E}_s(\bm{x})^T, \\
-		&\mathrm{E}_s(f(\bm{\eta})) = \sum_{n=1}^{N_s}w_nf(\bm{\eta}_n), \qquad \mathrm{cov}_s(f(\bm{\eta}),f(\bm{\eta})) = \sum_{n=1}^{N_s}w_nf(\bm{\eta}_n)f(\bm{\eta}_n)^T-\mathrm{E}_s(f(\bm{\eta}))\mathrm{E}_s(f(\bm{\eta}))^T, \\
-		&\mathrm{cov}_s(\bm{x},f(\bm{\eta})) = \sum_{n=1}^{N_s}w_n\bm{x}_nf(\bm{\eta}_n)^T-\mathrm{E}_s(\bm{x})\mathrm{E}_s(f(\bm{\eta}))^T.
+		&\mathrm{E}_s(f(\mathbf{R})) = \sum_{n=1}^{N_s}w_nf(\mathbf{R}_n), \qquad \mathrm{cov}_s(f(\mathbf{R}),f(\mathbf{R})) = \sum_{n=1}^{N_s}w_nf(\mathbf{R}_n)f(\mathbf{R}_n)^T-\mathrm{E}_s(f(\mathbf{R}))\mathrm{E}_s(f(\mathbf{R}))^T, \\
+		&\mathrm{cov}_s(\bm{x},f(\mathbf{R})) = \sum_{n=1}^{N_s}w_n\bm{x}_nf(\mathbf{R}_n)^T-\mathrm{E}_s(\bm{x})\mathrm{E}_s(f(\mathbf{R}))^T.
 	\end{align*}
 	Then the maximum likelihood estimation for the correlation part is:
 	\begin{equation} \label{eqn:MLEP}
-		\hat{\tilde{\mathbf{P}}} = \mathrm{cov}_s(\bm{x},f(\bm{\eta}))\mathrm{cov}_s(f(\bm{\eta}),f(\bm{\eta}))^{-1}
+		\hat{\tilde{\mathbf{P}}} = \mathrm{cov}_s(\bm{x},f(\mathbf{R}))\mathrm{cov}_s(f(\mathbf{R}),f(\mathbf{R}))^{-1}
 	\end{equation}
 	The maximum likelihood estimation for the Gaussian part is:
 	\begin{align}
-		&\hat{\bm{\mu}} = \mathrm{E}_s(\bm{x}) - \hat{\tilde{\mathbf{P}}}\mathrm{E}_s(f(\bm{\eta})), \label{eqn:MLEMiu} \\
-		&\hat{\mathbf{\Sigma}} = \mathrm{cov}_s(\bm{x},\bm{x}) - \mathrm{cov}_s(\bm{x},f(\bm{\eta}))\mathrm{cov}_s(f(\bm{\eta}),f(\bm{\eta}))^{-1}\mathrm{cov}_s(\bm{x},f(\bm{\eta}))^T + \hat{\tilde{\mathbf{P}}}\hat{\tilde{\mathbf{\Sigma}}}_2^{-1}\hat{\tilde{\mathbf{P}}}^T, \label{eqn:MLESigma}
+		&\hat{\bm{\mu}} = \mathrm{E}_s(\bm{x}) - \hat{\tilde{\mathbf{P}}}\mathrm{E}_s(f(\mathbf{R})), \label{eqn:MLEMiu} \\
+		&\hat{\mathbf{\Sigma}} = \mathrm{cov}_s(\bm{x},\bm{x}) - \mathrm{cov}_s(\bm{x},f(\mathbf{R}))\mathrm{cov}_s(f(\mathbf{R}),f(\mathbf{R}))^{-1}\mathrm{cov}_s(\bm{x},f(\mathbf{R}))^T + \hat{\tilde{\mathbf{P}}}\hat{\tilde{\mathbf{\Sigma}}}_2^{-1}\hat{\tilde{\mathbf{P}}}^T, \label{eqn:MLESigma}
 	\end{align}
 	where $\hat{\tilde{\mathbf{\Sigma}}}_2^{-1} = \frac{1}{2}\mathrm{diag}(\hat{s}_2+\hat{s}_3,\ \hat{s}_1+\hat{s}_3,\ \hat{s}_1+\hat{s}_2)$.
 \end{theorem}
@@ -292,32 +292,32 @@ Then the maximum likelihood estimator of the parameters of Matrix Fisher-Gaussia
 	\begin{equation}
 		\begin{split}
 			l = &-\log{c(\mathbf{F})} + \mathbf{F}\sum_{n=1}^{N_s}w_n\mathbf{R}_n \\
-			&+\frac{1}{2}\log{|\mathbf{\Sigma}_c|^{-1}} - \frac{1}{2}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\bm{\eta}_n)\right)^T\mathbf{\Sigma}_c^{-1}\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\bm{\eta}_n)\right),
+			&+\frac{1}{2}\log{|\mathbf{\Sigma}_c|^{-1}} - \frac{1}{2}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right)^T\mathbf{\Sigma}_c^{-1}\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right),
 		\end{split}
 	\end{equation}
-	where $\mathbf{\Sigma}_c = \mathbf{\Sigma}-\tilde{\mathbf{P}}\tilde{\mathbf{\Sigma}}_2^{-1}\tilde{\mathbf{P}}^T$ and $f(\bm{\eta}_n)$ is given in Theorem \ref{thm:Miuc}, with $\tilde{\mathbf{\Sigma}}_2^{-1} = \frac{1}{2}\mathrm{diag}(s_2+s_3,\ s_1+s_3,\ s_1+s_2)$ and $\mathrm{exp}(\bm{\eta}_n) = \mathbf{U}^T\mathbf{R}_n\mathbf{V}$.
+	where $\mathbf{\Sigma}_c = \mathbf{\Sigma}-\tilde{\mathbf{P}}\tilde{\mathbf{\Sigma}}_2^{-1}\tilde{\mathbf{P}}^T$ and $f(\mathbf{R}_n)$ is given in Theorem \ref{thm:Miuc}, with $\tilde{\mathbf{\Sigma}}_2^{-1} = \frac{1}{2}\mathrm{diag}(s_2+s_3,\ s_1+s_3,\ s_1+s_2)$.
 	The idea is to maximize the Matrix Fisher part first, then use the maximum likelihood estimation of the Matrix Fisher parameters in the Gaussian part.
 	If the Gaussian part can be maximized simultaneously and the resulting parameters make the Matrix Fisher-Gaussian distribution well defined, we can conclude that they are the maximum likelihood estimation of the parameters.
 	
 	First, the Matrix Fisher part can be maximized by \eqref{eqn:MLEMatrixFisher}.
 	For the Gaussian part, take derivatives with respect to $\bm{\mu}$ and $\tilde{\mathbf{P}}$:
 	\begin{align}
-		&\frac{\partial l}{\partial \bm{\mu}} = \mathbf{\Sigma}_c^{-1}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\bm{\eta}_n)\right), \\
-		&\frac{\partial l}{\partial \tilde{\mathbf{P}}} = \mathbf{\Sigma}_c^{-1} \left(\sum_{n=1}^{N_s}w_n(\bm{x}_n-\bm{\mu})f(\bm{\eta}_n)^T - \tilde{\mathbf{P}}\sum_{n=1}^{N_s}w_nf(\bm{\eta}_n)f(\bm{\eta}_n)^T\right).
+		&\frac{\partial l}{\partial \bm{\mu}} = \mathbf{\Sigma}_c^{-1}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right), \\
+		&\frac{\partial l}{\partial \tilde{\mathbf{P}}} = \mathbf{\Sigma}_c^{-1} \left(\sum_{n=1}^{N_s}w_n(\bm{x}_n-\bm{\mu})f(\mathbf{R}_n)^T - \tilde{\mathbf{P}}\sum_{n=1}^{N_s}w_nf(\mathbf{R}_n)f(\mathbf{R}_n)^T\right).
 		\label{eqn:logDeriP0}
 	\end{align}
 	Equate the derivatives to zero, then $\hat{\bm{\mu}}$ and $\hat{\tilde{\mathbf{P}}}$ can be solved as in \eqref{eqn:MLEP} and \eqref{eqn:MLEMiu}.
 	Next, take derivative of the log likelihood with respect to $\mathbf{\Sigma}_c^{-1}$:
 	\begin{equation}
-		\frac{\partial l}{\partial \mathbf{\Sigma}_c^{-1}} = \frac{1}{2}\mathbf{\Sigma}_c - \frac{1}{2}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\bm{\eta}_n)\right)\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\bm{\eta}_n)\right)^T
+		\frac{\partial l}{\partial \mathbf{\Sigma}_c^{-1}} = \frac{1}{2}\mathbf{\Sigma}_c - \frac{1}{2}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right)\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right)^T
 	\end{equation}
 	Equating the derivative to zero and substituting the maximum likelihood estimation of $\bm{\mu}$ and $\tilde{\mathbf{P}}$, $\hat{\mathbf{\Sigma}}_c$ can be solved as:
 	\begin{equation}
-		\hat{\mathbf{\Sigma}}_c = \mathrm{cov}_s(\bm{x},\bm{x}) - \mathrm{cov}_s(\bm{x},f(\bm{\eta}))\mathrm{cov}_s(f(\bm{\eta}),f(\bm{\eta}))^{-1}\mathrm{cov}_s(\bm{x},f(\bm{\eta}))^T.
+		\hat{\mathbf{\Sigma}}_c = \mathrm{cov}_s(\bm{x},\bm{x}) - \mathrm{cov}_s(\bm{x},f(\mathbf{R}))\mathrm{cov}_s(f(\mathbf{R}),f(\mathbf{R}))^{-1}\mathrm{cov}_s(\bm{x},f(\mathbf{R}))^T.
 	\end{equation}
 	Finally, we need to check the resulting parameters satisfy the conditions in Theorem \ref{thm:PTildeRange}.
 	$\hat{\mathbf{S}}$ is good since it comes from the maximum likelihood estimation of a Matrix Fisher distribution.
-	$\hat{\mathbf{\Sigma}}_c$ is the sample covariance matrix of the conditioned random variable $\bm{x}|\bm{\eta}$, so it is positive definite almost surely.
+	$\hat{\mathbf{\Sigma}}_c$ is the sample covariance matrix of the conditioned random variable $\bm{x}|f(\mathbf{R})$, so it is positive definite almost surely.
 	Since $\hat{\tilde{\mathbf{\Sigma}}}_2^{-1}$ is positive semi-definite, $\hat{\mathbf{\Sigma}}$ is positive definite almost surely.
 \end{proof}
 
