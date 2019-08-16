@@ -1,0 +1,58 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Maximum Likelihood of Matrix Fisher-Gaussian distribution\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\begin{document}
+
+\maketitle
+
+Neglecting some constants, the log-likelihood function for Matrix Fisher-Gaussian distribution is
+\begin{align}
+	l = &-\log{c(\mathbf{F})} + \mathrm{tr}(\mathbf{F}^T\sum_{n=1}^{N_s}w_n\mathbf{R}_n) \nonumber \\
+	&+\frac{1}{2}\log{|\mathbf{\Sigma}_c|^{-1}} - \frac{1}{2}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\mathbf{P}f(\mathbf{R}_n)\right)^T\mathbf{\Sigma}_c^{-1}\left(\bm{x}_n-\bm{\mu}-\mathbf{P}f(\mathbf{R}_n)\right),
+\end{align}
+where $\mathbf{\Sigma}_c = \mathbf{\Sigma} - \frac{1}{2}\mathbf{P}\mathrm{diag}(s_2+s_3,s_1+s_3,s_1+s_2)\mathbf{P}^T$, $f(\mathbf{R}) = (\mathbf{Q}\mathbf{S}-\mathbf{S}\mathbf{Q}^T)^\vee$, and $\mathbf{Q}=\mathbf{U}^T\mathbf{R}\mathbf{V}$.
+Calculating derivatives with respect to each parameter yields:
+\begin{align}
+	\frac{\partial l}{\partial \bm{\eta}_\mathbf{U}} = &\sum_{n=1}^{N_s}w_n\begin{bmatrix}
+		-s_2Q_{22}-s_3Q_{33} & s_1Q_{21} & s_1Q_{31} \\
+		s_2Q_{12} & -s_1Q_{11}-s_3Q_{33} & s_2Q_{32} \\
+		s_3Q_{13} & s_3Q_{23} & -s_1Q_{11}-s_2Q_{22}
+	\end{bmatrix}_n\mathbf{P}^T\mathbf{\Sigma}_c\left(\bm{x}_n-\bm{\mu}-\mathbf{P}\bm{f}(\mathbf{R}_n)\right) \nonumber \\
+	&+ \left(\mathrm{E}_s[\mathbf{Q}]\mathbf{S}-\mathbf{S}\mathrm{E}_s[\mathbf{Q}]^T\right)^\vee
+\end{align}
+
+\begin{align}
+	\frac{\partial l}{\partial \bm{\eta}_\mathbf{V}} = &\sum_{n=1}^{N_s}w_n\begin{bmatrix}
+		s_2Q_{33}+s_3Q_{22} & -s_3Q_{12} & -s_2Q_{13} \\
+		-s_3Q_{21} & s_1Q_{33}+s_3Q_{11} & -s_1Q_{23} \\
+		-s_2Q_{31} & -s_1Q_{32} & s_1Q_{22}+s_2Q_{11}
+	\end{bmatrix}_n\mathbf{P}^T\mathbf{\Sigma}_c\left(\bm{x}_n-\bm{\mu}-\mathbf{P}\bm{f}(\mathbf{R}_n)\right) \nonumber \\
+	&+ \left(\mathrm{E}_s[\mathbf{Q}]^T\mathbf{S}-\mathbf{S}\mathrm{E}_s[\mathbf{Q}]\right)^\vee
+\end{align}
+
+\begin{equation}
+	\frac{\partial l}{\partial\mathbf{S}} = \sum_{n=1}^{N_s}w_n\begin{bmatrix}
+		0 & -Q_{31} & Q_{21} \\
+		Q_{32} & 0 & -Q_{12} \\
+		-Q_{23} & Q_{13} & 0
+	\end{bmatrix}\mathbf{P}^T\mathbf{\Sigma}_c\left(\bm{x}_n-\bm{\mu}-\mathbf{P}\bm{f}(\mathbf{R}_n)\right) - \frac{1}{c(\mathbf{S})}\frac{\partial c(\mathbf{S})}{\partial\mathbf{S}} + \mathrm{E}_s\left[\begin{bmatrix}Q_{11}\\Q_{22}\\Q_{33}\end{bmatrix}\right]
+\end{equation}
+
+In these equations, $\left(\frac{\partial l}{\partial\bm{\eta}_\mathbf{U}}\right)_{1,2,3} = \frac{\mathrm{d}}{\mathrm{d}t}l(\mathbf{U}\mathrm{exp}(t\hat{\bm{e}}_{1,2,3}))\lvert_{t=0}$, $\left(\frac{\partial l}{\partial\bm{\eta}_\mathbf{V}}\right)_{1,2,3} = \frac{\mathrm{d}}{\mathrm{d}t}l(\mathbf{V}\mathrm{exp}(t\hat{\bm{e}}_{1,2,3}))\lvert_{t=0}$, and they are written in column vectors.
+
+\end{document}
+

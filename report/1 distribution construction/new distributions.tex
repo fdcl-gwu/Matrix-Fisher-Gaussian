@@ -291,7 +291,7 @@ Then the maximum likelihood estimator of the parameters of Matrix Fisher-Gaussia
 	Omitting some constants, the log-likelihood function is:
 	\begin{equation}
 		\begin{split}
-			l = &-\log{c(\mathbf{F})} + \mathbf{F}\sum_{n=1}^{N_s}w_n\mathbf{R}_n \\
+			l = &-\log{c(\mathbf{F})} + \mathrm{tr}\left(\mathbf{F}^T\sum_{n=1}^{N_s}w_n\mathbf{R}_n\right) \\
 			&+\frac{1}{2}\log{|\mathbf{\Sigma}_c|^{-1}} - \frac{1}{2}\sum_{n=1}^{N_s}w_n\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right)^T\mathbf{\Sigma}_c^{-1}\left(\bm{x}_n-\bm{\mu}-\tilde{\mathbf{P}}f(\mathbf{R}_n)\right),
 		\end{split}
 	\end{equation}
