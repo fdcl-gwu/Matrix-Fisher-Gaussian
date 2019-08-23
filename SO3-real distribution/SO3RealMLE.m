@@ -1,4 +1,4 @@
-function [ Miu, Sigma, PTilde, U, S, V, P ] = SO3RealMLE( x, R, w )
+function [ Miu, Sigma, P, U, S, V ] = SO3RealMLE( x, R, w, U, S, V )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
 pathCell = regexp(path, pathsep, 'split');
@@ -12,63 +12,121 @@ end
 N = size(x,1);
 Ns = size(R,3);
 
-if ~exist('w','var')
+if ~exist('w','var') || isempty(w)
     w = ones(1,Ns)/Ns;
 end
 
-% empirical moments
-Ex = sum(x.*w,2);
-ER = sum(R.*reshape(w,1,1,[]),3);
-
-covxx = zeros(N,N);
-for ns = 1:Ns
-    covxx = covxx+(x(:,ns)-Ex)*(x(:,ns)-Ex)'*w(ns);
+% default initial estimates
+if ~exist('U0','var')
+%     ER = sum(R.*reshape(w,1,1,Ns),3);
+%     [U,D,V] = usvd(ER);
+%     S = diag(pdf_MF_M2S(diag(D)));
+    U = eye(3);
+    V = eye(3);
+    S = eye(3);
 end
 
-% Matrix Fisher part
-[Up,Dp,Vp] = usvd(ER,true);
-Sp = diag(pdf_MF_M2S(diag(Dp)));
-[U,S,V] = usvd(Up*Sp*Vp');
+% step size
+kS = 1;
+kUV = 0.001;
 
-% tangent space
-M = U*V';
-Omega1 = skew(V*[1;0;0]);
-Omega2 = skew(V*[0;1;0]);
-Omega3 = skew(V*[0;0;1]);
-t1 = mat2vec(M*Omega1)/sqrt(2);
-t2 = mat2vec(M*Omega2)/sqrt(2);
-t3 = mat2vec(M*Omega3)/sqrt(2);
-n = null([t1';t2';t3']);
-Rt = [t1';t2';t3';n'];
-
-% f(eta)
-fEta = zeros(3,Ns);
-for ns = 1:Ns
-    expEta = U'*R(:,:,ns)*V;
-    fEta(1,ns) = trace(S*expEta'*skew([1,0,0]))/sqrt(2);
-    fEta(2,ns) = trace(S*expEta'*skew([0,1,0]))/sqrt(2);
-    fEta(3,ns) = trace(S*expEta'*skew([0,0,1]))/sqrt(2);
+% initial log likelihood
+[Miu,Sigma,P,fR,Sigmac,Q] = fromF(x,R,w,U,S,V);
+ER = sum(R.*reshape(w,1,1,Ns),3);
+l = -log(pdf_MF_normal(diag(S))) + trace(U*S*V'*ER.') -...
+    1/2*log(det(Sigmac));
+parfor ns = 1:Ns
+    l = l-1/2*w(ns)*(x(:,ns)-Miu-P*fR(:,ns))'*Sigmac^-1*...
+        (x(:,ns)-Miu-P*fR(:,ns));
 end
+l
 
-% other empirical moments
-EfEta = sum(fEta.*w,2)/Ns;
+% gradient descent iteration
+i = 1;
+while i==1 || abs(l-loldS)>1e-6
+    i = i+1;
+    loldS = l;
+    
+    j = 1;
+    while j==1 || abs(l-loldU)>1e-6
+        j = j+1;
+        loldU = l;
+        
+        k = 1;
+        while k==1 || abs(l-loldV)>1e-8
+            k = k+1;
+            loldV = l;
+            
+            % gradient descent
+            dS = [sum(Q(1,1,:).*reshape(w,1,1,Ns));
+                sum(Q(2,2,:).*reshape(w,1,1,Ns));
+                sum(Q(3,3,:).*reshape(w,1,1,Ns))]...
+                -pdf_MF_normal_deriv(diag(S))/pdf_MF_normal(diag(S));
+            parfor ns = 1:Ns
+                dS = dS+w(ns)*[0, -Q(3,1,ns), Q(2,1,ns);
+                    Q(3,2,ns), 0, -Q(1,2,ns);
+                    -Q(2,3,ns), Q(1,3,ns), 0]*...
+                    P'*Sigmac^-1*(x(:,ns)-Miu-P*fR(:,ns));
+            end
+            S = S+kS*diag(dS);
 
-covxfEta = zeros(N,N);
-covfEtafEta = zeros(N,N);
-for ns = 1:Ns
-    covxfEta = covxfEta+(x(:,ns)-Ex)*(fEta(:,ns)-EfEta)'*w(ns);
-    covfEtafEta = covfEtafEta+(fEta(:,ns)-EfEta)*(fEta(:,ns)-EfEta)'*w(ns);
+            % new log-likelihood
+            [Miu,Sigma,P,fR,Sigmac,Q] = fromF(x,R,w,U,S,V);
+            ER = sum(R.*reshape(w,1,1,Ns),3);
+            l = -log(pdf_MF_normal(diag(S))) + trace(U*S*V'*ER.') -...
+                1/2*log(det(Sigmac));
+            parfor ns = 1:Ns
+                l = l-1/2*w(ns)*(x(:,ns)-Miu-P*fR(:,ns))'*Sigmac^-1*...
+                    (x(:,ns)-Miu-P*fR(:,ns));
+            end
+            l
+        end
+        
+        % gradient descent
+        EQ = sum(Q.*reshape(w,1,1,Ns),3);
+        dU = vee(EQ*S-S*EQ');
+        parfor ns = 1:Ns
+            dU = dU+w(ns)*[-Q(2,2,ns)*S(2,2)-Q(3,3,ns)*S(3,3), Q(2,1,ns)*S(1,1), Q(3,1,ns)*S(1,1);
+                Q(1,2,ns)*S(2,2), -Q(1,1,ns)*S(1,1)-Q(3,3,ns)*S(1,1), Q(3,2,ns)*S(2,2);
+                Q(1,3,ns)*S(3,3), Q(2,3,ns)*S(3,3), -Q(1,1,ns)*S(1,1)-Q(2,2,ns)*S(2,2)]*...
+                P'*Sigmac^-1*(x(:,ns)-Miu-P*fR(:,ns));
+        end
+        U = U*expRM(kUV*dU);
+
+        % new log-likelihood
+        [Miu,Sigma,P,fR,Sigmac,Q] = fromF(x,R,w,U,S,V);
+        ER = sum(R.*reshape(w,1,1,Ns),3);
+        l = -log(pdf_MF_normal(diag(S))) + trace(U*S*V'*ER.') -...
+            1/2*log(det(Sigmac));
+        parfor ns = 1:Ns
+            l = l-1/2*w(ns)*(x(:,ns)-Miu-P*fR(:,ns))'*Sigmac^-1*...
+                (x(:,ns)-Miu-P*fR(:,ns));
+        end
+        l
+    end
+    
+    % gradient descent
+    EQ = sum(Q.*reshape(w,1,1,Ns),3);
+    dV = vee(EQ'*S-S*EQ);
+    parfor ns = 1:Ns
+        dV = dV+w(ns)*[Q(2,2,ns)*S(3,3)+Q(3,3,ns)*S(2,2), -Q(1,2,ns)*S(3,3), -Q(1,3,ns)*S(2,2);
+            -Q(2,1,ns)*S(3,3), Q(1,1,ns)*S(3,3)+Q(3,3,ns)*S(1,1), -Q(2,3,ns)*S(1,1);
+            -Q(3,1,ns)*S(2,2), -Q(3,2,ns)*S(1,1), Q(1,1,ns)*S(2,2)+Q(2,2,ns)*S(1,1)]*...
+            P'*Sigmac^-1*(x(:,ns)-Miu-P*fR(:,ns));
+    end
+    V = V*expRM(kUV*dV);
+
+    % new log-likelihood
+    [Miu,Sigma,P,fR,Sigmac,Q] = fromF(x,R,w,U,S,V);
+    ER = sum(R.*reshape(w,1,1,Ns),3);
+    l = -log(pdf_MF_normal(diag(S))) + trace(U*S*V'*ER.') -...
+        1/2*log(det(Sigmac));
+    parfor ns = 1:Ns
+        l = l-1/2*w(ns)*(x(:,ns)-Miu-P*fR(:,ns))'*Sigmac^-1*...
+            (x(:,ns)-Miu-P*fR(:,ns));
+    end
+    l
 end
-
-% correlation part
-PTilde = covxfEta*covfEtafEta^-1;
-P = [PTilde,zeros(1,6)]*Rt;
-
-% Gaussian part
-SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
-Miu = Ex-PTilde*EfEta;
-Sigma = covxx-covxfEta*covfEtafEta^-1*covxfEta'+...
-    PTilde*SigmaTilde2Inv*PTilde';
 
 if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
     rmpath('Matrix-Fisher-Distribution');
@@ -80,9 +138,34 @@ end
 end
 
 
-function [ vec ] = mat2vec( mat )
+function [ Miu, Sigma, P, fR, Sigmac, Q ] = fromF( x, R, w, U, S, V )
 
-vec = [mat(1,:)'; mat(2,:)'; mat(3,:)'];
+N = size(x,1);
+Ns = size(R,3);
+
+fR = zeros(3,Ns);
+Q = zeros(3,3,Ns);
+parfor ns = 1:Ns
+    Q(:,:,ns) = U.'*R(:,:,ns)*V;
+    fR(:,ns) = vee(Q(:,:,ns)*S-S*Q(:,:,ns).')/sqrt(2);
+end
+
+% correlation part
+Ex = sum(x.*w,2);
+EfR = sum(fR.*w,2);
+covxfR = sum(reshape(x,N,1,Ns).*reshape(fR,1,3,Ns).*...
+    reshape(w,1,1,Ns),3)-Ex*EfR.';
+covfRfR = sum(reshape(fR,3,1,Ns).*reshape(fR,1,3,Ns).*...
+    reshape(w,1,1,Ns),3)-EfR*EfR.';
+P = covxfR*covfRfR^-1;
+
+% Gaussian part
+covxx = sum(reshape(x,N,1,Ns).*reshape(x,1,N,Ns).*reshape(w,1,1,Ns),3)-...
+    Ex*Ex.';
+Sigma2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
+Miu = Ex-P*EfR;
+Sigmac = covxx-P*covxfR';
+Sigma = Sigmac+P*Sigma2Inv*P';
 
 end
 
