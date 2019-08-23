@@ -9,7 +9,7 @@ if size(P,2) == 1
     miuc = miu+k*P*sin(theta-theta0);
 elseif size(P,2) == 2
     sigmac = sqrt(sigma^2-k*(P*P'));
-    miuc = miu+k*P*[cos(theta)-cos(theta0);sin(theta)-sin(theta0)];
+    miuc = miu+k*P*[sin(theta)-sin(theta0);cos(theta)-cos(theta0)];
 end
 
 x = randn(1,Ns).*sigmac+miuc;
