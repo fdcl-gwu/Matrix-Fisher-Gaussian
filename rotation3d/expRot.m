@@ -1,4 +1,4 @@
-function [ R ] = expRM( S, checkSS )
+function [ R ] = expRot( S, checkSS )
 % calculate the exponetial map from so(3) to SO(3)
 % if size(V)=[3,3,n], treat V as n skew symmetric matrices;
 % if size(V)=[3,n,1] or size(V)=[n,3,1], treat V as n 3-vectors;
