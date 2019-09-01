@@ -1,0 +1,70 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Second moments of Matrix Fisher distribution\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\begin{document}
+
+\maketitle
+
+\section{Non-degenerative Case}
+Let $M_Q(T) = \frac{c(S+T)}{c(S)}$ be the moment generating function of $Q$.
+Then for $i \neq j$
+\begin{equation}
+	\mathrm{E}(Q_{ij}Q_{ij}) = \frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0}, \qquad
+	\mathrm{E}(Q_{ij}Q_{ji}) = \frac{\partial^2 M_Q(T)}{\partial T_{ij} \partial T_{ji}}\bigg|_{T=0}.
+\end{equation}
+Let $\tilde{s}_1, \tilde{s}_2, \tilde{s}_3$ be the eigenvalues of $S+T$, then
+\begin{align} \label{eqn:MGFDeriv}
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0} &= \frac{1}{c(S)}\frac{\partial}{\partial T_{ij}} \left(\sum_{k=1}^3\left(\frac{\partial c(S+T)}{\partial\tilde{s}_k}\frac{\partial \tilde{s}_k}{\partial T_{ij}}\right)\right)\bigg|_{T=0} \nonumber \\
+	&= \frac{1}{c(S)}\sum_{k=1}^3\sum_{l=1}^3\left(\frac{\partial c(S+T)}{\partial\tilde{s}_k\partial\tilde{s}_l}\frac{\partial\tilde{s}_l}{\partial T_{ij}}\frac{\partial\tilde{s}_k}{\partial T_{ij}}\right)\bigg|_{T=0} + \frac{1}{c(S)}\sum_{k=1}^3\left(\frac{\partial c(S+T)}{\partial\tilde{s}_k}\frac{\partial^2\tilde{s}_k}{\partial T_{ij}^2}\right)\bigg|_{T=0} \nonumber \\
+	&= \frac{1}{c(S)}\sum_{k=1}^3\sum_{l=1}^3\left(\frac{\partial c(S)}{\partial s_k\partial s_l}\frac{\partial\tilde{s}_l}{\partial T_{ij}}\bigg|_{T=0}\frac{\partial\tilde{s}_k}{\partial T_{ij}}\bigg|_{T=0}\right) + \frac{1}{c(S)}\sum_{k=1}^3\left(\frac{\partial c(S)}{\partial s_k}\frac{\partial^2\tilde{s}_k}{\partial T_{ij}^2}\bigg|_{T=0}\right).
+\end{align}
+$S+T$ has singular value decomposition of $S=USV^T$ when $T=0$, where $U=V=I_{3\times 3}$.
+The derivatives of singular value decomposition with respect to the entries of matrix can be found in \cite{papadopoulo2000estimating}.
+So we have the following equations
+\begin{align} \label{eqn:SDeriv}
+	\frac{\partial\tilde{s}_k}{\partial T_{ij}}\bigg|_{T=0} &= U_{ik}V_{jk}\bigg|_{T=0} = 0 \nonumber \\
+	\frac{\partial^2\tilde{s}_k}{\partial T_{ij}^2}\bigg|_{T=0} &= \frac{\partial U_{ik}V_{jk}}{\partial T_{ij}}\bigg|_{T=0} = V_{jk}\frac{\partial U_{ik}}{\partial T_{ij}}\bigg|_{T=0} + U_{ik}\frac{\partial V_{jk}}{\partial T_{ij}}\bigg|_{T=0} = \delta_j^k\frac{\partial U_{ij}}{\partial T_{ij}}\bigg|_{T=0} + \delta_i^k\frac{\partial V_{ji}}{\partial T_{ij}}\bigg|_{T=0}.
+\end{align}
+Substitute \eqref{eqn:SDeriv} into \eqref{eqn:MGFDeriv}, we get
+\begin{equation} \label{eqn:MGFijij}
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0} = \frac{1}{c(S)}\left(\frac{\partial c(S)}{\partial s_i}\frac{\partial V_{ji}}{\partial T_{ij}}\bigg|_{T=0} + \frac{\partial c(S)}{\partial s_j}\frac{\partial U_{ij}}{\partial T_{ij}}\bigg|_{T=0}\right).
+\end{equation}
+Similarly,
+\begin{equation} \label{eqn:MGFijji}
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}\partial T_{ji}}\bigg|_{T=0} = \frac{1}{c(S)}\left(\frac{\partial c(S)}{\partial s_i}\frac{\partial V_{ji}}{\partial T_{ji}}\bigg|_{T=0} + \frac{\partial c(S)}{\partial s_j}\frac{\partial U_{ij}}{\partial T_{ji}}\bigg|_{T=0}\right).
+\end{equation}
+From \cite{papadopoulo2000estimating}, we also have $\frac{\partial U}{\partial T_{ij}} = U\Omega_U^{ij}$ and $\frac{\partial V}{\partial T_{ij}} = -V\Omega_V^{ij}$, where $\Omega_U^{ij}$ and $\Omega_V^{ij}$ are anti-symmetric matrices with non-diagonal elements given by the solutions of
+\begin{align}
+	s_l\Omega_{U_{kl}}^{ij} + s_k\Omega_{V_{kl}}^{ij} &= U_{ik}V_{jl} \nonumber \\
+	s_k\Omega_{U_{kl}}^{ij} + s_l\Omega_{V_{kl}}^{ij} &= -U_{il}V_{jk},
+\end{align}
+If $s_k \neq s_l$, after some elementary algebra, we can get
+\begin{equation}
+	\frac{\partial V_{ij}}{\partial T_{ij}}\big|_{T=0} = -\frac{\partial V_{ji}}{\partial T_{ij}}\big|_{T=0} = \frac{s_i}{s_j^2-s_i^2}, \qquad
+	\frac{\partial U_{ij}}{\partial T_{ij}}\big|_{T=0} = -\frac{\partial U_{ji}}{\partial T_{ij}}\big|_{T=0} = \frac{s_j}{s_j^2-s_i^2}
+\end{equation}
+Substitute these results into \eqref{eqn:MGFijij} and \eqref{eqn:MGFijji}, we get the final result:
+\begin{align}
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0} &= \frac{1}{c(S)}\left(-\frac{\partial c(S)}{\partial s_i}\frac{s_i}{s_j^2-s_i^2}+\frac{\partial c(S)}{\partial s_j}\frac{s_j}{s_j^2-s_i^2}\right) \nonumber \\
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}\partial T_{ji}}\bigg|_{T=0} &= \frac{1}{c(S)}\left(-\frac{\partial c(S)}{\partial s_i}\frac{s_j}{s_j^2-s_i^2}+\frac{\partial c(S)}{\partial s_j}\frac{s_i}{s_j^2-s_i^2}\right).
+\end{align}
+
+\bibliographystyle{plain}
+\bibliography{second}
+
+\end{document}
+

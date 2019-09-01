@@ -1,12 +1,13 @@
 function [ Miu, Sigma, PTilde, U, S, V, P ] = SO3RealMLEAppro( x, R, w )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
+filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    addpath('Matrix-Fisher-Distribution');
+if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('Matrix-Fisher-Distribution',filePath));
 end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
+    addpath(getAbsPath('..\rotation3d',filePath));
 end
 
 N = size(x,1);
@@ -51,7 +52,7 @@ for ns = 1:Ns
 end
 
 % other empirical moments
-EfEta = sum(fEta.*w,2)/Ns;
+EfEta = sum(fEta.*w,2);
 
 covxfEta = zeros(N,N);
 covfEtafEta = zeros(N,N);
@@ -62,7 +63,7 @@ end
 
 % correlation part
 PTilde = covxfEta*covfEtafEta^-1;
-P = [PTilde,zeros(1,6)]*Rt;
+P = [PTilde,zeros(N,6)]*Rt;
 
 % Gaussian part
 SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
@@ -70,11 +71,11 @@ Miu = Ex-PTilde*EfEta;
 Sigma = covxx-covxfEta*covfEtafEta^-1*covxfEta'+...
     PTilde*SigmaTilde2Inv*PTilde';
 
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    rmpath('Matrix-Fisher-Distribution');
+if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution',filePath)))
+    rmpath(getAbsPath('Matrix-Fisher-Distribution',filePath));
 end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    rmpath('..\rotation3d');
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
+    rmpath(getAbsPath('..\rotation3d',filePath));
 end
 
 end

@@ -16,7 +16,7 @@ R=zeros(3,3,N);
 for i=1:N
     theta = acos(x(4,i))*2;
     v = x(1:3,i)/sqrt(sum(x(1:3,i).^2))*theta;
-    R(:,:,i)=expRM(v);
+    R(:,:,i)=expRot(v);
     R(:,:,i)=U*R(:,:,i)*V';
 end
 
