@@ -1,4 +1,4 @@
-function [ Miu, Sigma, P, U, S, V ] = SO3RealMLE( x, R, w, U, S, V )
+function [ Miu, Sigma, P, U, S, V ] = MFGMLE( x, R, w, U, S, V )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
 pathCell = regexp(path, pathsep, 'split');
@@ -147,7 +147,7 @@ fR = zeros(3,Ns);
 Q = zeros(3,3,Ns);
 parfor ns = 1:Ns
     Q(:,:,ns) = U.'*R(:,:,ns)*V;
-    fR(:,ns) = vee(Q(:,:,ns)*S-S*Q(:,:,ns).')/sqrt(2);
+    fR(:,ns) = vee(Q(:,:,ns)*S-S*Q(:,:,ns).');
 end
 
 % correlation part
@@ -162,7 +162,7 @@ P = covxfR*covfRfR^-1;
 % Gaussian part
 covxx = sum(reshape(x,N,1,Ns).*reshape(x,1,N,Ns).*reshape(w,1,1,Ns),3)-...
     Ex*Ex.';
-Sigma2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
+Sigma2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
 Miu = Ex-P*EfR;
 Sigmac = covxx-P*covxfR';
 Sigma = Sigmac+P*Sigma2Inv*P';

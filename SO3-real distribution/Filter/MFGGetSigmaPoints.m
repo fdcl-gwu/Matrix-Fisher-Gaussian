@@ -1,4 +1,4 @@
-function [ x, R, w ] = MFGGetSigmaPoints( Miu, Sigma, PTilde, U, S, V, wM, w0 )
+function [ x, R, w ] = MFGGetSigmaPoints( Miu, Sigma, P, U, S, V, wM, w0 )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -55,17 +55,16 @@ if s(1)==0
 end
 
 % calculate sigma points and weights
-fR = @(R)[trace(S*V'*R'*U*hat([1,0,0]));
-    trace(S*V'*R'*U*hat([0,1,0]));
-    trace(S*V'*R'*U*hat([0,0,1]))]/sqrt(2);
+Q = @(R)U'*R*V;
+fR = @(R)vee(Q(R)*S-S*Q(R)');
 for i = 1:3
     theta = acos(cost{i}(sigma));
     e = zeros(3,1);
     e(i) = 1;
     R(:,:,2*n+2*i-1) = U*expRot(theta*e)*V';
     R(:,:,2*n+2*i) = U*expRot(-theta*e)*V';
-    x(:,2*n+2*i-1) = Miu+PTilde*fR(R(:,:,2*n+2*i-1));
-    x(:,2*n+2*i) = Miu+PTilde*fR(R(:,:,2*n+2*i));
+    x(:,2*n+2*i-1) = Miu+P*fR(R(:,:,2*n+2*i-1));
+    x(:,2*n+2*i) = Miu+P*fR(R(:,:,2*n+2*i));
     w([2*n+2*i-1,2*n+2*i]) = wm{i}(sigma);
 end
 
@@ -74,8 +73,8 @@ wM = sum(w(2*n+1:2*n+6));
 
 %% Gaussian part
 wG = 1-w0-wM;
-SigmaTildeInv = diag([s(2)+s(3),s(1)+s(3),s(1)+s(2)])/2;
-Sigmac = Sigma-PTilde*SigmaTildeInv*PTilde';
+SigmaTildeInv = diag([s(2)+s(3),s(1)+s(3),s(1)+s(2)]);
+Sigmac = Sigma-P*SigmaTildeInv*P';
 for i = 1:n
     e = zeros(n,1);
     e(i) = 1;

@@ -1,4 +1,4 @@
-function [ Miu, Sigma, PTilde, U, S, V, P ] = SO3RealMLEAppro( x, R, w )
+function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
 filePath = mfilename('fullpath');
@@ -31,24 +31,13 @@ end
 Sp = diag(pdf_MF_M2S(diag(Dp)));
 [U,S,V] = usvd(Up*Sp*Vp');
 
-% tangent space
-M = U*V';
-Omega1 = hat(V*[1;0;0]);
-Omega2 = hat(V*[0;1;0]);
-Omega3 = hat(V*[0;0;1]);
-t1 = mat2vec(M*Omega1)/sqrt(2);
-t2 = mat2vec(M*Omega2)/sqrt(2);
-t3 = mat2vec(M*Omega3)/sqrt(2);
-n = null([t1';t2';t3']);
-Rt = [t1';t2';t3';n'];
-
 % f(eta)
 fEta = zeros(3,Ns);
 for ns = 1:Ns
     expEta = U'*R(:,:,ns)*V;
-    fEta(1,ns) = trace(S*expEta'*hat([1,0,0]))/sqrt(2);
-    fEta(2,ns) = trace(S*expEta'*hat([0,1,0]))/sqrt(2);
-    fEta(3,ns) = trace(S*expEta'*hat([0,0,1]))/sqrt(2);
+    fEta(1,ns) = trace(S*expEta'*hat([1,0,0]));
+    fEta(2,ns) = trace(S*expEta'*hat([0,1,0]));
+    fEta(3,ns) = trace(S*expEta'*hat([0,0,1]));
 end
 
 % other empirical moments
@@ -62,14 +51,13 @@ for ns = 1:Ns
 end
 
 % correlation part
-PTilde = covxfEta*covfEtafEta^-1;
-P = [PTilde,zeros(N,6)]*Rt;
+P = covxfEta*covfEtafEta^-1;
 
 % Gaussian part
-SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
-Miu = Ex-PTilde*EfEta;
+SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
+Miu = Ex-P*EfEta;
 Sigma = covxx-covxfEta*covfEtafEta^-1*covxfEta'+...
-    PTilde*SigmaTilde2Inv*PTilde';
+    P*SigmaTilde2Inv*P';
 
 if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution',filePath)))
     rmpath(getAbsPath('Matrix-Fisher-Distribution',filePath));

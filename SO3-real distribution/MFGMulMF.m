@@ -11,25 +11,25 @@ EQQ = pdf_MF_moment2(diag(S));
 %% fR1
 % first moment
 EQ1 = U1'*U*diag(EQ)*V'*V1;
-EfR1 = vee(EQ1*S1-S1*EQ1')/sqrt(2);
+EfR1 = vee(EQ1*S1-S1*EQ1');
 
 % second moment
 dU = U1'*U;
 dV = V1'*V;
 dS = dU'*S1*dV;
-EfRfR1 = dU*EfRfRX(EQQ,dS)*dU'/2;
+EfRfR1 = dU*EfRfRX(EQQ,dS)*dU';
 
 %% fR2
 EfR2 = [0;0;0];
-EfRfR2 = EfRfRX(EQQ,S)/2;
+EfRfR2 = EfRfRX(EQQ,S);
 
 %% fR1 fR2
-EfRfR12 = dU*EfRfRXS(EQQ,dS,diag(S))/2;
+EfRfR12 = dU*EfRfRXS(EQQ,dS,diag(S));
 
 %% estimation
-SigmaMInv1 = diag([S1(2,2)+S1(3,3),S1(1,1)+S1(3,3),S1(1,1)+S1(2,2)])/2;
+SigmaMInv1 = diag([S1(2,2)+S1(3,3),S1(1,1)+S1(3,3),S1(1,1)+S1(2,2)]);
 Sigmac1 = Sigma1-P1*SigmaMInv1*P1';
-SigmaMInv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)])/2;
+SigmaMInv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
 
 Ex = Miu1+P1*EfR1;
 Exx = Miu1*Miu1'+Miu1*EfR1'*P1'+P1*EfR1*Miu1'+P1*EfRfR1*P1'+Sigmac1;
