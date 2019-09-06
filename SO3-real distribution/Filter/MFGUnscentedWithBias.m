@@ -17,18 +17,18 @@ N = size(gyro,2);
 
 % noise parameters
 randomWalk = 10*pi/180;
-biasInstability = 10/3600*pi/180;
-rotMeaNoise = 0.1;
+biasInstability = 500/3600*pi/180;
+rotMeaNoise = 0.05;
 
 SM = Gau2MF(rotMeaNoise);
 
 % initialize distribution
-Miu = [0.1;0.1;0.1];
-Sigma = eye(3)*0.2^2;
+Miu = [0;0;0];
+Sigma = eye(3)*0.1^2;
 P = zeros(3);
 U = RInit;
 V = eye(3);
-S = eye(3)*100;
+S = eye(3)*0;
 
 % data containers
 MFG.Miu = zeros(3,N); MFG.Miu(:,1) = Miu;
@@ -37,7 +37,7 @@ MFG.P = zeros(3,3,N); MFG.P(:,:,1) = P;
 MFG.U = zeros(3,3,N); MFG.U(:,:,1) = U;
 MFG.V = zeros(3,3,N); MFG.V(:,:,1) = V;
 MFG.S = zeros(3,N); MFG.S(:,1) = diag(S);
-R = zeros(3,3,N);
+R = zeros(3,3,N); R(:,:,1) = RInit;
 
 % filter iteration
 for n = 2:N

@@ -46,7 +46,13 @@ end
 
 options = optimoptions('fsolve','Display','off');
 sumwm = @(sigma)2*(wm{1}(sigma)+wm{2}(sigma)+wm{3}(sigma));
-sigma = fsolve(@(sigma)sumwm(sigma)-wM,0,options);
+sigma = fsolve(@(sigma)sumwm(sigma)-wM,0.1,options);
+
+if s(1)==0
+    for i = 1:3
+        wm{i} = @(sigma)1/13;
+    end
+end
 
 % calculate sigma points and weights
 fR = @(R)[trace(S*V'*R'*U*hat([1,0,0]));

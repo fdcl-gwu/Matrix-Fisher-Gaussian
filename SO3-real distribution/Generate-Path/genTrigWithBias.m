@@ -15,8 +15,8 @@ E.magr = pi; E.magp = pi/2; E.magh = pi;
 
 % noise parameters
 randomWalk = 10*pi/180;
-biasInstability = 10/3600*pi/180;
-rotMeaNoise = 0.1;
+biasInstability = 500/3600*pi/180;
+rotMeaNoise = 0.05;
 
 % true state
 roll = @(t)E.magr*sin(E.fr*2*pi*t);
@@ -54,7 +54,7 @@ gyro = [w2(time);w3(time);w4(time)];
 
 % add noise
 biasNoise = randn(3,N)*biasInstability*sqrt(sf);
-biasTrue = cumsum(biasNoise/sf,2);
+biasTrue = cumsum(biasNoise/sf,2)+0.1;
 
 gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
 gyroMea = gyro+gyroNoise+biasTrue;

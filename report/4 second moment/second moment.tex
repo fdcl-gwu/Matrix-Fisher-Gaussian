@@ -58,10 +58,18 @@ If $s_k \neq s_l$, after some elementary algebra, we can get
 	\frac{\partial U_{ij}}{\partial T_{ij}}\big|_{T=0} = -\frac{\partial U_{ji}}{\partial T_{ij}}\big|_{T=0} = \frac{s_j}{s_j^2-s_i^2}
 \end{equation}
 Substitute these results into \eqref{eqn:MGFijij} and \eqref{eqn:MGFijji}, we get the final result:
-\begin{align}
+\begin{align} \label{eqn:secondMoments}
 	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0} &= \frac{1}{c(S)}\left(-\frac{\partial c(S)}{\partial s_i}\frac{s_i}{s_j^2-s_i^2}+\frac{\partial c(S)}{\partial s_j}\frac{s_j}{s_j^2-s_i^2}\right) \nonumber \\
 	\frac{\partial^2 M_Q(T)}{\partial T_{ij}\partial T_{ji}}\bigg|_{T=0} &= \frac{1}{c(S)}\left(-\frac{\partial c(S)}{\partial s_i}\frac{s_j}{s_j^2-s_i^2}+\frac{\partial c(S)}{\partial s_j}\frac{s_i}{s_j^2-s_i^2}\right).
 \end{align}
+
+\section{Degenerative case}
+When $s_i=s_j$, \eqref{eqn:secondMoments} does not give valid results.
+I have not found a rigorous proof for this, but taking the limits of \eqref{eqn:secondMoments} as $s_i$ approaching $s_j$ is the easiest method to deal with this degenerative case, which yields
+\begin{equation}
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0} = -\frac{\partial^2 M_Q(T)}{\partial T_{ij}\partial T_{ji}}\bigg|_{T=0} = \frac{1}{c(S)}\frac{\partial c(S)}{\partial s_i}\frac{1}{2s_i}.
+\end{equation}
+This can be verified by Monte Carlo simulations to calculate moments numerically.
 
 \bibliographystyle{plain}
 \bibliography{second}

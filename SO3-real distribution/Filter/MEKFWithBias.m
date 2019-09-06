@@ -11,16 +11,16 @@ N = size(gyro,2);
 
 % noise parameters
 randomWalk = 10*pi/180;
-biasInstability = 10/3600*pi/180;
-rotMeaNoise = 0.1;
+biasInstability = 500/3600*pi/180;
+rotMeaNoise = 0.05;
 
 % initialize distribution
-Sigma = [eye(3)*1e-4,zeros(3);zeros(3),eye(3)*0.2^2];
+Sigma = [eye(3)*100,zeros(3);zeros(3),eye(3)*0.1^2];
 
 % data containers
 G.Sigma = zeros(6,6,N); G.Sigma(:,:,1) = Sigma;
 R = zeros(3,3,N); R(:,:,1) = RInit;
-x = zeros(3,N); x(:,1) = [0.1;0.1;0.1];
+x = zeros(3,N);
 
 % filter iteration
 for n = 2:N
