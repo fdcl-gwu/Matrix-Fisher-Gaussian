@@ -39,10 +39,24 @@ u = reshape(cat(1,R(3,2,:)-R(2,3,:),R(1,3,:)-R(3,1,:),...
     R(2,1,:)-R(1,2,:)),3,[],1);
 st = sqrt(sum(u.^2))/2;
 ct = (traceM3(R)-1)/2;
+u = u./sqrt(sum(u.^2));
 theta = atan2(st,ct);
 
 % special cases
 ind0 = find(st==0 & ct==-1);
+theta(ind0) = pi;
+
+for i = 1:length(ind0)
+    if R(1,1,ind0(i))==1
+        u(:,ind0(i)) = [1;0;0];
+    elseif R(2,2,ind0(i))==1
+        u(:,ind0(i)) = [0;1;0];
+    elseif R(3,3,ind0(i))==1
+        u(:,ind0(i)) = [0;0;1];
+    else
+        error('something is wrong, check this fucntion');
+    end
+end
 
 % format result
 if strcmp(format,'ss')
