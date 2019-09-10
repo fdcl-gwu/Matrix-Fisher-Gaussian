@@ -5,8 +5,8 @@ addpath('..\Generate-Path');
 rng(0.01);
 N = 60;
 
-t = 60*10;
-sf = 100;
+t = 60;
+sf = 50;
 
 parfor n = 1:N
     [gyro,RMea,RTrue,xTrue] = genTrigWithBias(t,sf);
@@ -23,7 +23,7 @@ end
 
 function [] = parsave(n,gyro,RMea,RTrue,xTrue,RMEKF,xMEKF,G,RMFG,MFG)
 
-save(strcat('D:\result-SO3Euclid\Unscented 9-3-2019\',num2str(n),'.mat'),...
+save(strcat('D:\result-SO3Euclid\Unscented 9-10-2019\',num2str(n),'.mat'),...
     'gyro','RMea','RTrue','xTrue','RMEKF','xMEKF','G','RMFG','MFG','-v7.3');
 
 end

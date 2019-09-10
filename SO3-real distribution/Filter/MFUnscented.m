@@ -23,9 +23,9 @@ R = zeros(3,3,N);
 s = zeros(3,N);
 
 % initialize
-R(:,:,1) = RInit;
-s(:,1) = [100;100;100];
-F = RInit*eye(3)*100;
+R(:,:,1) = RInit*expRot([pi,0,0]);
+s(:,1) = [0;0;0];
+F = RInit*diag(s(:,1));
 
 % filter iterations
 for n = 2:N
@@ -52,7 +52,10 @@ for n = 2:N
     F = U*S*V';
     
     % update
-    F = F+RMea(:,:,n)*SM;
+    if rem(n,5)==0
+        F = F+RMea(:,:,n)*SM;
+    end
+    
     [U,S,V] = psvd(F);
     R(:,:,n) = U*V';
     s(:,n) = diag(S);

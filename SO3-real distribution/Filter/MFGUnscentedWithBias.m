@@ -18,7 +18,7 @@ N = size(gyro,2);
 % noise parameters
 randomWalk = 10*pi/180;
 biasInstability = 500/3600*pi/180;
-rotMeaNoise = 0.05;
+rotMeaNoise = 0.2;
 
 SM = Gau2MF(rotMeaNoise);
 
@@ -26,9 +26,9 @@ SM = Gau2MF(rotMeaNoise);
 Miu = [0;0;0];
 Sigma = eye(3)*0.1^2;
 P = zeros(3);
-U = RInit;
+U = RInit*expRot([pi,0,0]);
 V = eye(3);
-S = eye(3)*0;
+S = Gau2MF(sqrt(1/200));
 
 % data containers
 MFG.Miu = zeros(3,N); MFG.Miu(:,1) = Miu;
@@ -37,7 +37,7 @@ MFG.P = zeros(3,3,N); MFG.P(:,:,1) = P;
 MFG.U = zeros(3,3,N); MFG.U(:,:,1) = U;
 MFG.V = zeros(3,3,N); MFG.V(:,:,1) = V;
 MFG.S = zeros(3,N); MFG.S(:,1) = diag(S);
-R = zeros(3,3,N); R(:,:,1) = RInit;
+R = zeros(3,3,N); R(:,:,1) = RInit*expRot([pi,0,0]);
 
 % filter iteration
 for n = 2:N
@@ -63,10 +63,12 @@ for n = 2:N
     end
     
     % recover prior distribution
-    [Miu,Sigma,P,U,S,V] = SO3RealMLEAppro(xp,Rp,wp);
+    [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp);
     
     % update
-    [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,RMea(:,:,n)*SM);
+    if rem(n,5)==0
+        [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,RMea(:,:,n)*SM);
+    end
     
     % record results
     MFG.Miu(:,n) = Miu;

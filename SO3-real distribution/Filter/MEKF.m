@@ -18,8 +18,8 @@ R = zeros(3,3,N);
 Sigma = zeros(3,3,N);
 
 % initialize
-R(:,:,1) = RInit;
-Sigma(:,:,1) = eye(3)*0.01^2;
+R(:,:,1) = RInit*expRot([pi,0,0]);
+Sigma(:,:,1) = eye(3)*10^2;
 
 % filter iteration
 for n = 2:N
@@ -30,10 +30,12 @@ for n = 2:N
     Sigma(:,:,n) = F*Sigma(:,:,n-1)*F'+eye(3)*randomWalk^2*dt;
     
     % update
-    K = Sigma(:,:,n)*(Sigma(:,:,n)+eye(3)*rotMeaNoise^2)^-1;
-    dx = K*logRot(R(:,:,n)'*RMea(:,:,n),'v');
-    R(:,:,n) = R(:,:,n)*expRot(dx);
-    Sigma(:,:,n) = (eye(3)-K)*Sigma(:,:,n);
+    if rem(n,5)==0
+        K = Sigma(:,:,n)*(Sigma(:,:,n)+eye(3)*rotMeaNoise^2)^-1;
+        dx = K*logRot(R(:,:,n)'*RMea(:,:,n),'v');
+        R(:,:,n) = R(:,:,n)*expRot(dx);
+        Sigma(:,:,n) = (eye(3)-K)*Sigma(:,:,n);
+    end
 end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
