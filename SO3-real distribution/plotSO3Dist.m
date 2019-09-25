@@ -2,9 +2,10 @@ function [ c ] = plotSO3Dist( theta1, theta2, f )
 % f is the density function handle
 % s1, s2, s3 are coordinates on the ball
 
+filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
+    addpath(getAbsPath('..\rotation3d',filePath));
 end
 
 Nt1 = length(theta1);
@@ -25,7 +26,7 @@ parfor nt1 = 1:Nt1
             sin(theta1(nt1))*sin(theta2(nt2)); cos(theta2(nt2))];
         RAxis = zeros(3,3,Nt3);
         for nt3 = 1:Nt3
-            RAxis(:,:,nt3) = expRM(axis*theta3(nt3));
+            RAxis(:,:,nt3) = expRot(axis*theta3(nt3),false);
         end
         
         ortAxes = null(axis');

@@ -8,21 +8,22 @@ if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
     addpath('..\rotation3d');
 end
 
-N = length(Miu);
+N = size(Miu,1);
 
-% sample from Matrix Fisher distribution
-F = U*S*V';
-R = pdf_MF_sampling(F,Ns);
+% sample from canonical MFG
+y = mvnrnd(zeros(N,1),eye(N),Ns)';
+Q = pdf_MF_sampling(S,Ns);
 
-% sample from Gaussian ditribution
-Sigma2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
-Sigmac = Sigma-P*Sigma2Inv*P';
-x = zeros(N,Ns);
+% transfomr back to MFG
+SigmaMInv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
+Sigmac = Sigma-P*SigmaMInv*P';
+
+R = zeros(3,3,Ns);
+x = zeros(3,Ns);
 for ns = 1:Ns
-    Q = U.'*R(:,:,ns)*V;
-    fR = vee(Q*S-S*Q.');
-    Miuc = Miu+P*fR;
-    x(:,ns) = mvnrnd(Miuc,Sigmac);
+    R(:,:,ns) = U*Q(:,:,ns)*V';
+    gR = vee(Q(:,:,ns)*S-S*Q(:,:,ns)');
+    x(:,ns) = sqrtm(Sigmac)*y(:,ns)+Miu+P*gR;
 end
 
 end

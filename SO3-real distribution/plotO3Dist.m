@@ -3,8 +3,8 @@ function [ c ] = plotO3Dist( theta1, theta2, f )
 % s1, s2, s3 are coordinates on the ball
 
 pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
+    addpath(getAbsPath('..\rotation3d',filePath));
 end
 
 
