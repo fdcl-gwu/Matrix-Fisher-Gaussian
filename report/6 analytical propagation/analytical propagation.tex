@@ -1,0 +1,157 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Analytical Uncertainty Propagation of Matrix Fisher-Gaussian Distribution\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\begin{document}
+
+\maketitle
+
+\section{Attitude and Gyro Bias}
+
+\subsection{Kinematics Model}
+Let $(R,b_g)\in\mathrm{SO}(3)\times\mathbb{R}^3$ be the attitude and gyro bias, and they follow the usual gyroscope model:
+\begin{gather}
+	(R^T\mathrm{d}R)^\vee = (\omega+b_g)\mathrm{d}t + H_\omega\mathrm{d}W_\omega \\
+	\mathrm{d}b_g = H_g\mathrm{d}W_g.
+\end{gather}
+Define group $G$ as the following
+\begin{equation}
+	G = \left\{\left.\begin{bmatrix}
+		R & 0 & 0 \\
+		0 & I_{3\times 3} & \mathrm{diag}(x) \\
+		0 & 0 & I_{3\times 3}
+	\end{bmatrix}\in\mathbb{R}^{9\times 9}\right|R\in\mathrm{SO}(3),\,x\in\mathbb{R}^3\right\}.
+\end{equation}
+It can be shown the map $\Phi:\mathrm{SO}(3)\times\mathbb{R}^3\to G$ is a Lie group isomorphism.
+The Lie algebra of $G$ can be written as
+\begin{equation}
+	\mathfrak{g} = \left\{\left.\begin{bmatrix}
+		\Omega & 0 & 0 \\
+		0 & 0 & \mathrm{diag}(x) \\
+		0 & 0 & 0
+	\end{bmatrix}\in\mathbb{R}^{9\time 9}\right|\Omega=-\Omega^T\in\mathbb{R}^{3\times 3},\,x\in\mathbb{R}^3\right\}.
+\end{equation}
+Let $\phi$ be the associated Lie algebra isomorphism.
+Denote $X=\Phi(R,b_g)$, then the kinematic model can be written using Lie group theoretic as follows:
+\begin{equation} \label{eqn:biasSDEinLie}
+	\mathrm{d}X = X\phi\left((\omega+b_g(X))^\wedge\mathrm{d}t,0\right) + X\phi\left(\left(H_\omega\mathrm{d}W_\omega\right)^\wedge,H_g\mathrm{d}W_g\right)
+\end{equation}
+where $b_g(X)$ is used to emphasize the dependence on $X$.
+
+\subsection{A note on SDEs in matrix Lie groups}
+
+\begin{lemma} \label{lemma:expCommuteDexp}
+	Let $H$ be a matrix Lie group, and $\mathfrak{h}$ be its Lie algebra.
+	Also, let $Y$, $Z$ be any element in $\mathfrak{h}$, then
+	\begin{equation}
+		e^{-Y}\mathrm{dexp}_{Y}(Z) = \mathrm{dexp}_{-Y}(Z)e^{-Y}.
+	\end{equation}
+\end{lemma}
+\begin{proof}
+	Since $e^{-Y}\mathrm{dexp}_Y(Z)e^Y = \mathrm{Ad}_{e^{-Y}}(\mathrm{dexp}_Y(Z)) = e^{\mathrm{ad}_{-Y}}(\mathrm{dexp}_Y(Z))$, it suffices to prove $e^{\mathrm{ad}_{-Y}}\circ\mathrm{dexp}_Y = \mathrm{dexp}_{-Y}$.
+	And
+	\begin{equation}
+		e^{\mathrm{ad}_{-Y}}\circ\mathrm{dexp}_Y = \sum_{i=0}^\infty\frac{(-1)^i\mathrm{ad}^i_Y}{i!} \cdot \sum_{j=0}^\infty\frac{\mathrm{ad}_Y^j}{(j+1)!} = \sum_{k=0}^\infty a_k\mathrm{ad}_Y^k,
+	\end{equation}
+	where $a_k = \sum_{i+j=k}\frac{(-1)^i}{i!(j+1)!}$.
+	Using binomial polynomial expansion, it can be verified that $a_k=\frac{(-1)^k}{(k+1)!}$.
+	Then 
+	\begin{equation}
+		\sum_{k=0}^\infty a_k\mathrm{ad}_Y^k = \sum_{k=0}^\infty\frac{(-1)^k}{(k+1)!}\mathrm{ad}_Y^k = \sum_{k=0}^\infty\frac{\mathrm{ad}_{-Y}^k}{(k+1)!} = \mathrm{dexp}_{-Y},
+	\end{equation}
+	which finishes the proof.
+\end{proof}
+
+\begin{theorem} \label{thm:noDrift}
+	Let $H$ be a matrix Lie group, and $\mathfrak{h}$ be its Lie algebra.
+	Consider the following $H$-valued stochastic differential equation:
+	\begin{equation}
+		\mathrm{d}X = XV_0(X,t)\mathrm{d}t + X\sum_{r=1}^nV_r(X,t)\mathrm{d}W_r,
+	\end{equation}
+	where $V_r$ takes values in $\mathfrak{h}$ for $r=0,\ldots,n$.
+	Suppose the ODE $\mathrm{d}X=XV_0(X,t)\mathrm{d}t$ have solution $X=X_0e^{\Psi(t)}$,
+	let $Y=Xe^{-\Psi(t)}$, then $Y$ follows an SDE without drift term:
+	\begin{equation}
+		\mathrm{d}Y = Y\sum_{r=1}^ne^{\mathrm{ad}_{\Psi(t)}}\left(V_r(Ye^{\Psi(t)},t)\right)\mathrm{d}W_r.
+	\end{equation}
+\end{theorem}
+\begin{proof}
+	By Ito's lemma, we have
+	\begin{align} \label{eqn:/Thm:noDrift/dY}
+		\mathrm{d}Y &= \mathrm{d}Xe^{-\Psi(t)} + X\frac{\mathrm{d}}{\mathrm{d}t}e^{-\Psi(t)}\mathrm{d}t \nonumber \\
+		&= \mathrm{d}Xe^{-\Psi(t)} + Xe^{-\Psi(t)}\mathrm{dexp}_\Psi(t)\left(-\frac{\mathrm{d}\Psi(t)}{\mathrm{d}t}\right)\mathrm{d}t \nonumber \\
+		&= \left(XV_0(X,t)e^{-\Psi(t)}-Xe^{-\Psi(t)}\mathrm{dexp}_\Psi(t)\left(\frac{\mathrm{d}\Psi(t)}{\mathrm{d}t}\right)\right)\mathrm{d}t + X\sum_{r=1}^nV_r(X,t)e^{-\Psi(t)}\mathrm{d}W_r.
+	\end{align}
+	Because $X=X_0e^{\Psi(t)}$ is the solution to $\mathrm{d}X=XV_0(X,t)\mathrm{d}t$, we have
+	\begin{equation}
+		\frac{\mathrm{d}}{\mathrm{d}t}e^{\Psi(t)} = \mathrm{dexp}_{-\Psi(t)}\left(\frac{\mathrm{d}\Psi(t)}{\mathrm{d}t}\right) = V_0(X,t)
+	\end{equation}
+	Substitute $V_0$ into \eqref{eqn:/Thm:noDrift/dY} and use Lemma \ref{lemma:expCommuteDexp}, the drift term vanishes and we get the following equation:
+	\begin{equation}
+		\mathrm{d}Y = X\sum_{r=1}^nV_r(X,t)e^{-\Psi(t)}\mathrm{d}W_r = Y\sum_{r=1}^ne^{\mathrm{ad}_{\Psi(t)}}\left(V_r(Ye^{\Psi(t)},t)\right)\mathrm{d}W_r,
+	\end{equation}
+	which is the desired result.
+\end{proof}
+
+\begin{remark}
+	The exponential maps for SO(3) and $\mathbb{R}^3$ are both onto, so the exponential map for $G$ is also onto.
+	This means if the ODE $\mathrm{d}X=XV_0(X,t)\mathrm{d}t$ have a solution, it can always be written into $X=X_0e^{\Psi(t)}$ for some $\Psi(t)\in\mathfrak{g}$.
+\end{remark}
+
+\subsection{A numerical approximation to the solution of the SDE}
+
+In the view of last subsection, the SDE \eqref{eqn:biasSDEinLie} can be approximated by first solving the deterministic part, and then approximating the stochastic part.
+Suppose the angular velocity $\omega$ is constant, the deterministic part can be easily solved as:
+\begin{equation}
+	\Phi(R(t),b_g(t)) = \Phi(R_0,b_{g0})\exp\left(\phi\left((\hat{\omega}+\hat{b}_{g0})t,0\right)\right).
+\end{equation}
+Let $Y = X\exp\left(-\phi\left((\hat{\omega}+\hat{b}_{g0})t,0\right)\right)$, then $Y$ follows the SDE:
+\begin{equation}
+	\mathrm{d}Y = Ye^{\mathrm{ad}_{\phi\left((\hat{\omega}+\hat{b}_{g0})t,0\right)}}\phi\left(\left(H_\omega\mathrm{d}W_\omega\right)^\wedge,H_g\mathrm{d}W_g\right).
+\end{equation}
+Further simplifying the equation needs the following lemma:
+\begin{lemma}
+	Let $\Omega_1$, $\Omega_2\in\mathfrak{so}(3)$, and $x_1$, $x_2\in\mathfrak{R}^3$, then
+	\begin{equation}
+		e^{\mathrm{ad}_{\phi(\Omega_1,x_1)}}\phi(\Omega_2,x_2) = \phi(e^{\mathrm{ad}_{\Omega_1}}\Omega_2,x_2).
+	\end{equation}
+\end{lemma}
+\begin{proof}
+	It can be easily verified that $\mathrm{ad}_{\phi(\Omega_1,x_1)}\phi(\Omega_2,x_2) = \phi(\mathrm{ad}_{\Omega_1}\Omega_2,0)$ by direct calculation.
+	Repeating this for $k$ times, we get $\mathrm{ad}^k_{\phi(\Omega_1,x_1)}\phi(\Omega_2,x_2) = \phi(\mathrm{ad}^k_{\Omega_1}\Omega_2,x_2\delta^k_0)$, where $\delta$ is Kronecker delta.
+	And this leads to the desired result by $\phi$ is a vector space isomorphism.
+\end{proof}
+
+Thus, the SDE is simplified by the above lemma as follows
+\begin{align}
+	\mathrm{d}Y &= Y\phi\left(e^{\mathrm{ad}_{(\hat{\omega}+\hat{b}_{g0})t}}(H_\omega\mathrm{d}W_\omega)^\wedge,H_g\mathrm{d}W_g\right) \nonumber \\
+	&= Y\phi\left(\mathrm{Ad}_{e^{(\hat{\omega}+\hat{b}_{g0})t}}(H_\omega\mathrm{d}W_\omega)^\wedge,H_g\mathrm{d}W_g\right) \nonumber \\
+	&= Y\phi\left(\left(e^{(\hat{\omega}+\hat{b}_{g0})t}H_\omega\mathrm{d}W_\Omega\right)^\wedge,H_g\mathrm{d}W_g\right).
+\end{align}
+Using the Magnus expansion to approximate the solution to this SDE, we have
+\begin{align}
+	Y = Y_0\exp\{q_1+q_2+O(||W_\omega(t)||^3)\},
+\end{align}
+where
+\begin{align}
+	q_1 &= \int_{0}^{t}\phi\left(\left(e^{(\hat{\omega}+\hat{b}_{g0})\tau}H_\omega\mathrm{d}W_\Omega(\tau)\right)^\wedge,H_g\mathrm{d}W_g(\tau)\right) \\
+	q_2 &= \int_{0}^{t}\int_{0}^{\tau}\left\{\phi\left(\left(e^{(\hat{\omega}+\hat{b}_{g0})\tau}H_\omega\mathrm{d}W_\Omega(\tau)\right)^\wedge,H_g\mathrm{d}W_g(\tau)\right)\phi\left(\left(e^{(\hat{\omega}+\hat{b}_{g0})\sigma}H_\omega\mathrm{d}W_\Omega(\sigma)\right)^\wedge,H_g\mathrm{d}W_g(\sigma)\right)\right. \nonumber \\ 
+	&\qquad - \phi\left(\left(e^{(\hat{\omega}+\hat{b}_{g0})\sigma}H_\omega\mathrm{d}W_\Omega(\sigma)\right)^\wedge,H_g\mathrm{d}W_g(\sigma)\right)\phi\left(\left(e^{(\hat{\tau}+\hat{b}_{g0})\sigma}H_\omega\mathrm{d}W_\Omega(\tau)\right)^\wedge,H_g\mathrm{d}W_g(\tau)\right).
+\end{align}
+Note that $\mathrm{d}W_g$ only appears in the first order term $q_1$, and there is no product terms $(\mathrm{d}W_\omega)^i(\mathrm{d}W_g)^j$ for any $i,j>0$, according to the proof of Lemma \ref{lemma:expCommuteDexp}.
+
+\end{document}
+

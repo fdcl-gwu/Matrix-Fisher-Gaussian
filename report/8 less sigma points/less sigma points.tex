@@ -1,0 +1,107 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Less Sigma Points\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left( #1 \right)}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+\section{Adding a Gaussian noise}
+Suppose $(R,x)$ follow Matrix Fisher-Gaussian distribution with parameters $(\mu,\Sigma,P,U,S,V)$, we want to compute the distribution of $(R,x+W)$, where $W\in\real{n}$ follows $\mathcal{N}(\mu_w,\Sigma_w)$, and is independent of $(R,x)$.
+\begin{lemma} \label{lamma:AddGaussianNoise}
+	$(R,x+W)\sim\mathcal{MG}(\mu+\mu_w,\Sigma+\Sigma_w,P,U,S,V)$.
+\end{lemma}
+\begin{proof}
+	Let $y=x+W$, then the density function for $(R,y)$ is
+	\begin{align} \label{eqn:fRy}
+		f_{R,y}(R,y) &= \int_{x\in\real{n}}f_{R,x}(R,x)f_W(y-x)\diff{x} \nonumber \\
+		&= \frac{1}{c_{R,x}c_w}\int_{x\in\real{n}} \etr{FR^T} \exp\left(-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)\right) \nonumber \\ 
+		&\qquad\qquad\times \exp\left(-\frac{1}{2}(y-x-\mu_w)^T\Sigma_w^{-1}(y-x-\mu_w)\right) \diff{x}
+	\end{align}
+	By the convolution theorem for Gaussian distribution, this density function can be simplified as
+	\begin{equation*}
+		f_{R,y}(R,y) = \frac{1}{c_{R,x}c_w}\etr{FR^T} \exp\left\{-\frac{1}{2}(y-\mu_c-\mu_w)^T(\Sigma_c+\Sigma_w)^{-1}(y-\mu_c-\mu_w)\right\}
+	\end{equation*}
+	Because $\mu_c+\mu_w = \mu+\mu_w+P\nu_R$, and $\Sigma_c+\Sigma_w = \Sigma+\Sigma_w+P(\tr{S}I_{3\times 3}-S)P^T$, it follows that $(R,x+W)\sim\mathcal{MG}(\mu+\mu_w,\Sigma+\Sigma_w,P,U,S,V)$.
+\end{proof}
+
+\section{Reducing sigma points}
+
+Consider the following discrete stochastic process
+\begin{align}
+	R(t+\Delta t) &= R(t)\exp\left\{ \Delta t (\Omega(t)+x(t))^\wedge + (H_1\Delta W_1)^\wedge \right\} \\
+	x(t+\Delta t) &= x(t) + H_2\Delta W_2
+\end{align}
+Suppose at time $t$, $(R(t),x(t))$ follows Matrix Fisher-Gaussian distribution with parameters $(\mu,\Sigma,P,U,S,V)$, we want to calculate the distribution for $(R(t+\Delta t),x(t+\Delta t))$.
+By Lemma \ref{lamma:AddGaussianNoise}, we can first calculate the distribution for $(R(t+\Delta t),x(t))$, and fit it to a Matrix Fisher-Gaussian distribution, then add a Gaussian noise to the linear part.
+
+Because $x(t)$ is not changed in $(R(t+\Delta t),x(t))$, it's moments are also unchanged.
+We still need to calculate $\expect{R(t+\Delta t)}$, $\expect{\nu_R(t+\Delta t)}$, $\expect{x(t)\nu_R^T(t+\Delta t)}$, and $\expect{\nu_R(t+\Delta t)\nu_R^T(t+\Delta t)}$.
+These moments can be calculated using law of total expectation, e.g.
+\begin{equation} \label{eqn:totExpect}
+	\expect{R(t+\Delta t)} = \expect{\expect{R(t+\Delta t)\left|\right.x(t)}}.
+\end{equation}
+We propose to approximate the marginal distribution of $x(t)$ using sigma points, i.e.
+\begin{equation}
+	f_x(x) = \sum_i w_i\delta(x-x_i)
+\end{equation}
+With this, the expectation in \eqref{eqn:totExpect} becomes
+\begin{equation}
+	\expect{R(t+\Delta t)} = \sum_i w_i\expect{R(t+\Delta t)\left|\right. x_i}.
+\end{equation}
+
+\appendix
+\section{A direct calculation for Lemma 1}
+This calculation is for future reference, for example, when a similar calculation is needed for some other distribution, comparing with Gaussian case is sometimes motivating.
+First note that for any two invertible matrices $A$, $B$, if $A+B$ and $A^{-1}+B^{-1}$ are also invertible, then $(A^{-1}+B^{-1})^{-1} = A-A(A+B)^{-1}A = B-B(A+B)^{-1}B$.
+
+The exponentiated expression in \eqref{eqn:fRy} can be written as
+\begin{align*}
+	&-\frac{1}{2}x^T\Sigma_c^{-1}x + x^T\Sigma_c^{-1}\mu_c - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c - \frac{1}{2}x^T\Sigma_w^{-1}x + x^T\Sigma_w(\mu_w-y) - \frac{1}{2}(\mu_w-y)^T\Sigma_w^{-1}(\mu_w-y) \\
+	= &-\frac{1}{2}x^T(\Sigma_c^{-1}+\Sigma_w^{-1})x + x^T(\Sigma_c^{-1}+\Sigma_w^{-1})(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c + x^T(\Sigma_c^{-1}+\Sigma_w^{-1})(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y) \\
+	&-\frac{1}{2}\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right]^T(\Sigma_c^{-1}+\Sigma_w^{-1}) \\
+	&\qquad\cdot\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right] \\
+	&+\frac{1}{2}\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right]^T(\Sigma_c^{-1}+\Sigma_w^{-1}) \\
+	&\qquad\cdot\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right] - \frac{1}{2}\mu_c^T\Sigma_w^{-1}\mu_c - \frac{1}{2}(\mu_w-y)^T\Sigma_w^{-1}(\mu_w-y) \\
+	= &-\frac{1}{2}\left[x-(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c-(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right]^T(\Sigma_c^{-1}+\Sigma_w^{-1}) \\
+	&\qquad\cdot\left[x-(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c-(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right] \\
+	&+\frac{1}{2}\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right]^T(\Sigma_c^{-1}+\Sigma_w^{-1}) \\
+	&\qquad\cdot\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right] - \frac{1}{2}\mu_c^T\Sigma_w^{-1}\mu_c - \frac{1}{2}(\mu_w-y)^T\Sigma_w^{-1}(\mu_w-y)
+\end{align*}
+In the last expression, all of terms but the first do not depend on $x$, therefore can be moved out of the integral.
+The first term is a Gaussian density which integrates to $1$, so after integration, the remaining terms are (using the equations in the first paragraph at the second equation):
+\begin{align*}
+	&\frac{1}{2}\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right]^T(\Sigma_c^{-1}+\Sigma_w^{-1}) \\
+	&\qquad\cdot\left[(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c+(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y)\right] - \frac{1}{2}\mu_c^T\Sigma_w^{-1}\mu_c - \frac{1}{2}(\mu_w-y)^T\Sigma_w^{-1}(\mu_w-y) \\
+	= &\frac{1}{2}\mu_c^T\Sigma_c^{-1}(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_c^{-1}\mu_c + \frac{1}{2}(\mu_w-y)^T\Sigma_w^{-1}(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y) \\
+	&+\mu_c^T\Sigma_c^{-1}(\Sigma_c^{-1}+\Sigma_w^{-1})^{-1}\Sigma_w^{-1}(\mu_w-y) - \frac{1}{2}\mu_c^T\Sigma_w^{-1}\mu_c - \frac{1}{2}(\mu_w-y)^T\Sigma_w^{-1}(\mu_w-y) \\
+	= &-\frac{1}{2}\mu_c^T(\Sigma_c+\Sigma_w)^{-1}\mu_c - \frac{1}{2}(\mu_w-y)^T(\Sigma_c+\Sigma_w)^{-1}(\mu_w-y) + \mu_c^T(I-(\Sigma_c+\Sigma_w)^{-1}\Sigma_c)\Sigma_w^{-1}(\mu_w-y) \\ 
+	= &-\frac{1}{2}\mu_c^T(\Sigma_c+\Sigma_w)^{-1}\mu_c - \frac{1}{2}(\mu_w-y)^T(\Sigma_c+\Sigma_w)^{-1}(\mu_w-y) + \mu_c^T(\Sigma_c+\Sigma_w)^{-1}(\mu_w-y) \\
+	= &-\frac{1}{2}(\mu_c+\mu_w-y)^T(\Sigma_c+\Sigma_w)^{-1}(\mu_c+\mu_w-y).
+\end{align*}
+This is the needed result.
+
+\end{document}
+

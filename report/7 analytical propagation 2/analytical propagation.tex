@@ -1,0 +1,112 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Analytical Uncertainty Propagation of Matrix Fisher-Gaussian Distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+Suppose $(R,x)$ follows a Matrix Fisher-Gaussian distribution, we want to find the distribution of $(R\exp(x),x)$.
+First of all, let $Y=R\exp(\hat{x})$, then $(Y,x)$ has density function
+\begin{align}
+	f_{(Y,x)}(Y,x) = f_{(R,x)}(Y\exp(\hat{x})^T,x) = \frac{1}{c}\exp\left\{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)\right\}\mathrm{etr}(F\exp(\hat{x})Y^T),
+\end{align}
+where $\mu_c=\mu+P\nu_{Y,x}$ and
+\begin{equation}
+	\nu_{Y,x}=(U^TY\exp(\hat{x})^TVS-SV^T\exp(\hat{x})Y^TU)^\vee.
+\end{equation}
+This density function is clearly not a Matrix Fisher-Gaussian distribution, so we should try to find the necessary moments.
+Since the linear part is unchanged, its moments remain the same:
+\begin{equation}
+	\mathrm{E}[x] = \mu, \qquad \qquad \mathrm{E}[xx^T] = \Sigma_c+\mu\mu^T+P\mathrm{E}[\nu_R\nu_R^T]P^T.
+\end{equation}
+The attitude moments are much harder.
+After change of variables, we have
+\begin{align}
+	\mathrm{E}[Y] &= \frac{1}{c}\int_{R\in\mathrm{SO}(3)}\int_{x\in\mathbb{R}^3}R\exp(\hat{x})\exp\left\{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)\right\}\mathrm{etr}(FR^T)\mathrm{d}x\mathrm{d}R \nonumber \\
+	&= \frac{1}{c}\int_{R\in\mathrm{SO}(3)}\mathrm{etr}(FR^T)R\int_{x\in\mathbb{R}^3}\exp(\hat{x})\exp\left\{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)\right\}\mathrm{d}x\mathrm{d}R
+\end{align}
+where $\mu_c=\mu+P\nu_R$.
+The inner integral is the expectation of a ``wrapped normal distribution" on SO(3), as it follows a Gaussian distribution in the tangent space.
+For the $\mathbb{S}^1$ case, there is an elegant way to calculate the first moment using its characteristic function.
+Maybe it is possible to develop a similar method on SO(3), but as far as I know, there is no such method developed.
+From another point of view, the inner integral can be written in the spherical coordinates
+\begin{align}
+	\int_{r\geq 0}r^2\int_{u\in\mathbb{S}^2}\left(I_{3\times 3}+\sin r\hat{u}+(1-\cos r)\hat{u}^2\right)\exp\left\{-\frac{1}{2}(ru-\mu_c)^T\Sigma_c^{-1}(ru-\mu_c)\right\}\mathrm{d}u\mathrm{d}r.
+\end{align}
+Now, the difficulty is turned into evaluating a Gaussian integral on the unit sphere, or calculating the expectations of a Fisher-Bingham distribution.
+This is also an unsolved problem.
+
+\section{Approximations}
+It seems we have to make some approximations for the time being.
+The idea is to expand $\exp(\hat{x})$ into infinite sum, and show that the expectation of the higher order terms goes to zero with small covariance matrix.
+First, we have $\mathrm{E}[Y] = \sum_{n=0}^{\infty}\frac{1}{n!}\mathrm{E}[R\hat{x}^n]$, and want to show $\mathrm{E}[R\hat{x}^n]\sim O(||\Sigma||_\mathrm{F}^{n/2})$.
+Let us first prove a lemma about Frobenius norm and positive definiteness.
+
+\begin{lemma} \label{lamma:fnorm}
+	If $A$, $B\in\mathbb{R}^{n\times n}$ are symmetric, $A$ is positive definite, $B$ is positive semi-definite, and $A-B$ is positive semi-definite. Then $||A||_\mathrm{F}\geq||B||_\mathrm{F}$.
+\end{lemma}
+\begin{proof}
+	Since symmetric matrices are diagonalizable, let $A=Q\Lambda_AQ^T$, where $\Lambda_A=\mathrm{diag}(\lambda_{1A},\ldots,\lambda_{nA})$ is a diagonal matrix composed of the eigenvalues of $A$ in the decreasing order, $Q$ is a orthogonal matrix.
+	So $\fnorm{A}^2 = \mathrm{tr}(AA^T) = \mathrm{tr}(\Lambda_A^2) = \sum_{i=1}^{n}\lambda_{iA}^2$.
+	By Courant minimax principle,
+	\begin{equation} \label{eqn:maxmin}
+		\lambda_{iA} = \min_{C\in\mathbb{R}^{(i-1)\times n}}\max_{||x||=1,Cx=0}\langle Ax,x \rangle.
+	\end{equation}
+	Since $A-B$ is
+	 positive semi-definite, $\langle(A-B)x,x\rangle > 0$ for all $x\in\mathbb{R}^n$.
+	Together with \eqref{eqn:maxmin}, this proves $\lambda_{iA}\geq\lambda_{iB}$ for all $i=1,\ldots,n$.
+	Because $B$ is positive semi-definite, $\lambda_{iA}\geq\lambda_{iB}\geq 0$, and it follows that $||A||_\mathrm{F}\geq||B||_\mathrm{F}$ since they are the sum of square of eigenvalues.
+\end{proof}
+
+Then we can get the following proposition, which is ``NOT" enough for the purpose of safely neglecting the higher order terms.
+
+\begin{proposition}
+	If $(R,x)$ follows matrix Fisher-Gaussian distribution, then 
+\end{proposition}
+\begin{proof}
+	We have the following inequalities
+	\begin{alignat*}{2}
+		\fnorm{\expect{R\hat{x}^n}} &\leq \expect{\fnorm{R\hat{x}^n}} \qquad \qquad &&\text{(Jensen's inequality)} \nonumber \\
+		&\leq \expect{\fnorm{R}\fnorm{\hat{x}}^n} \qquad \qquad &&\text{(sub-multiplicativity of Frobenius norm)} \nonumber \\
+		&= 3\cdot 2^{n/2} \expect{\norm{x}^n}.
+	\end{alignat*}
+	
+	Expand the integration and apply change of variable,
+	\begin{align*}
+		\expect{\norm{x}^n} &= \frac{1}{c(S)\sqrt{(2\pi)^3\det(\Sigma_c)}} \int_{R\in\SO}\tr{FR^T}\int_{x\in\real{3}}\norm{x}^n\exp\left\{-\frac{1}{2}(x-P\nu_R)^T\Sigma_c^{-1}(x-P\nu_R)\right\}\diff{x}\diff{R} \\
+		&= \frac{1}{c(S)\sqrt{(2\pi)^3}} \int_{Q\in\SO}\tr{SQ^T}\int_{y\in\real{3}}\norm{\Sigma_c^{1/2}y+P\nu_Q}^n\exp\left\{-\frac{1}{2}y^Ty\right\}\diff{y}\diff{Q}
+	\end{align*}
+	Denote $D = \tr{S}I_{3\time 3}-S$, in order for the matrix Fisher-Gaussian distribution to be well defined, $\Sigma_c=\Sigma-PDP^T\succeq 0$, by Lemma \ref{lamma:fnorm}, $\fnorm{\Sigma} \geq \fnorm{PDP^T}$.
+	Since the induced 2-norm and Frobenius norm have the following relationship for 3-by-3 symmetric matrix: $\fnorm{A}^2 = \sum_{i=1}^3\lambda_{iA}^2 \leq 3\lambda_{A,\mathrm{max}}^2 = 3\norm{A}_2^2 \leq 3\fnorm{A}^2$, we can bound $PD^{1/2}$ by
+	\begin{equation*}
+		\fnorm{PD^{1/2}} \leq \sqrt{3}\norm{PD^{1/2}}_2 = \sqrt{3}\norm{PDP^T}^{1/2}_2 \leq \sqrt{3}\fnorm{PDP^T}^{1/2} \leq \sqrt{3}\fnorm{\Sigma}.
+	\end{equation*}
+	Also, $\fnorm{\Sigma_c}\leq\fnorm{\Sigma}$ by Lemma \ref{lamma:fnorm}, then $\expect{\norm{x}^n}$ can be bounded by
+	\begin{equation*}
+		\expect{\norm{x}^n} \leq \frac{1}{c(s)\sqrt{(2\pi)^3}}\int_{Q\in\SO}\tr{SQ^T}\int_{y\in\real{3}}\fnorm{\Sigma}^{n/2}\left(\norm{y}+\sqrt{3}\norm{D^{-1/2}\nu_Q}\right)^n\exp\left\{-\frac{1}{2}y^Ty\right\}\diff{y}\diff{Q}.
+	\end{equation*}
+\end{proof}
+
+\end{document}
+

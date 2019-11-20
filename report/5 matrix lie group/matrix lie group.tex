@@ -1,0 +1,69 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{$\mathrm{SO}(3)\times\mathbb{R}^n$ Expressed as a Matrix Lie Group\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\begin{document}
+
+\maketitle
+
+Consider the following map:
+\begin{equation*}
+	\Phi:\,\mathrm{SO}(3)\times\mathbb{R}^n\to GL(3+2n,\mathbb{R}), \qquad
+	\Phi(R,x) = \begin{bmatrix}
+		R & 0 & 0 \\
+		0 & I & \mathrm{diag}(x) \\
+		0 & 0 & I
+	\end{bmatrix}
+\end{equation*}
+$\Phi$ is clearly one-to-one, and it preserves the group multiplication and inverse as follows
+\begin{gather*}
+	\Phi(R_1R_2,x_1+x_2) = \begin{bmatrix}
+		R_1R_2 & 0 & 0 \\
+		0 & I & \mathrm{diag}(x_1+x_2) \\
+		0 & 0 & I
+	\end{bmatrix} = \\
+	\begin{bmatrix}
+	R_1 & 0 & 0 \\
+	0 & I & \mathrm{diag}(x_1) \\
+	0 & 0 & I
+	\end{bmatrix}\begin{bmatrix}
+	R_2 & 0 & 0 \\
+	0 & I & \mathrm{diag}(x_2) \\
+	0 & 0 & I
+	\end{bmatrix} = \Phi(R_1,x_1)\Phi(R_2,x_2)
+\end{gather*}
+and
+\begin{equation*}
+	\Phi(R^T,-x) = \begin{bmatrix}
+		R^T & 0 & 0 \\
+		0 & I & -\mathrm{diag}(x) \\
+		0 & 0 & I
+	\end{bmatrix} = \begin{bmatrix}
+	R & 0 & 0 \\
+	0 & I & \mathrm{diag}(x) \\
+	0 & 0 & I
+	\end{bmatrix}^{-1} = \Phi(R,x)^{-1}.
+\end{equation*}
+So $\Phi$ is a group isomorphism from $\mathrm{SO}(3)\times\mathbb{R}^n$ to a subgroup of $GL(3+2n,\mathbb{R})$.
+Since SO(3) is closed in $GL(3,\mathbb{R})$, and clearly the limit of a convergent sequence in subset $\left\{\left.\begin{bmatrix}
+	I & x \\
+	0 & I
+\end{bmatrix}\right|x\in\mathbb{R}^n\right\}\subset GL(2n,\mathbb{R})$ still lies in the same subset.
+Therefore, the image of $\Phi$ is a closed subgroup in $GL(3+2n,\mathbb{R})$, which is by definition a matrix Lie group.
+Furthermore, $\Phi$ and $\Phi^{-1}$ are clearly smooth, so $\Phi$ is a Lie group isomorphism.
+
+\end{document}
+
