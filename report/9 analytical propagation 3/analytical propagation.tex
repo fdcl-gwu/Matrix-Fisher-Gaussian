@@ -1,0 +1,110 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Analytical Uncertainty Propagation of Matrix Fisher-Gaussian Distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+Suppose at time $t$, $(R(t),x(t))$ follows Matrix Fisher-Gaussian distribution with parameters $(\mu,\Sigma,P,U,S,V)$, consider the following discrete stochastic process
+\begin{align}
+	R(t+\Delta t) &= R(t)\exp\left\{\hat{x}(t)\Delta t + \widehat{H\Delta W}\right\} \label{eqn:gyroKine} \\
+	x(t+\Delta t) &= x(t).
+\end{align}
+
+\section{Calculating $\expect{R(t+\Delta t)}$}
+First, try to calculate $\expect{R(t+\Delta t)}$:
+\begin{equation} \label{eqn:expectRNew}
+	\expect{R(t+\Delta t)} = \expect{R(t)\sum_{i=0}^{\infty}\frac{\left(\hat{x}(t)\Delta t + \widehat{H\Delta W}\right)^i}{i!}}
+\end{equation}
+Note that $\expect{R(\hat{x}(t)\Delta t)^m\widehat{H\Delta W}^n} = \Delta t^m\expect{R\hat{x}(t)^m}\expect{\widehat{H\Delta W}^n}$, so \eqref{eqn:expectRNew} can be approximated by
+\begin{equation} \label{eqn:expectRNewAppro}
+	\expect{R(t+\Delta t)} = \expect{R(t)} + \expect{R(t)\hat{x}(t)}\Delta t + \frac{1}{2}\expect{R(t)}\expect{\widehat{H\Delta W}^2} + O(\Delta t^{1.5}).
+\end{equation}
+The only hard part to evaluate \eqref{eqn:expectRNewAppro} is $\expect{R(t)\hat{x}(t)}$.
+After integrating out the linear component, this term is given as
+\begin{equation}
+	\expect{R(t)\hat{x}(t)} = \expect{R(t)}\hat{\mu}+\expect{R(t)\widehat{P\nu_R(t)}} = \expect{R(t)}\hat{\mu}+U\expect{QV^T\widehat{P\nu_R}}
+\end{equation}
+Denote $QV^T\widehat{P\nu_R} \triangleq Q_{2a}$, then by brute force calculation and considering some of the second moments of $Q$ vanish, we have
+\begin{align*}
+	\expect{Q_{2a}}_{11} &= (V_{23}P_{23}-V_{22}P_{33})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + (V_{32}P_{32}-V_{33}P_{22})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \\
+	\expect{Q_{2a}}_{12} &= (V_{21}P_{33}-V_{23}P_{13})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + 
+	(V_{33}P_{12}-V_{31}P_{32})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \\
+	\expect{Q_{2a}}_{13} &= (V_{22}P_{13}-V_{21}P_{23})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + (V_{31}P_{22}-V_{32}P_{12})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \\
+	\expect{Q_{2a}}_{21} &= (V_{12}P_{33}-V_{13}P_{23})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{33}P_{21}-V_{32}P_{31})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \\
+	\expect{Q_{2a}}_{22} &= (V_{13}P_{13}-V_{11}P_{33})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{31}P_{31}-V_{33}P_{11})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \\
+	\expect{Q_{2a}}_{23} &= (V_{11}P_{23}-V_{12}P_{13})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{32}P_{11}-V_{31}P_{21})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \\
+	\expect{Q_{2a}}_{31} &= (V_{13}P_{22}-V_{12}P_{32})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{22}P_{31}-V_{23}P_{21})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}}) \\
+	\expect{Q_{2a}}_{32} &= (V_{11}P_{32}-V_{13}P_{12})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{23}P_{11}-V_{21}P_{31})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}}) \\
+	\expect{Q_{2a}}_{33} &= (V_{12}P_{12}-V_{11}P_{22})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{21}P_{21}-V_{22}P_{11})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}})
+\end{align*}
+
+\section{Calculating $\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)}$}
+
+Next, let us consider $\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)}$, where $\nu'_R(t+\Delta t) = (U'^TR(t+\Delta t)V'S'-S'V'^TR(t+\Delta t)^TU')^\vee$, and $U', S', V'$ are obtained from $\expect{R(t+\Delta t)}$.
+We need a new notation, let $\nu'_A \triangleq (U'^TAV'S'-S'V'^TA^TU')^\vee$.
+Since $x(t+\Delta t) = x(t)$ and the linearity of the operator $\vee$, again expand $\exp\left\{\hat{x}(t)\Delta t + \widehat{H\Delta W}\right\}$ into series, we get
+\begin{equation}
+	\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)} = \expect{x(t)\nu'^T_{R(t)\sum_{i=0}^{\infty}\left(\hat{x}(t)\Delta t + \widehat{H\Delta W}\right)^i/i!}} = \sum_{i=0}^{\infty}\expect{x(t)\nu'^T_{R(t)\left(\hat{x}(t)\Delta t + \widehat{H\Delta W}\right)^i/i!}}
+\end{equation}
+Note that $x(t)\nu'^T_{R(t)(\hat{x}(t)\Delta t)^m\widehat{H\Delta W}^n}$ is a linear operator on $\widehat{H\Delta W}^n$ depending on $R(t)$ and $x(t)$.
+However, because $\Delta W$ is independent of $(R(t),x(t))$, we have the following approximations
+\begin{align*}
+	\expect{x(t)\nu'^T_{R(t)\widehat{H\Delta W}}} &= 0 \\
+	\expect{x(t)\nu'^T_{R(t)(\hat{x}(t)\Delta t)^m\widehat{H\Delta W}^n}} &= O(\Delta t^{m+n/2})
+\end{align*}
+As a sequel, $\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)}$ can be approximated by
+\begin{equation} \label{eqn:expectxvRNewAppro}
+	\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)} = \expect{x(t)\nu'^T_{R(t)}} + \expect{x(t)\nu'^T_{R(t)\hat{x}(t)\Delta t}} + \frac{1}{2}\expect{x(t)\nu'^T_{R(t)\widehat{H\Delta W}^2}} + O(t^{1.5})
+\end{equation}
+
+Now, we need to evaluate the three terms in \eqref{eqn:expectxvRNewAppro}.
+The first term is the easiest, since
+\begin{equation}
+	\expect{x(t)\nu'^T_{R(t)}} = \mu\expect{\nu'_{R(t)}}^T + P\expect{\nu_{R(t)}\nu'^T_{R(t)}},
+\end{equation}
+where $\expect{\nu'_{R(t)}} = (U'^T\expect{R(t)}V'S'-S'V'^T\expect{R(t)}^TU')^\vee$.
+To calculate $\expect{\nu_{R(t)}\nu'^T_{R(t)}}$, define $\tilde{U} = U'^TU$, $\tilde{V} = V'^TV$ and $\tilde{S} = \tilde{U}^TS'\tilde{V}$, then
+\begin{equation*}
+	\expect{\nu_{R(t)}\nu'^T_{R(t)}} = \expect{(QS-SQ^T)^\vee\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T}\tilde{U}^T
+\end{equation*}
+Denote $(QS-SQ^T)^\vee\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T \triangleq Q_{2b}$, by brute force calculation, we have
+\begin{align*}
+	\expect{Q_{2b}}_{11} &= (s_2\tilde{S}_{22}+s_3\tilde{S}_{33})\expect{Q_{23}^2} - (s_2\tilde{S}_{33}+s_3\tilde{S}_{22})\expect{Q_{23}Q_{32}} \\
+	\expect{Q_{2b}}_{12} &= s_3\tilde{S}_{12}\expect{Q_{23}Q_{32}} - s_2\tilde{S}_{12}\expect{Q_{23}^2} \\
+	\expect{Q_{2b}}_{13} &= s_3\tilde{S}_{13}\expect{Q_{23}Q_{32}} - s_3\tilde{S}_{13}\expect{Q_{23}^2} \\
+	\expect{Q_{2b}}_{21} &= s_3\tilde{S}_{21}\expect{Q_{13}Q_{31}} - s_1\tilde{S}_{21}\expect{Q_{13}^2} \\
+	\expect{Q_{2b}}_{22} &= (s_1\tilde{S}_{11}+s_3\tilde{S}_{33})\expect{Q_{13}^2} - (s_1\tilde{S}_{33}+s_3\tilde{S}_{11})\expect{Q_{13}Q_{31}} \\
+	\expect{Q_{2b}}_{23} &= s_1\tilde{S}_{23}\expect{Q_{13}Q_{31}} - s_3\tilde{S}_{23}{Q_{13}^2} \\
+	\expect{Q_{2b}}_{31} &= s_2\tilde{S}_{31}\expect{Q_{12}Q_{21}} - s_1\tilde{S}_{31}\expect{Q_{12}^2} \\
+	\expect{Q_{2b}}_{32} &= s_1\tilde{S}_{32}\expect{Q_{12}Q_{21}} - s_2\tilde{S}_{32}\expect{Q_{12}^2} \\
+	\expect{Q_{2b}}_{33} &= (s_1\tilde{S}_{11}+s_2\tilde{S}_{22})\expect{Q_{12}^2} - (s_1\tilde{S}_{22}+s_2\tilde{S}_{11})\expect{Q_{12}Q_{21}}
+\end{align*}
+
+Next, we need to calculate $\expect{x(t)\nu'^T_{R(t)\hat{x}(t)\Delta t}}$.
+Note that integrating out the second order of $x$ yields the second order of $\nu_R$, which means we need to calculate the third order moment of $Q$.
+
+\end{document}
+

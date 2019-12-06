@@ -17,6 +17,7 @@
 \newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
 \newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
 \newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
 \newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
 \newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
 \newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
@@ -79,7 +80,46 @@ Let us first prove a lemma about Frobenius norm and positive definiteness.
 	Because $B$ is positive semi-definite, $\lambda_{iA}\geq\lambda_{iB}\geq 0$, and it follows that $||A||_\mathrm{F}\geq||B||_\mathrm{F}$ since they are the sum of square of eigenvalues.
 \end{proof}
 
-Then we can get the following proposition, which is ``NOT" enough for the purpose of safely neglecting the higher order terms.
+Then we prove a lemma to find an upper bound on $\expect{\norm{\nu_R}^n}$ for a Matrix Fisher distribution with the parameter $F=USV^T$.
+\begin{lemma}
+	content...
+\end{lemma}
+\begin{proof}
+	Let $Q$ be expressed in axis-angle form, i.e. $Q = I_{3\times 3}+\sin\theta\hat{u} + (1-\cos\theta)\hat{u}^2$.
+	Under this new parameterization, the density function becomes
+	\begin{align} \label{eqn:densityInAA}
+		f(u,\theta) = \frac{1}{c(S)}\etr{S+(1-\cos\theta)S\hat{u}^2} &= \frac{1}{c(S)}\exp\left\{\tr{S}-(1-\cos\theta)\sum_{i=1}^3s_i(u_j^2+u_k^2)\right\} \nonumber \\
+		&= \frac{1}{c(S)}\exp\left\{\tr{S}\cos\theta+(1-\cos\theta)\sum_{i=1}^3s_iu_i^2\right\}.
+	\end{align}
+	Also, express $\nu_Q$ in axis-angle form
+	\begin{equation}
+		\nu_Q = (QS-SQ^T)^\vee = \begin{bmatrix}
+			(s_2+s_3)u_1\sin\theta + (s_2-s_3)u_2u_3(1-\cos\theta) \\
+			(s_1+s_3)u_2\sin\theta + (s_3-s_1)u_1u_3(1-\cos\theta) \\
+			(s_1+s_2)u_3\sin\theta + (s_1-s_2)u_1u_2(1-\cos\theta)
+		\end{bmatrix},
+	\end{equation}
+	\begin{equation} \label{eqn:vQnorm}
+		\norm{\nu_Q}^2 = \sum_{(i,j,k)\in\mathcal{I}}\left\{ (s_j+s_k)^2u_i^2\sin^2\theta  +(s_j-s_k)^2u_j^2u_k^2(1-\cos\theta)^2\right\},
+	\end{equation}
+	where the cross terms vanish in its norm.
+	Note that $(s_j \pm s_k)^2 \leq 4s_1^2$, so \eqref{eqn:vQnorm} can be bounded by
+	\begin{equation}
+		\norm{\nu_Q}^2 \leq 4s_1^2(\sin^2\theta+(1-\cos\theta)^2) = 8s_1^2(1-\cos\theta),
+	\end{equation}
+	where we used the fact that $u_1^2u_2^2+u_1^2u_3^2+u_2^2u_3^2 \leq 0.5(u_1^2+u_2^2+u_3^2-u_1^4-u_2^4-u_3^4) < 1$.
+	Also note that $1-\cos\theta \geq 0$, so the density in \eqref{eqn:densityInAA} can be bounded by
+	\begin{equation}
+		f(u,\theta) \leq \frac{1}{c(S)}\exp\left\{\tr{S}\cos\theta+(1-\cos\theta)s_1\right\} = \frac{e^{s_1}}{c(S)}\exp\left\{(s_2+s_3)\cos\theta\right\},
+	\end{equation}
+	which is a Von Mises density for $\theta$ and does not depend on $u$.
+	Finally, we can express $\diff{R}$ as $\frac{2}{\pi}\sin^2\frac{\theta}{2}\diff{u}\diff{\theta} \leq \frac{2}{\pi}\diff{u}\diff{\theta}$.
+	Combining these results, a bound can be given for $\expect{\norm{\nu_Q}^n}$, that is
+	\begin{equation}
+		\expect{\norm{\nu_Q}^n} \leq c\cdot(2\sqrt{2}s_1)^n \int_{\theta\in\mathbb{S}^1}(1-\cos\theta)^{n/2}e^{(s_2+s_3)\cos\theta}\diff{\theta},
+	\end{equation}
+	where $c = \frac{8e^{s_1}}{\pi c(S)}$.
+\end{proof}
 
 \begin{proposition}
 	If $(R,x)$ follows matrix Fisher-Gaussian distribution, then 

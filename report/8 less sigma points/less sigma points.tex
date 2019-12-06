@@ -69,8 +69,35 @@ We propose to approximate the marginal distribution of $x(t)$ using sigma points
 \end{equation}
 With this, the expectation in \eqref{eqn:totExpect} becomes
 \begin{equation}
-	\expect{R(t+\Delta t)} = \sum_i w_i\expect{R(t+\Delta t)\left|\right. x_i}.
+	\expect{R(t+\Delta t)} = \sum_i w_i\expect{R(t+\Delta t)\left|\right. x_i},
 \end{equation}
+where the conditional expectation is given by
+\begin{equation}
+	\expect{R(t+\Delta t)|x_i} = \expect{R(t)|x_i}\exp\left(I_{3\times 3}+\frac{\Delta t}{2}(-\tr{G}I_{3\times 3}+G)+O(\Delta t^{1.5})\right)\exp\left((\hat{\Omega}(t)+\hat{x}_i)\Delta t\right).
+\end{equation}
+From the expectation of $R(t+\Delta t)$, the new $U'$, $S'$ and $V'$ at $t+\Delta t$ can be calculated using the usual technique.
+Thus, the new $\nu_R(t+\Delta) = \left(U'^TR(t+\Delta t)V'S'-S'V'^TR(t+\Delta t)^TU'\right)^\vee$, and we have the following moments
+\begin{align}
+	\expect{\nu_R(t+\Delta)} &= \left( U'^T\expect{R(t+\Delta t)}V'S' - S'V'^T\expect{R(t+\Delta t)}^TU' \right)^\vee \\
+	\expect{x\nu_R^T(t+\Delta t)} &= \sum_i w_ix_i\left[\left( U'^T\expect{R(t+\Delta t)|x_i}V'S' - S'V'^T\expect{R(t+\Delta t)|x_i}^TU' \right)^\vee\right]^T
+\end{align}
+
+Next, let us calculate $\expect{\nu_R(t+\Delta t)\nu_R^T(t+\Delta t)}$. Before doing this, we need some messy calculations.
+\begin{lemma}
+	If $R$ follows Matrix Fisher distribution with the parameter $F=USV^T$, then its second order moments are given by
+	\begin{align}
+		\expect{R_{ij}R_{kl}} &= \sum_{m=1}^{3}\sum_{n=1}^{3}U_{im}U_{kn}V_{jm}V_{ln}\expect{Q_{mm}Q_{nn}} \nonumber \\
+		&+ \sum_{m=1}^{3}\sum_{\substack{n=1\\n\neq m}}^{3}U_{im}U_{km}V_{jn}V_{ln}\expect{Q_{nm}^2} \nonumber \\
+		&+ \sum_{m=1}^{3}\sum_{\substack{n=1\\n\neq m}}^{3}U_{im}U_{kn}V_{jn}V_{lm}\expect{Q_{nm}Q_{mn}}.
+	\end{align}
+\end{lemma}
+\begin{proof}
+	First write $R$ as $UQV^T$, so $R_{ij} = \sum_{m=1}^{3}\sum_{n=1}^{3}U_{im}V_{jn}Q_{mn}$.
+	Then we get
+	\begin{equation*}
+		\expect{R_{ij}R_{kl}} = \sum_{\alpha=1}^{3}\sum_{\beta=1}^{3}\sum_{m=1}^{3}\sum_{n=1}^{3}U_{im}V_{jn}U_{k\alpha}V_{l\beta}\expect{Q_{mn}Q_{\alpha\beta}}.
+	\end{equation*}
+\end{proof}
 
 \appendix
 \section{A direct calculation for Lemma 1}
