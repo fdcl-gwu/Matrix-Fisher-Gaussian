@@ -65,9 +65,18 @@ Substitute these results into \eqref{eqn:MGFijij} and \eqref{eqn:MGFijji}, we ge
 
 \section{Degenerative case}
 When $s_i=s_j$, \eqref{eqn:secondMoments} does not give valid results.
-I have not found a rigorous proof for this, but taking the limits of \eqref{eqn:secondMoments} as $s_i$ approaching $s_j$ is the easiest method to deal with this degenerative case, which yields
+I have not found a rigorous proof for this, but taking the limits of \eqref{eqn:secondMoments} as $s_i$ approaching $s_j$ is the easiest method to deal with this degenerative case.
+Let $s_j=s_i+\Delta$, $c(S) = c(s_i,s_j,s_k)$, and $\partial_{mn}c(S)$ denote taking derivative with the $m-$th and $n-$th variables.
+Note that when $s_i=s_j$, $\partial_1c(S) = \partial_2c(S)$, and $\partial_{11}c(S) = \partial_{22}c(S) \neq \partial_{12}c(S)$, so
+\begin{align}
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}&\bigg|_{T=0} = \frac{1}{c(S)} \lim\limits_{\Delta\to\infty} \frac{1}{2s_i+\Delta} \frac{ (s_i+\Delta)\partial_2s(s_i,s_i+\Delta,s_k) - s_i\partial_1s(s_i,s_i+\Delta,s_k)}{\Delta} \nonumber \\
+	&= \frac{1}{c(S)}\frac{1}{2s_i} \lim\limits_{\Delta\to\infty} \frac{\partial_2c(s_i,s_i+\Delta,s_k)\Delta + s_i \left(  \partial_2c(s_i,s_i+\Delta,s_k) - \partial_1c(s_i,s_i+\Delta,s_k) \right)}{\Delta} \nonumber \\
+	&= \frac{1}{c(S)}\frac{1}{2s_i} \left( \frac{\partial c(S)}{s_i} + \lim\limits_{\Delta\to\infty} s_i\frac{\partial_2(s_i,s_i+\Delta,s_k) - \partial_2c(s_i,s_i,s_k) + \partial_1c(s_i,s_i,s_k) - \partial_1c(s_i,s_i+\Delta,s_k)}{\Delta} \right) \nonumber \\
+	&= \frac{1}{c(S)}\frac{1}{2s_i} \left( \frac{\partial c(S)}{s_i} + s_i\left( \frac{\partial^2 c(S)}{\partial s_i^2} - \frac{\partial^2 c(S)}{\partial s_i \partial s_j} \right) \right)
+\end{align}
+Similarly,
 \begin{equation}
-	\frac{\partial^2 M_Q(T)}{\partial T_{ij}^2}\bigg|_{T=0} = -\frac{\partial^2 M_Q(T)}{\partial T_{ij}\partial T_{ji}}\bigg|_{T=0} = \frac{1}{c(S)}\frac{\partial c(S)}{\partial s_i}\frac{1}{2s_i}.
+	\frac{\partial^2 M_Q(T)}{\partial T_{ij}\partial T_{ji}}\bigg|_{T=0} = \frac{1}{c(S)}\frac{1}{2s_i}\left( -\frac{\partial c(S)}{s_i} + s_i\left( \frac{\partial^2 c(S)}{\partial s_i^2} - \frac{\partial^2 c(S)}{\partial s_i \partial s_j} \right) \right)
 \end{equation}
 This can be verified by Monte Carlo simulations to calculate moments numerically.
 

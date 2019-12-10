@@ -1,7 +1,7 @@
-function [ EQQ ] = pdf_MF_moment2( S )
+function [ EQQ ] = pdf_MF_moment2( s )
 
-c = pdf_MF_normal(S,true);
-[dc,ddc] = pdf_MF_normal_deriv(S,true,true);
+c = pdf_MF_normal(s,true);
+[dc,ddc] = pdf_MF_normal_deriv(s,true,true);
 
 EQQ = zeros(9,9);
 
@@ -18,8 +18,12 @@ end
 for i = 1:3
     for j = setdiff(1:3,i)
         ind1 = 3*(i-1)+j;
-        EQQ(ind1,ind1) = (1+dc(i)/c)*S(i)/(S(i)^2-S(j)^2)...
-            -(1+dc(j)/c)*S(j)/(S(i)^2-S(j)^2);
+        if s(i)==s(j)
+            EQQ(ind1,ind1) = 1/c/(2*s(i))*(c+dc(i)+s(i)*(ddc(i,i)-ddc(i,j)));
+        else
+            EQQ(ind1,ind1) = (1+dc(i)/c)*s(i)/(s(i)^2-s(j)^2)...
+                -(1+dc(j)/c)*s(j)/(s(i)^2-s(j)^2);
+        end
     end
 end
 
@@ -28,8 +32,12 @@ for i = 1:3
     for j = setdiff(1:3,i)
         ind1 = 3*(i-1)+j;
         ind2 = 3*(j-1)+i;
-        EQQ(ind1,ind2) = (1+dc(i)/c)*S(j)/(S(i)^2-S(j)^2)...
-            -(1+dc(j)/c)*S(i)/(S(i)^2-S(j)^2);
+        if s(i)==s(j)
+            EQQ(ind1,ind2) = 1/c/(2*s(i))*(-c-dc(i)+s(i)*(ddc(i,i)-ddc(i,j)));
+        else
+            EQQ(ind1,ind2) = (1+dc(i)/c)*s(j)/(s(i)^2-s(j)^2)...
+                -(1+dc(j)/c)*s(i)/(s(i)^2-s(j)^2);
+        end
     end
 end
 
