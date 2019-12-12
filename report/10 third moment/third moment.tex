@@ -230,9 +230,8 @@ Solve it, we get
 \end{align}
 Combining these results, we finally have
 \begin{align}
-	\expect{Q_{ij}Q_{jk}Q_{ki}} &= \frac{1}{c(S)}\left[ -\frac{c(S)}{\partial s_i} \frac{s_js_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \left( \frac{s_is_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} - \frac{s_is_k}{(s_i^2-s_k^2)(s_j^2-s_k^2)} \right) \right. \nonumber \\ &\qquad\qquad +\left. \frac{\partial c(S)}{\partial s_k} \frac{s_is_j}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right] \nonumber \\
-	\expect{Q_{ij}Q_{jk}Q_{ik}} &= \frac{1}{c(S)}\left[ -\frac{\partial c(S)}{\partial s_i} \frac{s_is_j}{(s_j^2-s_i^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \left( \frac{s_i^2}{(s_j^2-s_i^2)(s_i^2-s_k^2)} -\frac{s_k^2}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right) \right. \nonumber \\ &\qquad\qquad +\left. \frac{\partial c(S)}{\partial s_k} \frac{s_js_k}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right] \nonumber \\
-	\expect{Q_{ij}Q_{kj}Q_{ik}} &= \frac{1}{c(S)}\left[ -\frac{\partial c(S)}{\partial s_i} \frac{s_is_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \left(\frac{s_js_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} - \frac{s_js_k}{(s_i^2-s_k^2)(s_j^2-s_k^2)} \right) \right. \nonumber \\ &\qquad\qquad +\left. \frac{\partial c(S)}{\partial s_k} \frac{s_k^2}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right]
+	\expect{Q_{ij}Q_{jk}Q_{ki}} &= \frac{1}{c(S)}\left( \frac{\partial c(S)}{\partial s_i} \frac{s_js_k}{(s_i^2-s_j^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \frac{s_is_k}{(s_j^2-s_i^2)(s_j^2-s_k^2)} + \frac{\partial c(S)}{\partial s_k} \frac{s_is_j}{(s_k^2-s_i^2)(s_k^2-s_j^2)} \right) \nonumber \\
+	\expect{Q_{ij}Q_{jk}Q_{ik}} &= \frac{1}{c(S)}\left( \frac{\partial c(S)}{\partial s_i} \frac{s_is_j}{(s_j^2-s_i^2)(s_k^2-s_i^2)} + \frac{\partial c(S)}{\partial s_j} \frac{s_j^2}{(s_i^2-s_j^2)(s_k^2-s_j^2)} + \frac{\partial c(S)}{\partial s_k} \frac{s_js_k}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right) \nonumber \\
 \end{align}
 
 \end{document}
