@@ -40,6 +40,46 @@
 \begin{equation}
 	\frac{\partial^3 M_Q(T)}{\partial T_{ii} \partial T_{jj} \partial T_{kk}} = \frac{1}{c(S)} \left. \frac{\partial^3 c(S)}{\partial s_i \partial s_j \partial s_k} \right|_{T=0}
 \end{equation}
+For $(i,j,k)\in\mathcal{I}$, note that $c(S)$ can be evaluated as an one-dimensional integral as:
+\begin{equation}
+	c(S) = \int_{-1}^{1} \frac{1}{2} I_0\left[ \frac{1}{2}(s_i-s_j)(1-u) \right] I_0\left[ \frac{1}{2}(s_i+s_j)(1+u) \right] \exp(s_ku)\diff{u}
+\end{equation}
+So we have the third order derivatives as:
+\begin{align} \label{eqn:thirdDeriv}
+	\frac{\partial^3 c(S)}{\partial s_i^3} &= \int_{-1}^1 \frac{1}{2} I_0\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] I_0\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] u^3\exp(s_iu)\diff{u} \nonumber \\
+	\frac{\partial^3 c(S)}{\partial s_i^2 \partial s_j} &= \int_{-1}^1 \frac{1}{4} I_1\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] I_0\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1-u)u^2\exp(s_iu) \nonumber \\
+	&\qquad + \frac{1}{4} I_0\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] I_1\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1+u)u^2\exp(s_iu)\diff{u} \nonumber \\
+	\frac{\partial^3 c(S)}{\partial s_i \partial s_j \partial s_k} &= \int_{-1}^1 -\frac{1}{8} I'_1\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] I_0\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1-u)^2u\exp(s_iu) \nonumber \\
+	&\qquad + \frac{1}{8}I_0\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] I'_1\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1+u)^2u\exp(s_iu)\diff{u}
+\end{align}
+where
+\begin{equation}
+	I'_1(x) = \frac{1}{2}(I_0(x)+I_2(x)).
+\end{equation}
+
+If expressed using the exponentially scaled normalizing constant, i.e. $\bar{c}(S) = \exp(-\tr{S})c(S)$, we have:
+\begin{equation}
+	\frac{\partial^3 c(S)}{\partial s_i \partial s_j \partial s_k} = e^{\tr{S}}\left( \frac{\partial^3 \bar{c}(S)}{\partial s_i \partial s_j \partial s_k} + \frac{\partial^2 \bar{c}(S)}{\partial s_i \partial s_j} + \frac{\partial^2 \bar{c}(S)}{\partial s_i \partial s_k} + \frac{\partial^2 \bar{c}(S)}{\partial s_j \partial s_k} + \frac{\partial \bar{c}(S)}{\partial s_j} + \frac{\partial \bar{c}(S)}{\partial s_i} + \frac{\partial \bar{c}(S)}{\partial s_k} + \bar{c}(S) \right)
+\end{equation}
+Also note that
+\begin{equation}
+	\bar{c}(S) = \int_{-1}^{1}\frac{1}{2} \bar{I}_0\left[ \frac{1}{2}(s_i-s_j)(1-u) \right] \bar{I}_0\left[ \frac{1}{2}(s_i+s_j)(1+u) \right] \exp((\min\{s_i,s_j\}+s_k)(u-1)) \diff{u}
+\end{equation}
+So, the third order scaled derivatives are
+\begin{align} \label{eqn:thirdDerivScaled}
+	\frac{\partial^3 \bar{c}(S)}{\partial s_i^3} &= \int_{-1}^1 \frac{1}{2} \bar{I}_0\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] \bar{I}_0\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (u-1)^3\exp((\min\{s_j,s_k\}+s_i)(u-1)) \diff{u} \nonumber \\
+	\frac{\partial^3 \bar{c}(S)}{\partial s_i^2 \partial s_j} &= \int_{-1}^1 \frac{1}{4} \bar{I}_1\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] \bar{I}_0\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1-u)u^2\exp((\min\{s_j,s_k\}+s_i)(u-1)) \nonumber \\
+	&\quad + \frac{1}{4} \bar{I}_0\left[ \frac{1}{2}(s_j-s_k)(1-u) \right] \bar{I}_1\left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1+u)u^2\exp((\min\{s_j,s_k\}+s_i)(u-1)) \diff{u} \nonumber \\
+	&\quad -\frac{\partial^2 \bar{c}(S)}{\partial s_i^2} - 2\frac{\partial^2 \bar{c}(S)}{\partial s_i \partial s_j} - 2\frac{\partial \bar{c}(S)}{\partial s_i} - \frac{\partial \bar{c}(S)}{\partial s_j} - \bar{c}(S) \nonumber \\
+	\frac{\partial \bar{c}(S)}{\partial s_i \partial s_j \partial s_k} &= \int_{-1}^1 -\frac{1}{8}\bar{I}'_1 \left[ \frac{1}{2}(s_j-s_k)(1-u) \right] \bar{I}_0 \left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1-u)^2u\exp((\min\{s_j,s_k\}+s_i)(u-1)) \nonumber \\
+	&\quad +\frac{1}{8} \bar{I}_0 \left[ \frac{1}{2}(s_j-s_k)(1-u) \right] \bar{I}'_1 \left[ \frac{1}{2}(s_j+s_k)(1+u) \right] (1+u)^2u\exp((\min\{s_j,s_k\}+s_i)(u-1)) \diff{u} \nonumber \\
+	&\quad - \frac{\partial^2 \bar{c}(S)}{\partial s_i \partial s_j} - \frac{\partial^2 \bar{c}(S)}{\partial s_i \partial s_k} - \frac{\partial^2 \bar{c}(S)}{\partial s_j \partial s_k} - \frac{\partial \bar{c}(S)}{\partial s_j} - \frac{\partial \bar{c}(S)}{\partial s_i} - \frac{\partial \bar{c}(S)}{\partial s_k} - \bar{c}(S)
+\end{align}
+where 
+\begin{equation}
+	\bar{I}'_1(x) = \frac{1}{2}(\bar{I}_0(x)+\bar{I}_2(x)).
+\end{equation}
+Note that the modified Bessel function of the first kind is an even function, so $s_j$ and $s_k$ can be flipped in \eqref{eqn:thirdDeriv} and \eqref{eqn:thirdDerivScaled} to get $\frac{\partial^3 c(S)}{\partial s_i^2 \partial s_k}$ and $\frac{\partial^3 \bar{c}(S)}{\partial s_i^2 \partial s_k}$.
 
 \section{$\expect{Q_{ii}Q_{jk}Q_{jk}}$ ($j\neq k$)}
 
@@ -82,29 +122,118 @@ Evaluate the above equations at $T=0$, we get
 	\left.\frac{\partial \Omega_{U_{jk}}^{jk}}{\partial T_{ii}}\right|_{T=0} &= \left.\frac{\partial \Omega_{V_{jk}}^{jk}}{\partial T_{ii}}\right|_{T=0} = 0 
 \end{align}
 Combining all these results, the third order moments of the form in this subsection is given by
-\begin{align}
+\begin{align} \label{eqn:iijkjk}
 	\expect{Q_{ii}Q_{jk}Q_{jk}} &= \frac{1}{c(S)} \left( \frac{\partial^2 c(S)}{\partial s_i \partial s_k} \frac{s_k}{s_k^2-s_j^2} - \frac{\partial^2 c(S)}{\partial s_i \partial s_j} \frac{s_j}{s_k^2-s_j^2} \right) \nonumber \\
 	\expect{Q_{ii}Q_{jk}Q_{kj}} &= \frac{1}{c(S)} \left( \frac{\partial^2 c(S)}{\partial s_i \partial s_k} \frac{s_j}{s_k^2-s_j^2} - \frac{\partial^2 c(S)}{\partial s_i \partial s_j} \frac{s_k}{s_k^2-s_j^2} \right)
 \end{align}
+
 For the second condition (b) $i=j\neq k$, solving \eqref{eqn:Omega} gives:
 \begin{align}
 	\Omega_{U_{jk}}^{jk} &= \frac{s_kU_{jj}V_{kk}+s_jU_{jk}V_{kj}}{s_k^2-s_j^2} \nonumber \\
 	\Omega_{V_{jk}}^{jk} &= \frac{s_jU_{jj}V_{kk}+s_kU_{jk}V_{jk}}{s_j^2-s_k^2}
 \end{align}
-\eqref{eqn:dUVdT} gives
+Solving \eqref{eqn:dUVdT} gives
 \begin{align}
-	\left.\frac{\partial \Omega_{U_{jk}}^{jk}}{\partial T_{ii}}\right|_{T=0} &= \left.\frac{s_j\Omega_{U_{jk}}^{jk} - s_k\Omega_{V_{jk}}^{jk}}{s_j^2-s_k^2}\right|_{T=0} = \frac{2s_js_k}{(s_j^2-s_k^2)^2} \nonumber \\
-	\left.\frac{\partial \Omega_{V_{jk}}^{jk}}{\partial T_{ii}}\right|_{T=0} &= \left.\frac{s_k\Omega_{U_{jk}}^{jk} - s_j\Omega_{V_{jk}}^{jk}}{s_j^2-s_k^2}\right|_{T=0} = -\frac{s_j^2+s_k^2}{(s_j^2-s_k^2)^2}
+	\left.\frac{\partial \Omega_{V_{jk}}^{jk}}{\partial T_{kk}}\right|_{T=0} &=
+	\left.\frac{\partial \Omega_{U_{jk}}^{jk}}{\partial T_{jj}}\right|_{T=0} = \left.\frac{s_j\Omega_{U_{jk}}^{jk} - s_k\Omega_{V_{jk}}^{jk}}{s_j^2-s_k^2}\right|_{T=0} = \frac{2s_js_k}{(s_k^2-s_j^2)^2} \nonumber \\
+	\left.\frac{\partial \Omega_{U_{jk}}^{jk}}{\partial T_{kk}}\right|_{T=0} &= \left.\frac{\partial \Omega_{V_{jk}}^{jk}}{\partial T_{jj}}\right|_{T=0} = \left.\frac{s_k\Omega_{U_{jk}}^{jk} - s_j\Omega_{V_{jk}}^{jk}}{s_j^2-s_k^2}\right|_{T=0} = -\frac{s_j^2+s_k^2}{(s_j^2-s_k^2)^2}
 \end{align}
 Combining these results, we have
+\begin{align} \label{eqn:jjjkjk}
+	\expect{Q_{jj}Q_{jk}Q_{jk}} &= \frac{1}{c(S)} \left( \frac{\partial^2 c(S)}{\partial s_j \partial s_k} \frac{s_k}{s_k^2-s_j^2} - \frac{\partial^2 c(S)}{\partial s_j^2} \frac{s_j}{s_k^2-s_j^2} - \frac{\partial c(S)}{\partial s_j} \frac{s_j^2+s_k^2}{(s_j^2-s_k^2)^2} + \frac{\partial c(S)}{\partial s_k} \frac{2s_js_k}{(s_j^2-s_k^2)^2} \right) \nonumber \\
+	\expect{Q_{jj}Q_{jk}Q_{kj}} &= \frac{1}{c(S)} \left( \frac{\partial^2 c(S)}{\partial s_j \partial s_k} \frac{s_j}{s_k^2-s_j^2} - \frac{\partial^2 c(S)}{\partial s_j^2} \frac{s_k}{s_k^2-s_j^2} - \frac{\partial c(S)}{\partial s_j} \frac{2s_js_k}{(s_j^2-s_k^2)^2} + \frac{\partial c(S)}{\partial s_k} \frac{s_j^2+s_k^2}{(s_j^2-s_k^2)^2} \right)
+\end{align}
+
+For the case when $s_j=s_k$, take the limit of \eqref{eqn:iijkjk}, we get
 \begin{align}
-	\expect{Q_{jj}Q_{jk}Q_{jk}} &= \frac{1}{c(S)} \left( \frac{\partial^2 c(S)}{\partial s_j \partial s_k} \frac{s_k}{s_k^2-s_j^2} - \frac{\partial^2 c(S)}{\partial s_j^2} \frac{s_j}{s_k^2-s_j^2} - \frac{\partial c(S)}{\partial s_j} \frac{s_j^2+s_k^2}{(s_j^2-s_k^2)^2} + \frac{\partial c(S)}{\partial s_k} \frac{2s_js_k}{(s_j^2-s_k^2)^2} \right)
+	\expect{Q_{ii}Q_{jk}Q_{jk}} &= \frac{1}{c(S)}\frac{1}{2s_j} \left( \frac{\partial^2 c(S)}{\partial s_i \partial s_j} + s_j\left( \frac{\partial^3 c(S)}{\partial s_i \partial s_j^2} - \frac{\partial^3 c(S)}{\partial s_i \partial s_j \partial s_k} \right) \right) \nonumber \\
+	\expect{Q_{ii}Q_{jk}Q_{kj}} &= \frac{1}{c(S)}\frac{1}{2s_j} \left( -\frac{\partial^2 c(S)}{\partial s_i \partial s_j} + s_j\left( \frac{\partial^3 c(S)}{\partial s_i \partial s_j^2} - \frac{\partial^3 c(S)}{\partial s_i \partial s_j \partial s_k} \right) \right)
+\end{align}
+For \eqref{eqn:jjjkjk}, the first two terms are the same as the above equations when taking the limit. Let $(i,j,k)\in\mathcal{I}$, denote $\partial_{123}c(s_\alpha,s_\beta,s_\gamma) = \frac{\partial^3 c(s_\alpha,s_\beta,s_\gamma)}{\partial s_\alpha \partial s_\beta \partial s_\gamma}$, and let $s_k=s_j+\Delta$, the last two terms are calculated as
+\begin{align}
+	&\lim\limits_{\Delta\to 0} \left( -\frac{\partial c(S)}{\partial s_j} \frac{s_j^2+s_k^2}{(s_j^2-s_k^2)^2} + \frac{\partial c(S)}{\partial s_k} \frac{2s_js_k}{(s_j^2-s_k^2)^2} \right) \nonumber \\
+	= &\frac{1}{4s_j^2} \lim\limits_{\Delta\to 0} \left( \frac{2\partial_3 c(s_i,s_j,s_j+\Delta)s_j(s_j+\Delta)}{\Delta^2} - \frac{\partial_2 c(s_i,s_j,s_j+\Delta)(2s_j^2+2s_j\Delta+\Delta^2)}{\Delta^2} \right) \nonumber \\
+	= &\frac{1}{4s_j^2} \left( -\partial_2 c + 2\lim\limits_{\Delta\to 0} \frac{(\partial_3-\partial_2) c(s_i,s_j,s_j+\Delta)(s_j^2+s_j\Delta)}{\Delta^2} \right) \nonumber \\
+	= &\frac{1}{4s_j^2} \left( -\partial_2 c + 2s_j(\partial_{22}-\partial_{23})c +  \right. \nonumber \\ &\qquad \left. 2s_j^2\left[ \lim\limits_{\Delta\to 0} \frac{-\left( -\partial_3 c(s_i,s_j,s_j+\Delta) + \partial_3 c(s_i,s_j+\Delta,s_j+\Delta) - \partial_3 c(s_i,s_j+\Delta,s_j) + \partial_3 c(s_i,s_j,s_j) \right)}{\Delta^2} \right.\right. \nonumber \\ &\qquad \left.\left. +\lim\limits_{\Delta\to 0} \frac{-\partial_2 c(s_i,s_j,s_j+\Delta) + \partial_2 c(s_i,s_j+\Delta,s_j+\Delta) - \partial_2 c(s_i,s_j,s_j+\Delta) + \partial_2 c(s_i,s_j,s_j)}{\Delta^2} \right] \right) \nonumber \\
+	= &\frac{1}{4s_j^2} \left( -\partial_2 c + 2s_j(\partial_{22}-\partial_{23})c + 2s_j^2(\partial_{223}-\partial_{233})c \right) \nonumber \\
+	= &\frac{1}{4s_j^2} \left( -\frac{\partial c(S)}{\partial s_j} + 2s_j\left( \frac{\partial^2 c(S)}{\partial s_j^2} - \frac{\partial^2 c(S)}{\partial s_j \partial s_k} \right) + 2s_j^2\left( \frac{\partial^3 c(S)}{\partial s_j^2 \partial s_k} - \frac{\partial^3 c(S)}{\partial s_j \partial s_k^2} \right) \right)
+\end{align}
+Therefore, when $s_j=s_k$, \eqref{eqn:jjjkjk} becomes
+\begin{align}
+	\expect{Q_{jj}Q_{jk}Q_{jk}} &= \frac{1}{c(S)} \frac{1}{4s_j^2} \left( -\frac{\partial c(S)}{\partial s_j} + 2s_j\left( 2\frac{\partial^2 c(S)}{\partial s_j^2} - \frac{\partial^2 c(S)}{\partial s_j \partial s_k} \right) + 2s_j^2\left( \frac{\partial^3 c(S)}{\partial s_j^3} - \frac{\partial^3 c(S)}{\partial s_j \partial s_k^2} \right) \right) \nonumber \\
+	\expect{Q_{jj}Q_{jk}Q_{kj}} &= \frac{1}{c(S)} \frac{1}{4s_j^2} \left( \frac{\partial c(S)}{\partial s_j} - 2s_j\frac{\partial^2 c(S)}{\partial s_j \partial s_k} + 2s_j^2\left( \frac{\partial^3 c(S)}{\partial s_j^3} - \frac{\partial^3 c(S)}{\partial s_j \partial s_k^2} \right) \right)
 \end{align}
 
 \section{$\expect{Q_{ij}Q_{jk}Q_{ki}}$ ($i\neq j\neq k$)}
 \begin{equation*}
 	\frac{\partial^3 M_Q(T)}{\partial T_{ij} \partial T_{jk} \partial T_{ki}} = \frac{1}{c(S)}\left.\left( \sum_{\alpha=1}^3 \frac{\partial c(S+T)}{\partial s_\alpha} \frac{\partial^3 s_\alpha}{\partial T_{ij} \partial T_{jk} \partial T_{ki}} \right)\right|_{T=0}
 \end{equation*}
+First, calculate the third order derivative directly
+\begin{align} \label{eqn:3}
+	\frac{\partial^3 s_\alpha}{\partial T_{ij} \partial T_{jk} \partial T_{ki}} &= \frac{\partial (U_{i\alpha}V_{j\alpha})}{\partial T_{jk} \partial T_{ki}} \nonumber \\
+	&= \frac{\partial}{\partial T_{ki}} \left( V_{j\alpha}\frac{\partial U_{i\alpha}}{\partial T_{jk}} + U_{i\alpha}\frac{\partial V_{j\alpha}}{\partial T_{jk}} \right) \nonumber \\
+	&= \frac{\partial V_{j\alpha}}{\partial T_{ki}}\frac{\partial U_{i\alpha}}{\partial T_{jk}} + V_{j\alpha}\frac{\partial^2 U_{i\alpha}}{\partial T_{jk} \partial T_{ki}} + \frac{\partial U_{i\alpha}}{\partial T_{ki}} \frac{\partial V_{j\alpha}}{\partial T_{jk}} + U_{i\alpha}\frac{\partial^2 V_{j\alpha}}{\partial T_{jk} \partial T_{ki}}
+\end{align}
+Let $(j,\alpha,\beta)\in\mathcal{I}$, and $(i,\alpha,\gamma)\in\mathcal{I}$, add the first and third terms, we get
+\begin{align} \label{eqn:31}
+	&\left. \frac{\partial V_{j\alpha}}{\partial T_{ki}}\frac{\partial U_{i\alpha}}{\partial T_{jk}} + \frac{\partial U_{i\alpha}}{\partial T_{ki}} \frac{\partial V_{j\alpha}}{\partial T_{jk}} \right|_{T=0} \nonumber \\
+	= &\left. -\left( V_{jj}\Omega_{V_{j\alpha}}^{ki} + V_{j\beta}\Omega_{V_{\beta\alpha}}^{ki} \right)\left( U_{ii}\Omega_{U_{i\alpha}}^{jk} + U_{i\gamma}\Omega_{U_{\gamma\alpha}}^{jk} \right) \right|_{T=0} - \left. \left( U_{ii}\Omega_{U_{i\alpha}}^{ki} + U_{i\gamma}\Omega_{U_{\gamma\alpha}}^{ki} \right)\left( V_{jj}\Omega_{V_{j\alpha}}^{jk} + V_{j\beta}\Omega_{V_{\beta\alpha}}^{jk} \right)\right|_{T=0} \nonumber \\
+	= &-\left.\left( \Omega_{V_{j\alpha}}^{ki}\Omega_{U_{i\alpha}}^{jk} + \Omega_{U_{i\alpha}}^{ki}\Omega_{V_{j\alpha}}^{jk} \right)\right|_{T=0}
+\end{align}
+Solving \eqref{eqn:Omega}, we get
+\begin{align}
+	\Omega_{U_{kl}}^{ij} &= \frac{s_lU_{ik}V_{jl}+s_kU_{il}V_{jk}}{s_l^2-s_k^2} \nonumber \\
+	\Omega_{V_{kl}}^{ij} &= \frac{s_kU_{ik}V_{jl}+s_lU_{il}V_{jk}}{s_k^2-s_l^2}
+\end{align}
+Plug these into \eqref{eqn:31}, we get
+\begin{align}
+	&\left.\left( -\sum_{\alpha=1}^3 \frac{\partial c(S+T)}{\partial s_\alpha} \left( \Omega_{V_{j\alpha}}^{ki}\Omega_{U_{i\alpha}}^{jk} + \Omega_{U_{i\alpha}}^{ki}\Omega_{V_{j\alpha}}^{jk} \right) \right)\right|_{T=0} \nonumber \\
+	= &\left.-\sum_{\alpha=1}^3 \frac{\partial c(S)}{\partial s_\alpha} \left( \frac{s_\alpha U_{ji}V_{k\alpha} + s_iU_{j\alpha}V_{ki}}{s_\alpha^2-s_i^2} \frac{s_jU_{kj}V_{i\alpha} + s_\alpha U_{k\alpha}V_{ij}}{s_j^2-s_\alpha^2} + \frac{s_\alpha U_{ki}V_{i\alpha} + s_iU_{k\alpha}V_{ii}}{s_\alpha^2-s_i^2} \frac{s_jU_{jj}V_{k\alpha} + s_\alpha U_{j\alpha}V_{kj}}{s_j^2-s_\alpha^2} \right) \right|_{T=0} \nonumber \\
+	= &\frac{\partial c(S+T)}{\partial s_k} \frac{s_is_j}{(s_j^2-s_k^2)(s_i^2-s_k^2)}
+\end{align}
+
+Next, add the second and fourth terms in \eqref{eqn:3} and evaluate at $T=0$
+\begin{align}
+	\sum_{\alpha=1}^3 \frac{\partial c(S+T)}{\partial s_\alpha} \left.\left( V_{j\alpha}\frac{\partial^2 U_{i\alpha}}{\partial T_{jk} \partial T_{ki}} + U_{i\alpha}\frac{\partial^2 V_{j\alpha}}{\partial T_{jk} \partial T_{ki}} \right)\right|_{T=0} = \left. \frac{\partial c(S)}{\partial s_i} \frac{\partial^2 V_{ji}}{\partial T_{jk} \partial T_{ki}} \right|_{T=0} + \left. \frac{\partial c(S)}{\partial s_j} \frac{\partial^2 U_{ij}}{\partial T_{jk} \partial T_{ki}} \right|_{T=0}
+\end{align}
+Expand the second order derivatives in the above equation, we get
+\begin{align}
+	\left. \frac{\partial^2 V_{ji}}{\partial T_{jk} \partial T_{ki}} \right|_{T=0} &= -\left. \frac{\partial}{\partial T_{ki}} \left( V_{jj}\Omega_{V_{ji}}^{jk} + V_{jk}\Omega_{V_{ki}}^{jk} \right) \right|_{T=0} \nonumber \\
+	&= -\left.\left( \frac{\partial V_{jj}}{\partial T_{ki}}\Omega_{V_{ji}}^{jk} + V_{jj}\frac{\partial \Omega_{V_{ji}}^{jk}}{\partial T_{ki}} + \frac{\partial V_{jk}}{\partial T_{ki}}\Omega_{V_{ki}}^{jk} + V_{jk}\frac{\partial \Omega_{V_{ki}}^{jk}}{\partial T_{ki}} \right)\right|_{T=0} \nonumber \\
+	&= -\left.\left( -\left( V_{ji}\Omega_{V_{ij}}^{ki} + V_{jk}\Omega_{V_{kj}}^{ki} \right)\Omega_{V_{ji}}^{jk} + \frac{\partial \Omega_{V_{ji}}^{jk}}{\partial T_{ki}} - \left( V_{jj}\Omega_{V_{jk}}^{ki} + V_{ji}\Omega_{V_{ik}}^{ki} \right)\Omega_{V_{ki}}^{jk} \right)\right|_{T=0} \nonumber \\
+	&= \left.\left( \frac{s_jU_{kj}V_{ik} + s_kU_{kk}V_{ij}}{s_j^2-s_k^2} \frac{s_iU_{jk}V_{ki} + s_kU_{ji}V_{kk}}{s_k^2-s_i^2} - \frac{\partial \Omega_{V_{ji}}^{jk}}{\partial T_{ki}} \right)\right|_{T=0} \nonumber \\
+	&= \left. \frac{\partial \Omega_{V_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0}
+\end{align}
+and similarly
+\begin{align}
+	\left. \frac{\partial^2 U_{ij}}{\partial T_{jk} \partial T_{ki}} \right|_{T=0} &= \left. \frac{\partial}{\partial T_{ki}} \left( U_{ii}\Omega_{U_{ij}}^{jk} + U_{ik}\Omega_{U_{kj}}^{jk} \right) \right|_{T=0} \nonumber \\
+	&= \left.\left( \frac{\partial U_{ii}}{\partial T_{ki}}\Omega_{U_{ij}}^{jk} + U_{ii}\frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} + \frac{\partial U_{ik}}{\partial T_{ki}}\Omega_{U_{kj}}^{jk} + U_{ik}\frac{\partial \Omega_{U_{kj}}^{jk}}{\partial T_{ki}} \right)\right|_{T=0} \nonumber \\
+	&= \left.\left( \left( U_{ij}\Omega_{U_{ji}}^{ki} + U_{ik}\Omega_{U_{ki}}^{ki} \right)\Omega_{U_{ij}}^{jk} + \frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} + \left( U_{ii}\Omega_{U_{ik}}^{ki} + U_{ij}\Omega_{U_{jk}}^{ki} \right)\Omega_{U_{kj}}^{jk} \right)\right|_{T=0} \nonumber \\
+	&= \left.\left( \frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} + \frac{s_kU_{ki}V_{ik}+s_iU_{kk}V_{ii}}{s_k^2-s_i^2} \frac{s_jU_{jk}V_{kj}+s_kU_{jj}V_{kk}}{s_j^2-s_k^2} \right)\right|_{T=0} \nonumber \\
+	&= \left. \frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} - \frac{s_is_k}{(s_i^2-s_k^2)(s_j^2-s_k^2)}
+\end{align}
+Take derivatives of \eqref{eqn:Omega} with respect to $T_{ki}$ yields
+\begin{align}
+	\frac{\partial s_j}{\partial T_{ki}}\Omega_{U_{ij}}^{jk} + s_j\frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} + \frac{\partial s_i}{\partial T_{ki}}\Omega_{V_{ij}}^{jk} + s_i\frac{\partial \Omega_{V_{ij}}^{jk}}{\partial T_{ki}} &= \frac{\partial U_{ji}}{\partial T_{ki}}V_{kj} + U_{ji}\frac{\partial V_{kj}}{\partial T_{ki}} \nonumber \\
+	\frac{\partial s_i}{\partial T_{ki}}\Omega_{U_{ij}}^{jk} + s_i\frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} + \frac{\partial s_j}{\partial T_{ki}}\Omega_{V_{ij}}^{jk} + s_j\frac{\partial \Omega_{V_{ij}}^{jk}}{\partial T_{ki}} &= -\frac{\partial U_{jj}}{\partial T_{ki}}V_{ki} - U_{jj}\frac{\partial V_{ki}}{\partial T_{ki}}
+\end{align}
+Evaluate the above equations at $T=0$, we get
+\begin{align}
+	\left. s_j\frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} + \left. s_i\frac{\partial \Omega_{V_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} &= 0 \nonumber \\
+	\left. s_i\frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} + \left. s_j\frac{\partial \Omega_{V_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} &= \frac{s_k}{s_k^2-s_i^2}
+\end{align}
+Solve it, we get
+\begin{align}
+	\left. \frac{\partial \Omega_{U_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} &= \frac{s_is_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} \nonumber \\
+	\left. \frac{\partial \Omega_{V_{ij}}^{jk}}{\partial T_{ki}} \right|_{T=0} &=
+	-\frac{s_js_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)}
+\end{align}
+Combining these results, we finally have
+\begin{align}
+	\expect{Q_{ij}Q_{jk}Q_{ki}} &= \frac{1}{c(S)}\left[ -\frac{c(S)}{\partial s_i} \frac{s_js_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \left( \frac{s_is_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} - \frac{s_is_k}{(s_i^2-s_k^2)(s_j^2-s_k^2)} \right) \right. \nonumber \\ &\qquad\qquad +\left. \frac{\partial c(S)}{\partial s_k} \frac{s_is_j}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right] \nonumber \\
+	\expect{Q_{ij}Q_{jk}Q_{ik}} &= \frac{1}{c(S)}\left[ -\frac{\partial c(S)}{\partial s_i} \frac{s_is_j}{(s_j^2-s_i^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \left( \frac{s_i^2}{(s_j^2-s_i^2)(s_i^2-s_k^2)} -\frac{s_k^2}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right) \right. \nonumber \\ &\qquad\qquad +\left. \frac{\partial c(S)}{\partial s_k} \frac{s_js_k}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right] \nonumber \\
+	\expect{Q_{ij}Q_{kj}Q_{ik}} &= \frac{1}{c(S)}\left[ -\frac{\partial c(S)}{\partial s_i} \frac{s_is_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} + \frac{\partial c(S)}{\partial s_j} \left(\frac{s_js_k}{(s_j^2-s_i^2)(s_i^2-s_k^2)} - \frac{s_js_k}{(s_i^2-s_k^2)(s_j^2-s_k^2)} \right) \right. \nonumber \\ &\qquad\qquad +\left. \frac{\partial c(S)}{\partial s_k} \frac{s_k^2}{(s_j^2-s_k^2)(s_i^2-s_k^2)} \right]
+\end{align}
 
 \end{document}
 

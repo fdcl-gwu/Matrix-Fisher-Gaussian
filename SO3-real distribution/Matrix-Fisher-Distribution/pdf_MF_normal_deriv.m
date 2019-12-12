@@ -62,7 +62,21 @@ if ~bool_scaled
             end
         end
         
+        dddc=zeros(3,3,3);
+        for i=1:3
+            dddc(i,i,i) = integral(@(u) f_kunze_s_deriv_iii(u,s,i),-1,1);
+            for j = setdiff([1,2,3],i)
+                dddc(i,i,j) = integral(@(u) f_kunze_s_deriv_iij(u,s,i,j),-1,1);
+                dddc(i,j,i)=dddc(i,i,j);
+                dddc(j,i,i)=dddc(i,i,j);
+                
+                k = setdiff([1,2,3],[i,j]);
+                dddc(i,j,k) = integral(@(u) f_kunze_s_deriv_ijk(u,s),-1,1);
+            end
+        end
+        
         varargout{2}=ddc;
+        varargout{3}=dddc;
     end
     
 else
@@ -93,7 +107,32 @@ else
                 -dc_bar(i)-dc_bar(j)-c_bar;
             ddc_bar(j,i) = ddc_bar(i,j);
         end
+        
+        dddc_bar = zeros(3,3,3);
+        for i = 1:3
+            index=circshift([1 2 3],[0 4-i]);
+            j=index(2);
+            k=index(3);
+            
+            dddc_bar(i,i,i) = integral(@(u) f_kunze_s_deriv_scaled_iii(u,[s(i),s(j),s(k)]),-1,1);
+            
+            dddc_bar(i,i,j) = integral(@(u) f_kunze_s_deriv_scaled_ijj(u,[s(i),s(j),s(k)]),-1,1)...
+                -ddc_bar(i,i)-2*ddc_bar(i,j)-2*dc_bar(i)-dc_bar(j)-c_bar;
+            dddc_bar(i,j,i) = dddc_bar(i,i,j);
+            dddc_bar(j,i,i) = dddc_bar(i,i,j);
+            
+            dddc_bar(i,i,k) = integral(@(u) f_kunze_s_deriv_scaled_ijj(u,[s(i),s(k),s(j)]),-1,1)...
+                -ddc_bar(i,i)-2*ddc_bar(i,k)-2*dc_bar(i)-dc_bar(k)-c_bar;
+            dddc_bar(i,k,i) = dddc_bar(i,i,k);
+            dddc_bar(k,i,i) = dddc_bar(i,i,k);
+            
+            dddc_bar(i,j,k) = integral(@(u) f_kunze_s_deriv_scaled_ijk(u,[s(i),s(j),s(k)]),-1,1)...
+                -ddc_bar(i,j)-ddc_bar(j,k)-ddc_bar(i,k)-dc_bar(i)-dc_bar(j)-dc_bar(k)-c_bar;
+            dddc_bar(i,k,j) = dddc_bar(i,j,k);
+        end
+        
         varargout{2}=ddc_bar;
+        varargout{3}=dddc_bar;
     end
 end
 end
@@ -108,7 +147,6 @@ for ii=1:l
     end
 end
 end
-
 
 function Y=f_kunze_s_deriv_scaled_kk(u,s)
 % integrand for the second order derivative of the scaled normalizing constant
@@ -131,6 +169,47 @@ for ii=1:l
             +1/4*besseli(0,1/2*(s(2)-s(3))*(1-u(ii,jj)),1)*besseli(1,1/2*(s(2)+s(3))*(1+u(ii,jj)),1) ...
             *exp((s(1)+min([s(2) s(3)]))*(u(ii,jj)-1))*u(ii,jj)*(1+u(ii,jj));
         Y(ii,jj)=J;
+    end
+end
+end
+
+function Y=f_kunze_s_deriv_scaled_iii(u,s)
+% integrand for the third order derivative of the scaled normalizing constant
+[l m]=size(u);
+for ii=1:l
+    for jj=1:m
+        J=besseli(0,1/2*(s(2)-s(3))*(1-u(ii,jj)),1)*besseli(0,1/2*(s(2)+s(3))*(1+u(ii,jj)),1);
+        Y(ii,jj)=1/2*J*(u(ii,jj)-1)^3*exp((min([s(2) s(3)])+s(1))*(u(ii,jj)-1));
+    end
+end
+end
+
+function Y=f_kunze_s_deriv_scaled_ijj(u,s)
+% integrand for the third order derivative of the scaled normalizing constant
+[l m]=size(u);
+for ii=1:l
+    for jj=1:m
+        J10=besseli(1,1/2*(s(2)-s(3))*(1-u(ii,jj)),1)*besseli(0,1/2*(s(2)+s(3))*(1+u(ii,jj)),1);
+        J01=besseli(0,1/2*(s(2)-s(3))*(1-u(ii,jj)),1)*besseli(1,1/2*(s(2)+s(3))*(1+u(ii,jj)),1);
+        Y(ii,jj)=1/4*J10*(1-u(ii,jj))*u(ii,jj)^2*exp((min([s(2) s(3)])+s(1))*(u(ii,jj)-1))...
+            +1/4*J01*(1+u(ii,jj))*u(ii,jj)^2*exp((min([s(2) s(3)])+s(1))*(u(ii,jj)-1));
+    end
+end
+end
+
+function Y=f_kunze_s_deriv_scaled_ijk(u,s)
+% integrand for the third order derivative of the scaled normalizing constant
+[l m]=size(u);
+for ii=1:l
+    for jj=1:m
+        J20 = 0.5*(besseli(0,1/2*(s(2)-s(3))*(1-u(ii,jj)),1)+...
+            besseli(2,1/2*(s(2)-s(3))*(1-u(ii,jj)),1))*...
+            besseli(0,1/2*(s(2)+s(3))*(1+u(ii,jj)),1);
+        J02 = besseli(0,1/2*(s(2)-s(3))*(1-u(ii,jj)),1)*0.5*...
+            (besseli(0,1/2*(s(2)+s(3))*(1+u(ii,jj)),1)+...
+            besseli(2,1/2*(s(2)+s(3))*(1+u(ii,jj)),1));
+        Y(ii,jj)=-1/8*J20*(1-u(ii,jj))^2*u(ii,jj)*exp((min([s(2) s(3)])+s(1))*(u(ii,jj)-1))...
+            +1/8*J02*(1+u(ii,jj))^2*u(ii,jj)*exp((min([s(2) s(3)])+s(1))*(u(ii,jj)-1));
     end
 end
 end
@@ -176,6 +255,57 @@ for ii=1:l
         J01=besseli(0,1/2*(s(j)-s(k))*(1-u(ii,jj)))*besseli(1,1/2*(s(j)+s(k))*(1+u(ii,jj)));
         Y(ii,jj)=1/4*J10*u(ii,jj)*(1-u(ii,jj))*exp(s(i)*u(ii,jj))...
             +1/4*J01*u(ii,jj)*(1+u(ii,jj))*exp(s(i)*u(ii,jj));
+    end
+end
+end
+
+function Y=f_kunze_s_deriv_iii(u,s,i)
+% integrand for the third-order derivative of the normalizing constant
+index=circshift([1 2 3],[0 4-i]);
+j=index(2);
+k=index(3);
+
+[l m]=size(u);
+for ii=1:l
+    for jj=1:m
+        J00 = besseli(0,1/2*(s(j)-s(k))*(1-u(ii,jj)))*besseli(0,1/2*(s(j)+s(k))*(1+u(ii,jj)));
+        Y(ii,jj)=1/2*J00*u(ii,jj)^3*exp(s(i)*u(ii,jj));
+    end
+end
+end
+
+function Y=f_kunze_s_deriv_iij(u,s,i,j)
+% integrand for the mixed third-order derivative of the normalizing constant
+k = setdiff([1,2,3],[i,j]);
+
+[l m]=size(u);
+for ii = 1:l
+    for jj = 1:m
+        J10 = besseli(1,1/2*(s(j)-s(k))*(1-u(ii,jj)))*besseli(0,1/2*(s(j)+s(k))*(1+u(ii,jj)));
+        J01 = besseli(0,1/2*(s(j)-s(k))*(1-u(ii,jj)))*besseli(1,1/2*(s(j)+s(k))*(1+u(ii,jj)));
+        Y(ii,jj)=1/4*J10*u(ii,jj)^2*(1-u(ii,jj))*exp(s(i)*u(ii,jj))...
+            +1/4*J01*u(ii,jj)^2*(1+u(ii,jj))*exp(s(i)*u(ii,jj));
+    end
+end
+end
+
+function Y=f_kunze_s_deriv_ijk(u,s)
+% integrand for the mixed third-order derivative of the normalizing constant
+i=1;
+j=2;
+k=3;
+
+[l m]=size(u);
+for ii = 1:l
+    for jj = 1:m
+        J20 = 0.5*(besseli(0,1/2*(s(j)-s(k))*(1-u(ii,jj)))+...
+            besseli(2,1/2*(s(j)-s(k))*(1-u(ii,jj))))*...
+            besseli(0,1/2*(s(j)+s(k))*(1+u(ii,jj)));
+        J02 = besseli(0,1/2*(s(j)-s(k))*(1-u(ii,jj)))*0.5*...
+            (besseli(0,1/2*(s(j)+s(k))*(1+u(ii,jj)))+...
+            besseli(2,1/2*(s(j)+s(k))*(1+u(ii,jj))));
+        Y(ii,jj)=-1/8*J20*u(ii,jj)*(1-u(ii,jj))^2*exp(s(i)*u(ii,jj))...
+            +1/8*J02*u(ii,jj)*(1+u(ii,jj))^2*exp(s(i)*u(ii,jj));
     end
 end
 end
