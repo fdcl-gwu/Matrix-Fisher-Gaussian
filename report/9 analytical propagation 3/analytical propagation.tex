@@ -47,19 +47,19 @@ After integrating out the linear component, this term is given as
 \begin{equation}
 	\expect{R(t)\hat{x}(t)} = \expect{R(t)}\hat{\mu}+\expect{R(t)\widehat{P\nu_R(t)}} = \expect{R(t)}\hat{\mu}+U\expect{QV^T\widehat{P\nu_R}}
 \end{equation}
-Denote $QV^T\widehat{P\nu_R} \triangleq Q_{2a}$, then by brute force calculation and considering some of the second moments of $Q$ vanish, we have
-\begin{align*}
-	\expect{Q_{2a}}_{11} &= (V_{23}P_{23}-V_{22}P_{33})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + (V_{32}P_{32}-V_{33}P_{22})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \\
-	\expect{Q_{2a}}_{12} &= (V_{21}P_{33}-V_{23}P_{13})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + 
-	(V_{33}P_{12}-V_{31}P_{32})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \\
-	\expect{Q_{2a}}_{13} &= (V_{22}P_{13}-V_{21}P_{23})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + (V_{31}P_{22}-V_{32}P_{12})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \\
-	\expect{Q_{2a}}_{21} &= (V_{12}P_{33}-V_{13}P_{23})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{33}P_{21}-V_{32}P_{31})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \\
-	\expect{Q_{2a}}_{22} &= (V_{13}P_{13}-V_{11}P_{33})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{31}P_{31}-V_{33}P_{11})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \\
-	\expect{Q_{2a}}_{23} &= (V_{11}P_{23}-V_{12}P_{13})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{32}P_{11}-V_{31}P_{21})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \\
-	\expect{Q_{2a}}_{31} &= (V_{13}P_{22}-V_{12}P_{32})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{22}P_{31}-V_{23}P_{21})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}}) \\
-	\expect{Q_{2a}}_{32} &= (V_{11}P_{32}-V_{13}P_{12})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{23}P_{11}-V_{21}P_{31})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}}) \\
-	\expect{Q_{2a}}_{33} &= (V_{12}P_{12}-V_{11}P_{22})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{21}P_{21}-V_{22}P_{11})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}})
-\end{align*}
+Denote $QV^T\widehat{P\nu_R} \triangleq Q_{1a}$, then by brute force calculation and considering some of the second moments of $Q$ vanish, we have
+\begin{align} \label{eqn:Q1a}
+	\expect{Q_{1a}}_{11} &= (V_{23}P_{23}-V_{22}P_{33})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + (V_{32}P_{32}-V_{33}P_{22})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \nonumber \\
+	\expect{Q_{1a}}_{12} &= (V_{21}P_{33}-V_{23}P_{13})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + 
+	(V_{33}P_{12}-V_{31}P_{32})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \nonumber \\
+	\expect{Q_{1a}}_{13} &= (V_{22}P_{13}-V_{21}P_{23})(s_2\expect{Q_{12}^2}-s_1\expect{Q_{12}Q_{21}}) + (V_{31}P_{22}-V_{32}P_{12})(s_3\expect{Q_{13}^2}-s_1\expect{Q_{13}Q_{31}}) \nonumber \\
+	\expect{Q_{1a}}_{21} &= (V_{12}P_{33}-V_{13}P_{23})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{33}P_{21}-V_{32}P_{31})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \nonumber \\
+	\expect{Q_{1a}}_{22} &= (V_{13}P_{13}-V_{11}P_{33})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{31}P_{31}-V_{33}P_{11})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \nonumber \\
+	\expect{Q_{1a}}_{23} &= (V_{11}P_{23}-V_{12}P_{13})(s_1\expect{Q_{21}^2}-s_2\expect{Q_{21}Q_{12}}) + (V_{32}P_{11}-V_{31}P_{21})(s_3\expect{Q_{23}^2}-s_2\expect{Q_{23}Q_{32}}) \nonumber \\
+	\expect{Q_{1a}}_{31} &= (V_{13}P_{22}-V_{12}P_{32})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{22}P_{31}-V_{23}P_{21})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}}) \nonumber \\
+	\expect{Q_{1a}}_{32} &= (V_{11}P_{32}-V_{13}P_{12})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{23}P_{11}-V_{21}P_{31})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}}) \nonumber \\
+	\expect{Q_{1a}}_{33} &= (V_{12}P_{12}-V_{11}P_{22})(s_1\expect{Q_{31}^2}-s_3\expect{Q_{31}Q_{13}}) + (V_{21}P_{21}-V_{22}P_{11})(s_2\expect{Q_{32}^2}-s_3\expect{Q_{32}Q_{23}})
+\end{align}
 
 \section{Calculating $\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)}$}
 
@@ -82,7 +82,7 @@ As a sequel, $\expect{x(t+\Delta t)\nu'^T_R(t+\Delta t)}$ can be approximated by
 
 Now, we need to evaluate the three terms in \eqref{eqn:expectxvRNewAppro}.
 The first term is the easiest, since
-\begin{equation}
+\begin{equation} \label{eqn:ExvRp}
 	\expect{x(t)\nu'^T_{R(t)}} = \mu\expect{\nu'_{R(t)}}^T + P\expect{\nu_{R(t)}\nu'^T_{R(t)}},
 \end{equation}
 where $\expect{\nu'_{R(t)}} = (U'^T\expect{R(t)}V'S'-S'V'^T\expect{R(t)}^TU')^\vee$.
@@ -90,21 +90,339 @@ To calculate $\expect{\nu_{R(t)}\nu'^T_{R(t)}}$, define $\tilde{U} = U'^TU$, $\t
 \begin{equation*}
 	\expect{\nu_{R(t)}\nu'^T_{R(t)}} = \expect{(QS-SQ^T)^\vee\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T}\tilde{U}^T
 \end{equation*}
-Denote $(QS-SQ^T)^\vee\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T \triangleq Q_{2b}$, by brute force calculation, we have
-\begin{align*}
-	\expect{Q_{2b}}_{11} &= (s_2\tilde{S}_{22}+s_3\tilde{S}_{33})\expect{Q_{23}^2} - (s_2\tilde{S}_{33}+s_3\tilde{S}_{22})\expect{Q_{23}Q_{32}} \\
-	\expect{Q_{2b}}_{12} &= s_3\tilde{S}_{12}\expect{Q_{23}Q_{32}} - s_2\tilde{S}_{12}\expect{Q_{23}^2} \\
-	\expect{Q_{2b}}_{13} &= s_3\tilde{S}_{13}\expect{Q_{23}Q_{32}} - s_3\tilde{S}_{13}\expect{Q_{23}^2} \\
-	\expect{Q_{2b}}_{21} &= s_3\tilde{S}_{21}\expect{Q_{13}Q_{31}} - s_1\tilde{S}_{21}\expect{Q_{13}^2} \\
-	\expect{Q_{2b}}_{22} &= (s_1\tilde{S}_{11}+s_3\tilde{S}_{33})\expect{Q_{13}^2} - (s_1\tilde{S}_{33}+s_3\tilde{S}_{11})\expect{Q_{13}Q_{31}} \\
-	\expect{Q_{2b}}_{23} &= s_1\tilde{S}_{23}\expect{Q_{13}Q_{31}} - s_3\tilde{S}_{23}{Q_{13}^2} \\
-	\expect{Q_{2b}}_{31} &= s_2\tilde{S}_{31}\expect{Q_{12}Q_{21}} - s_1\tilde{S}_{31}\expect{Q_{12}^2} \\
-	\expect{Q_{2b}}_{32} &= s_1\tilde{S}_{32}\expect{Q_{12}Q_{21}} - s_2\tilde{S}_{32}\expect{Q_{12}^2} \\
-	\expect{Q_{2b}}_{33} &= (s_1\tilde{S}_{11}+s_2\tilde{S}_{22})\expect{Q_{12}^2} - (s_1\tilde{S}_{22}+s_2\tilde{S}_{11})\expect{Q_{12}Q_{21}}
-\end{align*}
+Denote $(QS-SQ^T)^\vee\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T \triangleq Q_{2a}$, by brute force calculation, we have
+\begin{align} \label{eqn:Q2a}
+	\expect{Q_{2a}}_{11} &= (s_2\tilde{S}_{22}+s_3\tilde{S}_{33})\expect{Q_{23}^2} - (s_2\tilde{S}_{33}+s_3\tilde{S}_{22})\expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{2a}}_{12} &= s_3\tilde{S}_{12}\expect{Q_{23}Q_{32}} - s_2\tilde{S}_{12}\expect{Q_{23}^2} \nonumber \\
+	\expect{Q_{2a}}_{13} &= s_2\tilde{S}_{13}\expect{Q_{23}Q_{32}} - s_3\tilde{S}_{13}\expect{Q_{23}^2} \nonumber \\
+	\expect{Q_{2a}}_{21} &= s_3\tilde{S}_{21}\expect{Q_{13}Q_{31}} - s_1\tilde{S}_{21}\expect{Q_{13}^2} \nonumber \\
+	\expect{Q_{2a}}_{22} &= (s_1\tilde{S}_{11}+s_3\tilde{S}_{33})\expect{Q_{13}^2} - (s_1\tilde{S}_{33}+s_3\tilde{S}_{11})\expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{2a}}_{23} &= s_1\tilde{S}_{23}\expect{Q_{13}Q_{31}} - s_3\tilde{S}_{23}\expect{Q_{13}^2} \nonumber \\
+	\expect{Q_{2a}}_{31} &= s_2\tilde{S}_{31}\expect{Q_{12}Q_{21}} - s_1\tilde{S}_{31}\expect{Q_{12}^2} \nonumber \\
+	\expect{Q_{2a}}_{32} &= s_1\tilde{S}_{32}\expect{Q_{12}Q_{21}} - s_2\tilde{S}_{32}\expect{Q_{12}^2} \nonumber \\
+	\expect{Q_{2a}}_{33} &= (s_1\tilde{S}_{11}+s_2\tilde{S}_{22})\expect{Q_{12}^2} - (s_1\tilde{S}_{22}+s_2\tilde{S}_{11})\expect{Q_{12}Q_{21}}
+\end{align}
 
 Next, we need to calculate $\expect{x(t)\nu'^T_{R(t)\hat{x}(t)\Delta t}}$.
 Note that integrating out the second order of $x$ yields the second order of $\nu_R$, which means we need to calculate the third order moment of $Q$.
+Using the definition of $\nu'_A$, and equation $\left(\hat{x}A-A^T\hat{x}\right)^\vee = \left(\tr{A}I_{3\times 3}-A\right)x$, $\nu'_{R(t)\hat{x}(t)\Delta t}$ is
+\begin{align} \label{eqn:vRhatxp}
+	\nu'_{R(t)\hat{x}(t)\Delta t} &= \Delta t \tilde{U}\left( Q\widehat{V^Tx(t)}\tilde{S}^T+\tilde{S}\widehat{V^Tx(t)}Q^T \right)^\vee \nonumber \\
+	&= \Delta t \tilde{U} \left(\tr{Q\tilde{S}^T}I_{3\times 3}-Q\tilde{S}^T\right)QV^Tx(t) \triangleq \Delta t \tilde{U}\Gamma_Q x(t),
+\end{align}
+which is a linear function of $x(t)$ dependent on $Q$.
+So, $x(t)\nu'^T_{R(t)\hat{x}(t)\Delta t}$ is simplified as
+\begin{equation}
+x(t)\nu'^T_{R(t)\hat{x}(t)\Delta t} = \Delta t x(t)x(t)^T\Gamma_Q^T\tilde{U}^T,
+\end{equation}
+and its moment is
+\begin{align}
+\expect{x(t)\nu'^T_{R(t)\hat{x}(t)\Delta t}} &= \Delta t \expect{\left(\Sigma_c + (\mu+P\nu_R)(\mu+P\nu_R)^T\right) \Gamma_Q^T} \tilde{U}^T \nonumber \\
+&= \Delta t \left( (\Sigma_c+\mu\mu^T)\expect{\Gamma_Q^T} +  \mu\expect{\nu_R^TP^T\Gamma_Q^T} +  P\expect{\nu_R\mu^T\Gamma_Q^T} +  P\expect{\nu_R\nu_R^TP^T\Gamma_Q^T} \right) \tilde{U}^T.
+\end{align}
+Let $\Gamma_Q = \Gamma'_Q V^T$. By brute force calculation, and note that $Q_{ij}=(-1)^{i+j}M_{ij}$ where $M_{ij}$ is the determinant of the minor of $Q_{ij}$, $\Gamma'_Q$ can be simplified as:
+\begin{align}
+	(\Gamma'_Q)_{11} &= \tilde{S}_{22}Q_{33} + \tilde{S}_{33}Q_{22} - \tilde{S}_{23}Q_{32} - \tilde{S}_{32}Q_{23} \nonumber \\
+	(\Gamma'_Q)_{12} &= \tilde{S}_{23}Q_{31} + \tilde{S}_{31}Q_{23} - \tilde{S}_{21}Q_{33} - \tilde{S}_{33}Q_{21} \nonumber \\
+	(\Gamma'_Q)_{13} &= \tilde{S}_{21}Q_{32} + \tilde{S}_{32}Q_{21} - \tilde{S}_{22}Q_{31} - \tilde{S}_{31}Q_{22} \nonumber \\
+	(\Gamma'_Q)_{21} &= \tilde{S}_{13}Q_{32} + \tilde{S}_{32}Q_{13} - \tilde{S}_{12}Q_{33} - \tilde{S}_{33}Q_{12} \nonumber \\
+	(\Gamma'_Q)_{22} &= \tilde{S}_{11}Q_{33} + \tilde{S}_{33}Q_{11} - \tilde{S}_{13}Q_{31} - \tilde{S}_{31}Q_{13} \nonumber \\
+	(\Gamma'_Q)_{23} &= \tilde{S}_{12}Q_{31} + \tilde{S}_{31}Q_{12} - \tilde{S}_{11}Q_{32} - \tilde{S}_{32}Q_{11} \nonumber \\
+	(\Gamma'_Q)_{31} &= \tilde{S}_{12}Q_{23} + \tilde{S}_{23}Q_{12} - \tilde{S}_{13}Q_{22} - \tilde{S}_{22}Q_{13} \nonumber \\
+	(\Gamma'_Q)_{32} &= \tilde{S}_{13}Q_{21} + \tilde{S}_{21}Q_{13} - \tilde{S}_{11}Q_{23} - \tilde{S}_{23}Q_{11} \nonumber \\
+	(\Gamma'_Q)_{33} &= \tilde{S}_{11}Q_{22} + \tilde{S}_{22}Q_{11} - \tilde{S}_{12}Q_{21} - \tilde{S}_{21}Q_{12}
+\end{align}
+Denote $Q_{2b} = \Gamma_Q^T$, $Q_{2c} = \nu_R^TP^T\Gamma_Q^T$, $Q_{2d} = \nu_R\mu^T\Gamma_Q^T$, and $Q_{2e} = \nu_R\nu_R^TP^T\Gamma_Q^T$, by brute force calculation, we have the following equations
+\begin{equation}
+	\expect{Q_{2b}} = V \begin{bmatrix}
+		\tilde{S}_{22}\expect{Q_{33}}+\tilde{S}_{33}\expect{Q_{22}} & -\tilde{S}_{12}\expect{Q_{33}} & -\tilde{S}_{13}\expect{Q_{22}} \\
+		-\tilde{S}_{21}\expect{Q_{33}} & \tilde{S}_{11}\expect{Q_{33}}+S_{33}\expect{Q_{11}} & -\tilde{S}_{23}\expect{Q_{11}} \\
+		-\tilde{S}_{31}\expect{Q_{22}} & -S_{32}\expect{Q_{11}} & \tilde{S}_{11}\expect{Q_{22}}+\tilde{S}_{22}\expect{Q_{11}}
+	\end{bmatrix}
+\end{equation}
+
+\begin{align} \label{eqn:Q2c}
+	\expect{Q_{2c}}_1 &= \left( s_1(P^TV)_{33}\tilde{S}_{32} - s_1(P^TV)_{32}\tilde{S}_{33} \right) \expect{Q_{12}^2} + \left( s_2(P^TV)_{32}\tilde{S}_{33} - s_2(P^TV)_{33}\tilde{S}_{32} \right) \expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \left( s_1(P^TV)_{23}\tilde{S}_{22} - s_1(P^TV)_{22}\tilde{S}_{23} \right) \expect{Q_{13}^2} + \left( s_3(P^TV)_{22}\tilde{S}_{23} - s_3(P^TV)_{23}\tilde{S}_{22} \right) \expect{Q_{13}Q_{31}} \nonumber \\
+	&+ \left( s_2(P^TV)_{13}\tilde{S}_{21} - s_3(P^TV)_{12}\tilde{S}_{31} + s_3(P^TV)_{11}\tilde{S}_{32} - s_2(P^TV)_{11}\tilde{S}_{23} \right) \expect{Q_{23}^2} \nonumber \\
+	&+ \left( s_2(P^TV)_{12}\tilde{S}_{31} - s_3(P^TV)_{13}\tilde{S}_{21} + s_3(P^TV)_{11}\tilde{S}_{23} - s_2(P^TV)_{11}\tilde{S}_{32} \right) \expect{Q_{23}Q_{32}} \nonumber\\ 
+	\expect{Q_{2c}}_2 &= \left( s_2(P^TV)_{31}\tilde{S}_{33} - s_2(P^TV)_{33}\tilde{S}_{31} \right) \expect{Q_{12}^2} + \left( s_1(P^TV)_{33}\tilde{S}_{31} - s_1(P^TV)_{31}\tilde{S}_{33} \right) \expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \left( s_3(P^TV)_{21}\tilde{S}_{32} - s_1(P^TV)_{23}\tilde{S}_{12} + s_1(P^TV)_{22}\tilde{S}_{13} - s_3(P^TV)_{22}\tilde{S}_{31} \right) \expect{Q_{13}^2} \nonumber \\
+	&+ \left( s_3(P^TV)_{23}\tilde{S}_{12} - s_1(P^TV)_{21}\tilde{S}_{32} +  s_1(P^TV)_{22}\tilde{S}_{31} - s_3(P^TV)_{22}\tilde{S}_{13} \right) \expect{Q_{13}Q_{31}} \nonumber \\
+	&+ \left( s_2(P^TV)_{11}\tilde{S}_{13} - s_2(P^TV)_{13}\tilde{S}_{11} \right) \expect{Q_{23}^2} + \left( s_3(P^TV)_{13}\tilde{S}_{11} - s_3(P^TV)_{11}\tilde{S}_{13} \right) \expect{Q_{23}Q_{32}} \nonumber\\ 
+	\expect{Q_{2c}}_3 &= \left( s_1(P^TV)_{32}\tilde{S}_{13} - s_2(P^TV)_{31}\tilde{S}_{23} + s_2(P^TV)_{33}\tilde{S}_{21} - s_1(P^TV)_{33}\tilde{S}_{12} \right) \expect{Q_{12}^2} \nonumber \\
+	&+ \left( s_1(P^TV)_{31}\tilde{S}_{23} - s_2(P^TV)_{32}\tilde{S}_{13} + s_2(P^TV)_{33}\tilde{S}_{12} - s_1(P^TV)_{33}\tilde{S}_{21} \right) \expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \left( s_3(P^TV)_{22}\tilde{S}_{21} - s_3(P^TV)_{21}\tilde{S}_{22} \right) \expect{Q_{13}^2} + \left( s_1(P^TV)_{21}\tilde{S}_{22} - s_1(P^TV)_{22}\tilde{S}_{21} \right) \expect{Q_{13}Q_{31}} \nonumber \\
+	&+ \left( s_3(P^TV)_{12}\tilde{S}_{11} - s_3(P^TV)_{11}\tilde{S}_{12} \right) \expect{Q_{23}^2} + \left( s_2(P^TV)_{11}\tilde{S}_{12} - s_2(P^TV)_{12}\tilde{S}_{11} \right) \expect{Q_{23}Q_{32}} \nonumber\\ 
+\end{align}
+
+\begin{align} \label{eqn:Q2d}
+	\expect{Q_{2d}}_{11} &= \left( (\mu^TV)_1(s_3\tilde{S}_{32}-s_2\tilde{S}_{23}) + (\mu^TV)_3s_2\tilde{S}_{21} - (\mu^TV)_2s_3\tilde{S}_{31} \right) \expect{Q_{23}^2} \nonumber \\
+	& \quad + \left( (\mu^TV)_1(s_3\tilde{S}_{23}-s_2\tilde{S}_{32}) + (\mu^TV)_2s_2\tilde{S}_{31} - (\mu^TV)_3s_3\tilde{S}_{21} \right) \expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{2d}}_{12} &= \left( (\mu^TV)_1s_2\tilde{S}_{13} - (\mu^TV)_3s_2\tilde{S}_{11} \right) \expect{Q_{23}^2} + \left( (\mu^TV)_3s_3\tilde{S}_{11} - (\mu^TV)_1s_3\tilde{S}_{13} \right) \expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{2d}}_{13} &= \left( (\mu^TV)_2s_3\tilde{S}_{11} - (\mu^TV)_1s_3\tilde{S}_{12} \right) \expect{Q_{23}^2} + \left( (\mu^TV)_1s_2\tilde{S}_{12} - (\mu^TV)_2s_2\tilde{S}_{11} \right) \expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{2d}}_{21} &= \left( (\mu^TV)_3s_1\tilde{S}_{22} - (\mu^TV)_2s_1\tilde{S}_{23} \right) \expect{Q_{13}^2} + \left( (\mu^TV)_2s_3\tilde{S}_{23} - (\mu^TV)_3s_3\tilde{S}_{22} \right) \expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{2d}}_{22} &= \left( (\mu^TV)_2(s_1\tilde{S}_{13}-s_3\tilde{S}_{31}) + (\mu^TV)_1s_3\tilde{S}_{32} - (\mu^TV)_3s_1\tilde{S}_{12} \right) \expect{Q_{13}^2} \nonumber \\ 
+	& \quad + \left( (\mu^TV)_2(s_1\tilde{S}_{31}-s_3\tilde{S}_{13}) + (\mu^TV)_3s_3\tilde{S}_{12} - (\mu^TV)_1s_1\tilde{S}_{32} \right) \expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{2d}}_{23} &= \left( (\mu^TV)_2s_3\tilde{S}_{21} - (\mu^TV)_1s_3\tilde{S}_{22} \right) \expect{Q_{13}^2} + \left( (\mu^TV)_1s_1\tilde{S}_{22} - (\mu^TV)_2s_1\tilde{S}_{21} \right) \expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{2d}}_{31} &= \left( (\mu^TV)_3s_1\tilde{S}_{32} - (\mu^TV)_2s_1\tilde{S}_{33} \right) \expect{Q_{12}^2} + \left( (\mu^TV)_2s_2\tilde{S}_{33}-(\mu^TV)_3s_2\tilde{S}_{32} \right) \expect{Q_{12}Q_{21}} \nonumber \\
+	\expect{Q_{2d}}_{32} &= \left( (\mu^TV)_1s_2\tilde{S}_{33} - (\mu^TV)_3s_2\tilde{S}_{31} \right) \expect{Q_{12}^2} + \left( (\mu^TV)_3s_1\tilde{S}_{31} - (\mu^TV)_1s_1\tilde{S}_{33} \right) \expect{Q_{12}Q_{21}} \nonumber \\
+	\expect{Q_{2d}}_{33} &= \left( (\mu^TV)_3(s_2\tilde{S}_{21}-s_1\tilde{S}_{12}) + (\mu^TV)_2s_1\tilde{S}_{13} - (\mu^TV)_1s_2\tilde{S}_{23} \right) \expect{Q_{12}^2} \nonumber \\
+	& \quad + \left( (\mu^TV)_3(s_2\tilde{S}_{12}-s_1\tilde{S}_{21}) + (\mu^TV)_1s_1\tilde{S}_{23} - (\mu^TV)_2s_2\tilde{S}_{31} \right) \expect{Q_{12}Q_{21}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{11} &= \left( (P^TV)_{11}\tilde{S}_{33} - (P^TV)_{13}\tilde{S}_{31} \right)\left( (s_2^2+s_3^2)\expect{Q_{22}Q_{23}^2} - 2s_2s_3 \expect{Q_{22}Q_{23}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{11}\tilde{S}_{22} - (P^TV)_{12}\tilde{S}_{21} \right)\left( (s_2^2+s_3^2)\expect{Q_{33}Q_{23}^2} - 2s_2s_3 \expect{Q_{33}Q_{23}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{32}\tilde{S}_{23} - (P^TV)_{33}\tilde{S}_{22} \right)\left( s_2s_3\expect{Q_{12}Q_{23}Q_{31}} + s_1s_2\expect{Q_{32}Q_{21}Q_{31}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} - s_2^2\expect{Q_{31}Q_{12}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{23}\tilde{S}_{32} - (P^TV)_{22}\tilde{S}_{33} \right)\left( s_2s_3\expect{Q_{13}Q_{32}Q_{21}} + s_1s_3\expect{Q_{23}Q_{31}Q_{21}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{32}Q_{21}Q_{31}} - s_3^2\expect{Q_{21}Q_{13}Q_{23}} \right) \nonumber \\
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{12} &= \left( (P^TV)_{12}\tilde{S}_{33} - (P^TV)_{13}\tilde{S}_{32} \right)\left( (s_2^2+s_3^2)\expect{Q_{11}Q_{23}^2} - 2s_2s_3\expect{Q_{11}Q_{23}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{12}\tilde{S}_{11} - (P^TV)_{11}\tilde{S}_{12} \right)\left( (s_2^2+s_3^2)\expect{Q_{33}Q_{23}^2} - 2s_2s_3\expect{Q_{33}Q_{23}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{31}\tilde{S}_{32} - (P^TV)_{32}\tilde{S}_{31} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{13}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} - s_2^2\expect{Q_{13}Q_{32}Q_{12}} \right) \nonumber \\
+	&+ \left( (P^TV)_{33}\tilde{S}_{12} - (P^TV)_{32}\tilde{S}_{13} \right)\left( s_2s_3\expect{Q_{12}Q_{23}Q_{31}} + s_1s_2\expect{Q_{32}Q_{21}Q_{31}} \right. \nonumber \\ &\qquad \left. - s_2^2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{21}\tilde{S}_{33} - (P^TV)_{23}\tilde{S}_{31} \right)\left( s_1s_2\expect{Q_{31}Q_{12}Q_{32}} + s_3^2\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{31}Q_{12}Q_{23}} - s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{13} &= \left( (P^TV)_{13}\tilde{S}_{22} - (P^TV)_{12}\tilde{S}_{23} \right)\left( (s_2^2+s_3^2)\expect{Q_{11}Q_{23}^2} - 2s_2s_3\expect{Q_{11}Q_{23}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{13}\tilde{S}_{11} - (P^TV)_{11}\tilde{S}_{13} \right)\left( (s_2^2+s_3^2)\expect{Q_{22}Q_{23}^2} - 2s_2s_3\expect{Q_{22}Q_{23}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{23}\tilde{S}_{21} - (P^TV)_{21}\tilde{S}_{23} \right)\left( s_1s_2\expect{Q_{31}Q_{12}Q_{23}} + s_3^2\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{31}Q_{12}Q_{23}} - s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right) \nonumber \\
+	&+ \left( (P^TV)_{23}\tilde{S}_{12} - (P^TV)_{22}\tilde{S}_{13} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{31}} + s_3^2\expect{Q_{21}Q_{13}Q_{23}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} - s_2s_3\expect{Q_{21}Q_{13}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{32}\tilde{S}_{21} - (P^TV)_{31}\tilde{S}_{22} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{13}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} - s_2^2\expect{Q_{13}Q_{32}Q_{12}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{21} &= \left( (P^TV)_{21}\tilde{S}_{33} - (P^TV)_{23}\tilde{S}_{31} \right)\left( (s_1^2+s_3^2)\expect{Q_{22}Q_{13}^2} - 2s_1s_3\expect{Q_{22}Q_{13}Q_{31}} \right) \nonumber \\
+	&+ \left( (P^TV)_{21}\tilde{S}_{22} - (P^TV)_{22}\tilde{S}_{21} \right)\left( (s_1^2+s_3^2)\expect{Q_{33}Q_{13}^2} - 2s_1s_3\expect{Q_{33}Q_{13}Q_{31}} \right) \nonumber \\
+	&+ \left( (P^TV)_{31}\tilde{S}_{32} - (P^TV)_{32}\tilde{S}_{31} \right)\left( s_1^2\expect{Q_{23}Q_{31}Q_{21}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{23}Q_{31}Q_{12}} - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} \right) \nonumber \\
+	&+ \left( (P^TV)_{31}\tilde{S}_{23} - (P^TV)_{33}\tilde{S}_{21} \right)\left( s_1^2\expect{Q_{32}Q_{21}Q_{31}} + s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{32}Q_{21}Q_{13}} \right) \nonumber \\
+	&+ \left( (P^TV)_{12}\tilde{S}_{33} - (P^TV)_{13}\tilde{S}_{32} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{31}} + s_3^2\expect{Q_{21}Q_{13}Q_{23}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} - s_2s_3\expect{Q_{21}Q_{13}Q_{32}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{22} &= \left( (P^TV)_{22}\tilde{S}_{33} - (P^TV)_{23}\tilde{S}_{32} \right)\left( (s_1^2+s_3^2)\expect{Q_{11}Q_{13}^2} - 2s_1s_3\expect{Q_{11}Q_{13}Q_{31}} \right) \nonumber \\
+	&+ \left( (P^TV)_{22}\tilde{S}_{11} - (P^TV)_{21}\tilde{S}_{12} \right)\left( (s_1^2+s_3^2)\expect{Q_{33}Q_{13}^2} - 2s_1s_3\expect{Q_{33}Q_{13}Q_{31}} \right) \nonumber \\
+	&+ \left( (P^TV)_{33}\tilde{S}_{11} - (P^TV)_{31}\tilde{S}_{13} \right)\left( s_1^2\expect{Q_{32}Q_{21}Q_{31}} + s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{32}Q_{21}Q_{13}} \right) \nonumber \\
+	&+ \left( (P^TV)_{11}\tilde{S}_{33} - (P^TV)_{13}\tilde{S}_{31} \right)\left( s_1s_2\expect{Q_{31}Q_{12}Q_{32}} + s_3^2\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{12}Q_{23}Q_{31}} - s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{23} &= \left( (P^TV)_{23}\tilde{S}_{22} - (P^TV)_{22}\tilde{S}_{23} \right)\left( (s_1^2+s_3^2)\expect{Q_{11}Q_{13}^2} - 2s_1s_3\expect{Q_{11}Q_{13}Q_{31}} \right) \nonumber \\
+	&+ \left( (P^TV)_{23}\tilde{S}_{11} - (P^TV)_{21}\tilde{S}_{13} \right)\left( (s_1^2+s_3^2)\expect{Q_{22}Q_{13}^2} - 2s_1s_3\expect{Q_{22}Q_{13}Q_{31}} \right) \nonumber \\
+	&+ \left( (P^TV)_{13}\tilde{S}_{21} - (P^TV)_{11}\tilde{S}_{23} \right)\left( s_1s_2\expect{Q_{31}Q_{12}Q_{32}} + s_3^2\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{12}Q_{23}Q_{31}} - s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right) \nonumber \\
+	&+ \left( (P^TV)_{13}\tilde{S}_{12} - (P^TV)_{12}\tilde{S}_{13} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{31}} + s_3^2\expect{Q_{21}Q_{13}Q_{23}} \right. \nonumber \\ &\qquad \left. - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} - s_2s_3\expect{Q_{21}Q_{13}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{32}\tilde{S}_{11} - (P^TV)_{31}\tilde{S}_{12} \right)\left( s_1^2\expect{Q_{23}Q_{31}Q_{21}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{23}Q_{31}Q_{12}} - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{31} &= \left( (P^TV)_{31}\tilde{S}_{33} - (P^TV)_{33}\tilde{S}_{31} \right)\left( (s_1^2+s_2^2)\expect{Q_{22}Q_{12}^2} - 2s_1s_2\expect{Q_{22}Q_{12}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{31}\tilde{S}_{22} - (P^TV)_{32}\tilde{S}_{21} \right)\left( (s_1^2+s_2^2)\expect{Q_{33}Q_{12}^2} - 2s_1s_2\expect{Q_{33}Q_{12}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{21}\tilde{S}_{32} - (P^TV)_{22}\tilde{S}_{31} \right)\left( s_1^2\expect{Q_{23}Q_{31}Q_{21}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{12}Q_{23}Q_{31}} - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} \right) \nonumber \\
+	&+ \left( (P^TV)_{21}\tilde{S}_{23} - (P^TV)_{23}\tilde{S}_{21} \right)\left( s_1^2\expect{Q_{32}Q_{21}Q_{31}} + s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{21}Q_{13}Q_{32}} \right) \nonumber \\
+	&+ \left( (P^TV)_{12}\tilde{S}_{23} - (P^TV)_{13}\tilde{S}_{22} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{31}} + s_2s_3\expect{Q_{12}Q_{23}Q_{31}} \right. \nonumber \\ &\qquad \left. - s_2^2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{32} &= \left( (P^TV)_{32}\tilde{S}_{33} - (P^TV)_{33}\tilde{S}_{32} \right)\left( (s_1^2+s_2^2)\expect{Q_{11}Q_{12}^2} - 2s_1s_2\expect{Q_{11}Q_{12}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{32}\tilde{S}_{11} - (P^TV)_{31}\tilde{S}_{12} \right)\left( (s_1^2+s_2^2)\expect{Q_{33}Q_{12}^2} - 2s_1s_2\expect{Q_{33}Q_{12}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{11}\tilde{S}_{32} - (P^TV)_{12}\tilde{S}_{31} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{13}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_2^2\expect{Q_{13}Q_{31}Q_{12}} - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} \right) \nonumber \\
+	&+ \left( (P^TV)_{13}\tilde{S}_{12} - (P^TV)_{12}\tilde{S}_{13} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{31}} + s_2s_3\expect{Q_{12}Q_{23}Q_{31}} \right. \nonumber \\ &\qquad \left. - s_2^2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{23}Q_{31}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{23}\tilde{S}_{11} - (P^TV)_{21}\tilde{S}_{13} \right)\left( s_1^2\expect{Q_{32}Q_{21}Q_{31}} + s_2s_3\expect{Q_{13}Q_{32}Q_{12}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{31}Q_{12}Q_{32}} - s_1s_3\expect{Q_{21}Q_{13}Q_{32}} \right)
+\end{align}
+
+\begin{align}
+	\expect{Q_{2e}}_{33} &= \left( (P^TV)_{33}\tilde{S}_{22} - (P^TV)_{32}\tilde{S}_{23} \right)\left( (s_1^2+s_2^2)\expect{Q_{11}Q_{12}^2} - 2s_1s_2\expect{Q_{11}Q_{12}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{33}\tilde{S}_{11} - (P^TV)_{31}\tilde{S}_{13} \right)\left( (s_1^2+s_2^2)\expect{Q_{22}Q_{12}^2} - 2s_1s_2\expect{Q_{22}Q_{12}Q_{21}} \right) \nonumber \\
+	&+ \left( (P^TV)_{22}\tilde{S}_{11} - (P^TV)_{21}\tilde{S}_{12} \right)\left( s_1^2\expect{Q_{23}Q_{31}Q_{21}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_1s_2\expect{Q_{12}Q_{23}Q_{31}} - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} \right) \nonumber \\
+	&+ \left( (P^TV)_{12}\tilde{S}_{21} - (P^TV)_{11}\tilde{S}_{22} \right)\left( s_1s_2\expect{Q_{32}Q_{21}Q_{13}} + s_2s_3\expect{Q_{12}Q_{23}Q_{13}} \right. \nonumber \\ &\qquad \left. - s_2^2\expect{Q_{13}Q_{31}Q_{12}} - s_1s_3\expect{Q_{21}Q_{13}Q_{23}} \right)
+\end{align}
+
+Finally, we need to calculate $\expect{x(t)\nu'^T_{R(t)\widehat{H\Delta W}^2}}$.
+Since this term is linear in $\widehat{H\Delta W}^2\in\real{3\times 3}$ as a vector space, by the total law of expectation, the expectation of $\widehat{H\Delta W}^2$ can be calculated first separately.
+Let $G = HH^T$, then we know $\expect{\widehat{H\Delta W}^2} = \Delta t(G-\tr{G}I_{3\times 3})$.
+So we have the following simplification
+\begin{equation}
+	\expect{x(t)\nu'^T_{R(t)\widehat{H\Delta W}^2}} = \Delta t\expect{x(t)\nu'^T_{R(t)G}} - \tr{G}\Delta t\expect{x(t)\nu'^T_{R(t)}}.
+\end{equation}
+$\expect{x(t)\nu'^T_{R(t)}}$ has been calculated in \eqref{eqn:ExvRp}, and we have
+\begin{equation}
+	\expect{x(t)\nu'^T_{R(t)G}} = \mu\expect{\nu'^T_{R(t)G}} + P\expect{\nu_{R(t)}\nu'^T_{R(t)G}},
+\end{equation}
+where $\expect{\nu'^T_{R(t)G}} = \nu'^T_{\expect{R(t)}G}$.
+Let $\tilde{\tilde{V}} = V'^TG^TV$, and $\tilde{\tilde{S}} = \tilde{U}^TS'\tilde{\tilde{V}}$, then
+\begin{equation}
+	\expect{\nu_{R(t)}\nu'^T_{R(t)G}} = (QS-SQ^T)^\vee\left( \left( Q\tilde{\tilde{S}}^T-\tilde{\tilde{S}}Q^T \right)^\vee \right)^T\tilde{U}^T,
+\end{equation}
+which can be calculated using \eqref{eqn:Q2a} by replacing $\tilde{S}$ with $\tilde{\tilde{S}}$.
+
+\section{Calculating $\expect{\nu'_R(t+\Delta t)\nu'^T_R(t+\Delta t)}$}
+Again, expand $\exp\left\{ \hat{x}(t)\Delta t + \widehat{H\Delta W} \right\}$ into series, we have the following
+\begin{equation}
+	\expect{\nu'_R(t+\Delta t)\nu'^T_R(t+\Delta t)} = \sum_{i=0}^\infty\sum_{j=0}^{\infty}\expect{ \nu'_{R(t)\left(\hat{x}(t)\Delta t+\widehat{H\Delta W}\right)^i/i!} \nu'^T_{R(t)\left(\hat{x}(t)\Delta t+\widehat{H\Delta W}\right)^j/j!} }
+\end{equation}
+After considering $\Delta t$ and $\Delta W$ are small, the above equation can be approximated as
+\begin{align}
+	\expect{\nu'_R(t+\Delta t)\nu'^T_R(t+\Delta t)} &= \expect{\nu'_{R(t)}\nu'^T_{R(t)}} + \Delta t\expect{\nu'_{R(t)}\nu'^T_{R(t)\hat{x}(t)}} + \Delta t\expect{\nu'_{R(t)\hat{x}(t)}\nu'^T_{R(t)}} \nonumber \\
+	&+ \frac{1}{2}\expect{\nu'_{R(t)}\nu'^T_{R(t)\widehat{H\Delta W}^2}} + \frac{1}{2}\expect{\nu'_{R(t)\widehat{H\Delta W}^2}\nu'^T_{R(t)}} + \expect{\nu'_{R(t)\widehat{H\Delta W}}\nu'^T_{R(t)\widehat{H\Delta W}}}
+\end{align}
+The first term is relatively easy, but we will have a more general calculation in the fourth and fifty terms.
+Since $\expect{\nu'_{R(t)\hat{x}(t)}\nu'^T_{R(t)}} = \expect{\nu'_{R(t)}\nu'^T_{R(t)\hat{x}(t)}}^T$, we only calculate the second terms for the second and third terms.
+Using \eqref{eqn:vRhatxp}, it can be simplified as
+\begin{equation}
+	\expect{\nu'_{R(t)}\nu'^T_{R(t)\hat{x}(t)}} = \tilde{U}\expect{(Q\tilde{S}^T-\tilde{S}Q^T)^\vee x(t)^T \Gamma_Q^T}\tilde{U}^T.
+\end{equation}
+After taking the expectation of $x(t)$ first, it becomes
+\begin{equation}
+	\expect{\nu'_{R(t)}\nu'^T_{R(t)\hat{x}(t)}} = \tilde{U}\expect{(Q\tilde{S}^T-\tilde{S}Q^T)^\vee \mu^T \Gamma_Q^T}\tilde{U}^T + \tilde{U}\expect{(Q\tilde{S}^T-\tilde{S}Q^T)^\vee \nu_{R(t)}^TP^T \Gamma_Q^T}\tilde{U}^T
+\end{equation}
+Let $Q_{3a} = (Q\tilde{S}^T-\tilde{S}Q^T)^\vee \mu^T \Gamma_Q^T$, and $Q_{3b} = (Q\tilde{S}^T-\tilde{S}Q^T)^\vee \nu_{R(t)}^TP^T \Gamma_Q^T$.
+Then by brute force calculation, we get
+\begin{align}
+	\expect{Q_{3a}}_{11} &= \tilde{S}_{32}\left( (\mu^TV)_3\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{33} \right)\expect{Q_{22}^2} + \tilde{S}_{23}\left( (\mu^TV)_1\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{21} \right)\expect{Q_{33}^2} \nonumber \\
+	&+ \left( \tilde{S}_{32}\left( (\mu^TV)_2\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{22} \right) + \tilde{S}_{23}\left( (\mu^TV)_1\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{31} \right) \right)\expect{Q_{22}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{31}\left( (\mu^TV)_2\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{32} \right)\expect{Q_{21}^2} + \tilde{S}_{21}\left( (\mu^TV)_2\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{22} \right)\expect{Q_{31}^2} \nonumber \\
+	&+ \left( \tilde{S}_{33}\left( (\mu^TV)_1\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{31} \right) + \tilde{S}_{22}\left( (\mu^TV)_3\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{23} \right) \right)\expect{Q_{32}^2} \nonumber \\
+	&+ \left( \tilde{S}_{33}\left( (\mu^TV)_1\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{21} \right) + \tilde{S}_{22}\left( (\mu^TV)_2\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{32} \right) \right)\expect{Q_{23}Q_{32}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{12} &= \tilde{S}_{32}\left( (\mu^TV)_3\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{33} \right)\expect{Q_{11}Q_{22}} + \tilde{S}_{23}\left( (\mu^TV)_2\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{32} \right)\expect{Q_{11}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{32}\left( (\mu^TV)_1\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{11} \right)\expect{Q_{22}Q_{33}} + \tilde{S}_{23}\left( (\mu^TV)_2\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{12} \right)\expect{Q_{33}^2} \nonumber \\
+	&+ \tilde{S}_{31}\left( (\mu^TV)_1\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{31} \right)\expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \tilde{S}_{21}\left( (\mu^TV)_{1}\tilde{S}_{32}-(\mu^TV)_{2}\tilde{S}_{31} \right)\expect{Q_{13}Q_{31}} + \tilde{S}_{21}\left( (\mu^TV)_3\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{13} \right)\expect{Q_{31}^2} \nonumber \\
+	&+ \tilde{S}_{33}\left( (\mu^TV)_3\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{13} \right)\expect{Q_{23}Q_{32}} + \tilde{S}_{22}\left( (\mu^TV)_1\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{11} \right)\expect{Q_{32}^2}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{13} &= \tilde{S}_{32}\left( (\mu^TV)_2\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{22} \right)\expect{Q_{11}Q_{22}} + \tilde{S}_{23}\left( (\mu^TV)_3\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{23} \right)\expect{Q_{11}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{32}\left( (\mu^TV)_1\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{11} \right)\expect{Q_{22}^2} + \tilde{S}_{23}\left( (\mu^TV)_3\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{13} \right)\expect{Q_{22}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{21}\left( (\mu^TV)_2\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{22} \right)\expect{Q_{13}Q_{31}} \nonumber \\
+	&+ \tilde{S}_{31}\left( (\mu^TV)_{3}\tilde{S}_{21}-(\mu^TV)_{1}\tilde{S}_{23} \right)\expect{Q_{12}Q_{21}} + \tilde{S}_{31}\left( (\mu^TV)_3\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{13} \right)\expect{Q_{21}^2} \nonumber \\
+	&+ \tilde{S}_{33}\left( (\mu^TV)_2\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{12} \right)\expect{Q_{23}^2} + \tilde{S}_{22}\left( (\mu^TV)_1\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{11} \right)\expect{Q_{23}Q_{32}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{21} &= \tilde{S}_{31}\left( (\nu^TV)_1\tilde{S}_{33}-(\mu^TV)_{3}\tilde{S}_{31} \right)\expect{Q_{11}Q_{22}} + \tilde{S}_{31}\left( (\mu^TV)_1\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{21} \right)\expect{Q_{11}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{13}\left( (\mu^TV)_3\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{33} \right)\expect{Q_{22}Q_{33}} + \tilde{S}_{13}\left( (\mu^TV)_2\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{22} \right)\expect{Q_{33}^2} \nonumber \\
+	&+ \tilde{S}_{32}\left( (\mu^TV)_3\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{33} \right)\expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \tilde{S}_{33}\left( (\mu^TV)_2\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{22} \right)\expect{Q_{13}Q_{31}} + \tilde{S}_{11}\left( (\mu^TV)_3\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{23} \right)\expect{Q_{31}^2} \nonumber \\
+	&+ \tilde{S}_{12}\left( (\mu^TV)_1\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{31} \right)\expect{Q_{23}Q_{32}} + \tilde{S}_{12}\left( (\mu^TV)_1\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{21} \right)\expect{Q_{32}^2}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{22} &= \tilde{S}_{31}\left( (\mu^TV)_2\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{32} \right)\expect{Q_{11}^2} + \tilde{S}_{13}\left( (\mu^TV)_1\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{11} \right)\expect{Q_{33}^2} \nonumber \\
+	&+ \left( \tilde{S}_{31}\left( (\mu^TV)_2\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{12} \right) + \tilde{S}_{13}\left( (\mu^TV)_3\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{33} \right) \right)\expect{Q_{11}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{32}\left( (\mu^TV)_3\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{33} \right)\expect{Q_{12}^2} + \tilde{S}_{12}\left( (\mu^TV)_3\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{13} \right)\expect{Q_{32}^2} \nonumber \\
+	&+ \left( \tilde{S}_{33}\left( (\mu^TV)_1\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{31} \right) + \tilde{S}_{11}\left( (\mu^TV)_2\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{12} \right) \right)\expect{Q_{13}^2} \nonumber \\
+	&+ \left( \tilde{S}_{33}\left( (\mu^TV)_3\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{13} \right) + \tilde{S}_{11}\left( (\mu^TV)_2\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{32} \right) \right)\expect{Q_{13}Q_{31}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{23} &= \tilde{S}_{31}\left( (\nu^TV)_3\tilde{S}_{22}-(\mu^TV)_{2}\tilde{S}_{23} \right)\expect{Q_{11}^2} + \tilde{S}_{31}\left( (\mu^TV)_3\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{13} \right)\expect{Q_{11}Q_{22}} \nonumber \\
+	&+ \tilde{S}_{13}\left( (\mu^TV)_2\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{22} \right)\expect{Q_{11}Q_{33}} + \tilde{S}_{13}\left( (\mu^TV)_1\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{11} \right)\expect{Q_{22}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{12}\left( (\mu^TV)_2\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{12} \right)\expect{Q_{23}Q_{32}} \nonumber \\
+	&+ \tilde{S}_{32}\left( (\mu^TV)_1\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{21} \right)\expect{Q_{12}^2} + \tilde{S}_{32}\left( (\mu^TV)_2\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{12} \right)\expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \tilde{S}_{33}\left( (\mu^TV)_2\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{22} \right)\expect{Q_{13}^2} + \tilde{S}_{11}\left( (\mu^TV)_1\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{21} \right)\expect{Q_{13}Q_{31}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{31} &= \tilde{S}_{21}\left( (\nu^TV)_3\tilde{S}_{31}-(\mu^TV)_{1}\tilde{S}_{33} \right)\expect{Q_{11}Q_{22}} + \tilde{S}_{21}\left( (\mu^TV)_2\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{22} \right)\expect{Q_{11}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{12}\left( (\mu^TV)_1\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{31} \right)\expect{Q_{22}^2} + \tilde{S}_{12}\left( (\mu^TV)_1\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{21} \right)\expect{Q_{22}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{23}\left( (\mu^TV)_3\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{23} \right)\expect{Q_{13}Q_{31}} \nonumber \\
+	&+ \tilde{S}_{22}\left( (\mu^TV)_2\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{32} \right)\expect{Q_{12}Q_{21}} + \tilde{S}_{11}\left( (\mu^TV)_3\tilde{S}_{32}-(\mu^TV)_2\tilde{S}_{33} \right)\expect{Q_{21}^2} \nonumber \\
+	&+ \tilde{S}_{13}\left( (\mu^TV)_2\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{32} \right)\expect{Q_{23}^2} + \tilde{S}_{13}\left( (\mu^TV)_3\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{23} \right)\expect{Q_{23}Q_{32}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{32} &= \tilde{S}_{21}\left( (\nu^TV)_3\tilde{S}_{32}-(\mu^TV)_{2}\tilde{S}_{33} \right)\expect{Q_{11}^2} + \tilde{S}_{12}\left( (\mu^TV)_2\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{32} \right)\expect{Q_{11}Q_{22}} \nonumber \\
+	&+ \tilde{S}_{21}\left( (\mu^TV)_1\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{11} \right)\expect{Q_{11}Q_{33}} + \tilde{S}_{12}\left( (\mu^TV)_2\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{12} \right)\expect{Q_{22}Q_{33}} \nonumber \\
+	&+ \tilde{S}_{13}\left( (\mu^TV)_1\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{11} \right)\expect{Q_{23}Q_{32}} \nonumber \\
+	&+ \tilde{S}_{22}\left( (\mu^TV)_1\tilde{S}_{33}-(\mu^TV)_3\tilde{S}_{31} \right)\expect{Q_{12}^2} + \tilde{S}_{11}\left( (\mu^TV)_3\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{33} \right)\expect{Q_{12}Q_{21}} \nonumber \\
+	&+ \tilde{S}_{23}\left( (\mu^TV)_2\tilde{S}_{31}-(\mu^TV)_1\tilde{S}_{32} \right)\expect{Q_{13}^2} + \tilde{S}_{23}\left( (\mu^TV)_2\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{12} \right)\expect{Q_{13}Q_{31}}
+\end{align}
+
+\begin{align}
+	\expect{Q_{3a}}_{33} &= \tilde{S}_{21}\left( (\mu^TV)_2\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{22} \right)\expect{Q_{11}^2} + \tilde{S}_{12}\left( (\mu^TV)_3\tilde{S}_{11}-(\mu^TV)_1\tilde{S}_{13} \right)\expect{Q_{22}^2} \nonumber \\
+	&+ \left( \tilde{S}_{12}\left( (\mu^TV)_3\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{23} \right) + \tilde{S}_{21}\left( (\mu^TV)_1\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{11} \right) \right)\expect{Q_{11}Q_{22}} \nonumber \\
+	&+ \tilde{S}_{23}\left( (\mu^TV)_1\tilde{S}_{22}-(\mu^TV)_2\tilde{S}_{21} \right)\expect{Q_{13}^2} + \tilde{S}_{13}\left( (\mu^TV)_1\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{11} \right)\expect{Q_{23}^2} \nonumber \\
+	&+ \left( \tilde{S}_{22}\left( (\mu^TV)_3\tilde{S}_{21}-(\mu^TV)_1\tilde{S}_{23} \right) + \tilde{S}_{11}\left( (\mu^TV)_2\tilde{S}_{13}-(\mu^TV)_3\tilde{S}_{12} \right) \right)\expect{Q_{12}^2} \nonumber \\
+	&+ \left( \tilde{S}_{22}\left( (\mu^TV)_3\tilde{S}_{12}-(\mu^TV)_2\tilde{S}_{13} \right) + \tilde{S}_{11}\left( (\mu^TV)_1\tilde{S}_{23}-(\mu^TV)_3\tilde{S}_{21} \right) \right)\expect{Q_{12}Q_{21}}
+\end{align}
+
+Unfortunately, the expression for $\expect{Q_{3b}}$ is too complicated to write down.
+The calculation is done symbolically using a computer.
+
+Next, let us consider $\expect{\nu'_{R(t)}\nu'^T_{R(t)\widehat{H\Delta W}^2}}$.
+Same as before, the expectation of $\widehat{H\Delta W}^2$ can be calculated first, so
+\begin{equation}
+	\expect{\nu'_{R(t)}\nu'^T_{R(t)\widehat{H\Delta W}^2}} = \Delta t\expect{\nu'_{R(t)}\nu'^T_{R(t)G}} - \tr{G}\Delta t\expect{\nu'_{R(t)}\nu'^T_{R(t)}}
+\end{equation}
+Using the notations before, we have
+\begin{equation}
+	\expect{\nu'_{R(t)}\nu'^T_{R(t)G}} = \tilde{U}\expect{\left( Q\tilde{S}^T-\tilde{S}Q^T \right)^\vee \left(\left( Q\tilde{\tilde{S}}^T-\tilde{\tilde{S}}Q^T \right)^\vee\right)^T }\tilde{U}^T
+\end{equation}
+This means $\expect{\nu'_{R(t)}\nu'^T_{R(t)}}$ is just a special case of $\expect{\nu'_{R(t)}\nu'^T_{R(t)G}}$ where in the above equation, $\tilde{\tilde{S}}$ is replaced by $\tilde{S}$.
+Let $Q_{3c} = \nu'_{R(t)}\nu'^T_{R(t)G}$, then by brute force calculation, we get
+\begin{align}
+	\expect{Q_{3c}}_{11} &= \tilde{S}_{32}\tilde{\tilde{S}}_{32}\expect{Q_{22}^2} + \tilde{S}_{23}\tilde{\tilde{S}}_{23}\expect{Q_{33}^2} - \left( \tilde{S}_{23}\tilde{\tilde{S}}_{32}+\tilde{S}_{32}\tilde{\tilde{S}}_{23} \right)\expect{Q_{22}Q_{33}} + \tilde{S}_{31}\tilde{\tilde{S}}_{31}\expect{Q_{21}^2} \nonumber \\
+	&+ \tilde{S}_{21}\tilde{\tilde{S}}_{21}\expect{Q_{31}^2} + \left( \tilde{S}_{22}\tilde{\tilde{S}}_{22}+\tilde{S}_{33}\tilde{\tilde{S}}_{33} \right)\expect{Q_{23}^2} - \left( \tilde{S}_{22}\tilde{\tilde{S}}_{33}+\tilde{S}_{33}\tilde{\tilde{S}}_{22} \right)\expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{3c}}_{12} &= -\tilde{S}_{32}\tilde{\tilde{S}}_{31}\expect{Q_{11}Q_{22}} + \tilde{S}_{23}\tilde{\tilde{S}}_{31}\expect{Q_{11}Q_{33}} + 
+	\tilde{S}_{32}\tilde{\tilde{S}}_{13}\expect{Q_{22}Q_{33}} - \tilde{S}_{23}\tilde{\tilde{S}}_{13}\expect{Q_{33}^2} \nonumber \\
+	&- \tilde{S}_{31}\tilde{\tilde{S}}_{32}\expect{Q_{12}Q_{21}} - \tilde{S}_{21}\tilde{\tilde{S}}_{11}\expect{Q_{13}^2} + \tilde{S}_{21}\tilde{\tilde{S}}_{33}\expect{Q_{13}Q_{31}} - \tilde{S}_{22}\tilde{\tilde{S}}_{12}\expect{Q_{23}^2} + \tilde{S}_{33}\tilde{\tilde{S}}_{12}\expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{3c}}_{13} &= \tilde{S}_{32}\tilde{\tilde{S}}_{21}\expect{Q_{11}Q_{22}} - \tilde{S}_{23}\tilde{\tilde{S}}_{21}\expect{Q_{11}Q_{33}} - \tilde{S}_{32}\tilde{\tilde{S}}_{12}\expect{Q_{22}^2} + \tilde{S}_{23}\tilde{\tilde{S}}_{12}\expect{Q_{22}Q_{33}} \nonumber \\
+	&- \tilde{S}_{21}\tilde{\tilde{S}}_{23}\expect{Q_{13}Q_{31}} - \tilde{S}_{31}\tilde{\tilde{S}}_{11}\expect{Q_{12}^2} + \tilde{S}_{31}\tilde{\tilde{S}}_{22}\expect{Q_{12}Q_{21}} - \tilde{S}_{33}\tilde{\tilde{S}}_{13}\expect{Q_{23}^2} + \tilde{S}_{22}\tilde{\tilde{S}}_{13}\expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{3c}}_{21} &= -\tilde{S}_{31}\tilde{\tilde{S}}_{32}\expect{Q_{11}Q_{22}} + \tilde{S}_{31}\tilde{\tilde{S}}_{23}\expect{Q_{11}Q_{33}} + \tilde{S}_{13}\tilde{\tilde{S}}_{32}\expect{Q_{22}Q_{33}} - \tilde{S}_{13}\tilde{\tilde{S}}_{23}\expect{Q_{33}^2} \nonumber \\
+	&- \tilde{S}_{32}\tilde{\tilde{S}}_{31}\expect{Q_{12}Q_{21}} - \tilde{S}_{11}\tilde{\tilde{S}}_{21}\expect{Q_{13}^2} + \tilde{S}_{33}\tilde{\tilde{S}}_{21}\expect{Q_{13}Q_{31}} - \tilde{S}_{12}\tilde{\tilde{S}}_{22}\expect{Q_{23}^2} + \tilde{S}_{12}\tilde{\tilde{S}}_{33}\expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{3c}}_{22} &= \tilde{S}_{31}\tilde{\tilde{S}}_{31}\expect{Q_{11}^2} + \tilde{S}_{13}\tilde{\tilde{S}}_{13}\expect{Q_{33}^2} - \left( \tilde{S}_{13}\tilde{\tilde{S}}_{31}+\tilde{S}_{31}\tilde{\tilde{S}}_{13} \right)\expect{Q_{11}Q_{33}} + \tilde{S}_{32}\tilde{\tilde{S}}_{32}\expect{Q_{12}^2} \nonumber \\
+	&+ \tilde{S}_{12}\tilde{\tilde{S}}_{12}\expect{Q_{23}^2} + \left( \tilde{S}_{11}\tilde{\tilde{S}}_{11}+\tilde{S}_{33}\tilde{\tilde{S}}_{33} \right)\expect{Q_{13}^2} - \left( \tilde{S}_{11}\tilde{\tilde{S}}_{33}+\tilde{S}_{33}\tilde{\tilde{S}}_{11} \right)\expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{3c}}_{23} &= -\tilde{S}_{31}\tilde{\tilde{S}}_{21}\expect{Q_{11}^2} + \tilde{S}_{31}\tilde{\tilde{S}}_{12}\expect{Q_{11}Q_{22}} + \tilde{S}_{13}\tilde{\tilde{S}}_{21}\expect{Q_{11}Q_{33}} - \tilde{S}_{13}\tilde{\tilde{S}}_{12}\expect{Q_{22}Q_{33}} \nonumber \\
+	&- \tilde{S}_{12}\tilde{\tilde{S}}_{13}\expect{Q_{23}Q_{32}} - \tilde{S}_{32}\tilde{\tilde{S}}_{22}\expect{Q_{12}^2} + \tilde{S}_{32}\tilde{\tilde{S}}_{11}\expect{Q_{12}Q_{21}} - \tilde{S}_{33}\tilde{\tilde{S}}_{23}\expect{Q_{13}^2} - \tilde{S}_{11}\tilde{\tilde{S}}_{23}\expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{3c}}_{31} &= \tilde{S}_{21}\tilde{\tilde{S}}_{32}\expect{Q_{11}Q_{22}} - \tilde{S}_{21}\tilde{\tilde{S}}_{23}\expect{Q_{11}Q_{33}} - \tilde{S}_{12}\tilde{\tilde{S}}_{32}\expect{Q_{22}^2} + \tilde{S}_{12}\tilde{\tilde{S}}_{23}\expect{Q_{22}Q_{33}} \nonumber \\
+	&- \tilde{S}_{23}\tilde{\tilde{S}}_{21}\expect{Q_{13}Q_{31}} - \tilde{S}_{11}\tilde{\tilde{S}}_{31}\expect{Q_{12}^2} + \tilde{S}_{22}\tilde{\tilde{S}}_{31}\expect{Q_{12}Q_{21}} - \tilde{S}_{13}\tilde{\tilde{S}}_{33}\expect{Q_{23}^2} + \tilde{S}_{13}\tilde{\tilde{S}}_{22}\expect{Q_{23}Q_{32}} \nonumber \\
+	\expect{Q_{3c}}_{32} &= -\tilde{S}_{21}\tilde{\tilde{S}}_{31}\expect{Q_{11}^2} + \tilde{S}_{12}\tilde{\tilde{S}}_{31}\expect{Q_{11}Q_{22}} + \tilde{S}_{21}\tilde{\tilde{S}}_{13}\expect{Q_{11}Q_{33}} - \tilde{S}_{12}\tilde{\tilde{S}}_{13}\expect{Q_{22}Q_{33}} \nonumber \\
+	&- \tilde{S}_{13}\tilde{\tilde{S}}_{12}\expect{Q_{23}Q_{32}} - \tilde{S}_{22}\tilde{\tilde{S}}_{32}\expect{Q_{12}^2} + \tilde{S}_{11}\tilde{\tilde{S}}_{32}\expect{Q_{12}Q_{21}} - \tilde{S}_{23}\tilde{\tilde{S}}_{33}\expect{Q_{13}^2} + \tilde{S}_{23}\tilde{\tilde{S}}_{11}\expect{Q_{13}Q_{31}} \nonumber \\
+	\expect{Q_{3c}}_{33} &= \tilde{S}_{21}\tilde{\tilde{S}}_{21}\expect{Q_{11}^2} + \tilde{S}_{12}\tilde{\tilde{S}}_{12}\expect{Q_{22}^2} - \left( \tilde{S}_{12}\tilde{\tilde{S}}_{21}+\tilde{S}_{21}\tilde{\tilde{S}}_{12} \right)\expect{Q_{11}Q_{22}} + \tilde{S}_{23}\tilde{\tilde{S}}_{23}\expect{Q_{13}^2} \nonumber \\
+	&+ \tilde{S}_{13}\tilde{\tilde{S}}_{13}\expect{Q_{23}^2} + \left( \tilde{S}_{11}\tilde{\tilde{S}}_{11}+\tilde{S}_{22}\tilde{\tilde{S}}_{22} \right)\expect{Q_{12}^2} - \left( \tilde{S}_{11}\tilde{\tilde{S}}_{22}-\tilde{S}_{22}\tilde{\tilde{S}}_{11} \right)\expect{Q_{12}Q_{21}}
+\end{align}
+
+Finally, the only term left is $\expect{\nu'_{R(t)\widehat{H\Delta W}}\nu'^T_{R(t)\widehat{H\Delta W}}}$.
+Similar to \eqref{eqn:vRhatxp}, $\nu'_{R(t)\widehat{H\Delta W}}$ can be written as
+\begin{equation}
+	\nu'_{R(t)\widehat{H\Delta W}} = \tilde{U}\Gamma_QH\Delta W.
+\end{equation}
+So, after calculate the expectation associated with $\Delta W$, we have
+\begin{align}
+	\expect{\nu'_{R(t)\widehat{H\Delta W}}\nu'^T_{R(t)\widehat{H\Delta W}}} = \tilde{U}\expect{\Gamma_QH\Delta W\Delta W^TH^T\Gamma_Q^T}\tilde{U}^T = \Delta t\tilde{U}\expect{\Gamma_QG\Gamma_Q^T}\tilde{U}^T
+\end{align}
+Let $\tilde{G} = V^TGV$, and recall that $\Gamma_Q = \Gamma'_QV^T$.
+Let $Q_{3d} = \Gamma_QG\Gamma_Q^T$, again its expression is too complicated to include here, which is done by symbolic calculations.
+
+\section{Simplifications}
+It can be verified by direct calculation that $\expect{Q_{ii}} = s_i\expect{Q_{ij}^2}-s_j\expect{Q_{ij}Q_{ji}}$, and $\expect{Q_{jj}} = s_j\expect{Q_{ij}^2}-s_i\expect{Q_{ij}Q_{ji}}$.
+Using these, \eqref{eqn:Q2c} can be simplified as
+\begin{align}
+	\expect{Q_{2c}}_1 &= \left( (P^TV)_{33}\tilde{S}_{32} + (P^TV)_{23}\tilde{S}_{22} - (P^TV)_{32}\tilde{S}_{33} - (P^TV)_{22}\tilde{S}_{23} \right)\expect{Q_{11}} \nonumber \\
+	&+ \left( (P^TV)_{13}\tilde{S}_{21} - (P^TV)_{11}\tilde{S}_{23} \right)\expect{Q_{22}} + \left( (P^TV)_{11}\tilde{S}_{32} - (P^TV)_{12}\tilde{S}_{31} \right)\expect{Q_{33}} \nonumber \\
+	\expect{Q_{2c}}_2 &= \left( (P^TV)_{11}\tilde{S}_{13} + (P^TV)_{31}\tilde{S}_{33} - (P^TV)_{13}\tilde{S}_{11} - (P^TV)_{33}\tilde{S}_{31} \right)\expect{Q_{22}} \nonumber \\
+	&+ \left( (P^TV)_{21}\tilde{S}_{32} - (P^TV)_{22}\tilde{S}_{31} \right)\expect{Q_{33}} + \left( (P^TV)_{22}\tilde{S}_{13} - (P^TV)_{23}\tilde{S}_{12} \right)\expect{Q_{11}} \nonumber \\
+	\expect{Q_{2c}}_3 &= \left( (P^TV)_{22}\tilde{S}_{21} + (P^TV)_{12}\tilde{S}_{11} - (P^TV)_{21}\tilde{S}_{22} - (P^TV)_{11}\tilde{S}_{12} \right)\expect{Q_{33}} \nonumber \\
+	&+ \left( (P^TV)_{32}\tilde{S}_{13} - (P^TV)_{33}\tilde{S}_{12} \right)\expect{Q_{11}} + \left( (P^TV)_{33}\tilde{S}_{21} - (P^TV)_{31}\tilde{S}_{23} \right)\expect{Q_{22}}
+\end{align}
+Equation \eqref{eqn:Q2d} can be simplified as
+\begin{align}
+	\expect{Q_{2d}}_{11} &= \left( (\mu^TV)_3\tilde{S}_{21} - (\mu^TV)_1\tilde{S}_{23} \right)\expect{Q_{22}} + \left( (\mu^TV)_1\tilde{S}_{32} - (\mu^TV)_2\tilde{S}_{31} \right)\expect{Q_{33}} \nonumber \\
+	\expect{Q_{2d}}_{12} &= \left( (\mu^TV)_1\tilde{S}_{13} - (\mu^TV)_3\tilde{S}_{11} \right)\expect{Q_{22}} \nonumber \\
+	\expect{Q_{2d}}_{13} &= \left( (\mu^TV)_2\tilde{S}_{11} - (\mu^TV)_1\tilde{S}_{12} \right)\expect{Q_{33}} \nonumber \\
+	\expect{Q_{2d}}_{21} &= \left( (\mu^TV)_3\tilde{S}_{22} - (\mu^TV)_2\tilde{S}_{23} \right)\expect{Q_{11}} \nonumber \\
+	\expect{Q_{2d}}_{22} &= \left( (\mu^TV)_2\tilde{S}_{13} - (\mu^TV)_3\tilde{S}_{12} \right)\expect{Q_{11}} + \left( (\mu^TV)_1\tilde{S}_{32} - (\mu^TV)_2\tilde{S}_{31} \right)\expect{Q_{33}} \nonumber \\
+	\expect{Q_{2d}}_{23} &= \left( (\mu^TV)_2\tilde{S}_{21} - (\mu^TV)_1\tilde{S}_{22} \right)\expect{Q_{33}} \nonumber \\
+	\expect{Q_{2d}}_{31} &= \left( (\mu^TV)_3\tilde{S}_{32} - (\mu^TV)_2\tilde{S}_{33} \right)\expect{Q_{11}} \nonumber \\
+	\expect{Q_{2d}}_{32} &= \left( (\mu^TV)_1\tilde{S}_{33} - (\mu^TV)_3\tilde{S}_{31} \right)\expect{Q_{22}} \nonumber \\
+	\expect{Q_{2d}}_{33} &= \left( (\mu^TV)_2\tilde{S}_{13} - (\mu^TV)_3\tilde{S}_{12} \right)\expect{Q_{11}} + \left( (\mu^TV)_3\tilde{S}_{21} - (\mu^TV)_1\tilde{S}_{23} \right)\expect{Q_{22}}
+\end{align}
 
 \end{document}
 
