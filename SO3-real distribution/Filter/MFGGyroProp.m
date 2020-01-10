@@ -1,4 +1,4 @@
-function [ ERtdt, ExvRptdt, EvRpvRptdt ] = MFGGyroProp( Miu, Sigma, P, U, S, V, H, dt )
+function [ Miutdt, Sigmatdt, Ptdt, Utdt, Stdt, Vtdt ] = MFGGyroProp( omega, Miu, Sigma, P, U, S, V, H, SigmaWx, dt )
 
 s = diag(S);
 
@@ -28,12 +28,13 @@ EQ1a(3,2) = (V(1,1)*P(3,2)-V(1,3)*P(1,2))*(s(1)*EQQ(7,7)-s(3)*EQQ(7,3))+...
 EQ1a(3,3) = (V(1,2)*P(1,2)-V(1,1)*P(2,2))*(s(1)*EQQ(7,7)-s(3)*EQQ(7,3))+...
     (V(2,1)*P(2,1)-V(2,2)*P(1,1))*(s(2)*EQQ(8,8)-s(3)*EQQ(8,6));
 ERHatPvRt = U*EQ1a;
-ERHatxt = ERt*hat(Miu)+ERHatPvRt;
+ERHatxwt = ERt*hat(Miu)+ERHatPvRt;
 
 G = H*H';
 EHW2 = (G-trace(G)*eye(3))*dt;
 
-ERtdt = ERt + ERHatxt*dt + 0.5*ERt*EHW2;
+ERtdt = ERt + ERHatxwt*dt + 0.5*ERt*EHW2;
+ERtdt = ERtdt*expRot(omega*dt);
 
 [Utdt,D,Vtdt] = psvd(ERtdt);
 Stdt = diag(pdf_MF_M2S(diag(D)));
@@ -41,10 +42,10 @@ Stdt = diag(pdf_MF_M2S(diag(D)));
 %% E[x(t+dt)v'R(t+dt)]
 % ExvRpt
 UT = Utdt'*U;
-VT = Vtdt'*V;
+VT = Vtdt'*expRot(omega*dt)'*V;
 ST = UT'*Stdt*VT;
 
-EvRpt = UT*vee(EQ*ST'-ST*EQ');
+EvRwpt = UT*vee(EQ*ST'-ST*EQ');
 
 EQ2a(1,1) = (s(2)*ST(2,2)+s(3)*ST(3,3))*EQQ(6,6) - (s(2)*ST(3,3)+s(3)*ST(2,2))*EQQ(6,8);
 EQ2a(1,2) = s(3)*ST(1,2)*EQQ(6,8) - s(2)*ST(1,2)*EQQ(6,6);
@@ -55,11 +56,11 @@ EQ2a(2,3) = s(1)*ST(2,3)*EQQ(3,7) - s(3)*ST(2,3)*EQQ(3,3);
 EQ2a(3,1) = s(2)*ST(3,1)*EQQ(2,4) - s(1)*ST(3,1)*EQQ(2,2);
 EQ2a(3,2) = s(1)*ST(3,2)*EQQ(2,4) - s(2)*ST(3,2)*EQQ(2,2);
 EQ2a(3,3) = (s(1)*ST(1,1)+s(2)*ST(2,2))*EQQ(2,2) - (s(1)*ST(2,2)+s(2)*ST(1,1))*EQQ(2,4);
-EvRvRpt = EQ2a*UT';
+EvRvRwpt = EQ2a*UT';
 
-ExvRpt = Miu*EvRpt'+P*EvRvRpt;
+ExvRwpt = Miu*EvRwpt'+P*EvRvRwpt;
 
-% ExvRhatxpt
+% ExvRhatxwpt
 EQ2b = [ST(2,2)*EQ(3,3)+ST(3,3)*EQ(2,2), -ST(1,2)*EQ(3,3), -ST(1,3)*EQ(2,2);
       -ST(2,1)*EQ(3,3), ST(1,1)*EQ(3,3)+ST(3,3)*EQ(1,1), -ST(2,3)*EQ(1,1);
       -ST(3,1)*EQ(2,2), -ST(3,2)*EQ(1,1), ST(1,1)*EQ(2,2)+ST(2,2)*EQ(1,1)];
@@ -129,56 +130,56 @@ EQ2e(3,3) = (PV(3,3)*ST(2,2)-PV(3,2)*ST(2,3))*((s(1)^2+s(2)^2)*EQQQ(1,2,2)-2*s(1
 
 SigmaMInv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
 Sigmac = Sigma-P*SigmaMInv*P';
-ExvRhatxpt = dt*((Sigmac+Miu*Miu')*EQ2b+Miu*EQ2c+P*EQ2d+P*EQ2e)*UT';
+ExvRhatxwpt = dt*((Sigmac+Miu*Miu')*EQ2b+Miu*EQ2c+P*EQ2d+P*EQ2e)*UT';
 
 % ExvRhatHWpt
-VTT = Vtdt'*G'*V;
+VTT = Vtdt'*expRot(omega*dt)'*G'*V;
 STT = UT'*Stdt*VTT;
 
-EvRGpt = UT*vee(EQ*STT'-STT*EQ');
+EvRGwpt = UT*vee(EQ*STT'-STT*EQ');
 
-EvRvRGpt(1,1) = (s(2)*STT(2,2)+s(3)*STT(3,3))*EQQ(6,6) - (s(2)*STT(3,3)+s(3)*STT(2,2))*EQQ(6,8);
-EvRvRGpt(1,2) = s(3)*STT(1,2)*EQQ(6,8) - s(2)*STT(1,2)*EQQ(6,6);
-EvRvRGpt(1,3) = s(2)*STT(1,3)*EQQ(6,8) - s(3)*STT(1,3)*EQQ(6,6);
-EvRvRGpt(2,1) = s(3)*STT(2,1)*EQQ(3,7) - s(1)*STT(2,1)*EQQ(3,3);
-EvRvRGpt(2,2) = (s(1)*STT(1,1)+s(3)*STT(3,3))*EQQ(3,3) - (s(1)*STT(3,3)+s(3)*STT(1,1))*EQQ(3,7);
-EvRvRGpt(2,3) = s(1)*STT(2,3)*EQQ(3,7) - s(3)*STT(2,3)*EQQ(3,3);
-EvRvRGpt(3,1) = s(2)*STT(3,1)*EQQ(2,4) - s(1)*STT(3,1)*EQQ(2,2);
-EvRvRGpt(3,2) = s(1)*STT(3,2)*EQQ(2,4) - s(2)*STT(3,2)*EQQ(2,2);
-EvRvRGpt(3,3) = (s(1)*STT(1,1)+s(2)*STT(2,2))*EQQ(2,2) - (s(1)*STT(2,2)+s(2)*STT(1,1))*EQQ(2,4);
+EvRvRGwpt(1,1) = (s(2)*STT(2,2)+s(3)*STT(3,3))*EQQ(6,6) - (s(2)*STT(3,3)+s(3)*STT(2,2))*EQQ(6,8);
+EvRvRGwpt(1,2) = s(3)*STT(1,2)*EQQ(6,8) - s(2)*STT(1,2)*EQQ(6,6);
+EvRvRGwpt(1,3) = s(2)*STT(1,3)*EQQ(6,8) - s(3)*STT(1,3)*EQQ(6,6);
+EvRvRGwpt(2,1) = s(3)*STT(2,1)*EQQ(3,7) - s(1)*STT(2,1)*EQQ(3,3);
+EvRvRGwpt(2,2) = (s(1)*STT(1,1)+s(3)*STT(3,3))*EQQ(3,3) - (s(1)*STT(3,3)+s(3)*STT(1,1))*EQQ(3,7);
+EvRvRGwpt(2,3) = s(1)*STT(2,3)*EQQ(3,7) - s(3)*STT(2,3)*EQQ(3,3);
+EvRvRGwpt(3,1) = s(2)*STT(3,1)*EQQ(2,4) - s(1)*STT(3,1)*EQQ(2,2);
+EvRvRGwpt(3,2) = s(1)*STT(3,2)*EQQ(2,4) - s(2)*STT(3,2)*EQQ(2,2);
+EvRvRGwpt(3,3) = (s(1)*STT(1,1)+s(2)*STT(2,2))*EQQ(2,2) - (s(1)*STT(2,2)+s(2)*STT(1,1))*EQQ(2,4);
 
-EvRvRGpt = EvRvRGpt*UT';
-ExvRGpt = Miu*EvRGpt'+P*EvRvRGpt;
+EvRvRGwpt = EvRvRGwpt*UT';
+ExvRGwpt = Miu*EvRGwpt'+P*EvRvRGwpt;
 
-ExvRhatHWpt = dt*ExvRGpt - dt*trace(G)*ExvRpt;
+ExvRhatHWwpt = dt*ExvRGwpt - dt*trace(G)*ExvRwpt;
 
 % final result
-ExvRptdt = ExvRpt + ExvRhatxpt + 0.5*ExvRhatHWpt;
+ExvRptdt = ExvRwpt + ExvRhatxwpt + 0.5*ExvRhatHWwpt;
 
 %% E[v'R(t+dt)v'R(t+dt)]
-% EvRpvRpt
-EvRpvRpt(1,1) = (ST(3,2)^2)*EQQ(5,5)+(-2*ST(2,3)*ST(3,2))*EQQ(5,9)+(ST(2,3)^2)*EQQ(9,9)...
+% EvRwpvRwpt
+EvRwpvRwpt(1,1) = (ST(3,2)^2)*EQQ(5,5)+(-2*ST(2,3)*ST(3,2))*EQQ(5,9)+(ST(2,3)^2)*EQQ(9,9)...
     +(ST(3,1)^2)*EQQ(2,2)+(ST(2,1)^2)*EQQ(3,3)+(ST(2,2)^2+ST(3,3)^2)*EQQ(6,6)+(-2*ST(2,2)*ST(3,3))*EQQ(6,8);
-EvRpvRpt(1,2) = (-ST(3,1)*ST(3,2))*EQQ(1,5)+(ST(2,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)*ST(3,2))*EQQ(5,9)+(-ST(1,3)*ST(2,3))*EQQ(9,9)...
+EvRwpvRwpt(1,2) = (-ST(3,1)*ST(3,2))*EQQ(1,5)+(ST(2,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)*ST(3,2))*EQQ(5,9)+(-ST(1,3)*ST(2,3))*EQQ(9,9)...
     +(-ST(3,1)*ST(3,2))*EQQ(2,4)+(-ST(1,1)*ST(2,1))*EQQ(3,3)+(ST(2,1)*ST(3,3))*EQQ(3,7)+(-ST(1,2)*ST(2,2))*EQQ(6,6)+(ST(1,2)*ST(3,3))*EQQ(6,8);
-EvRpvRpt(1,3) = (ST(2,1)*ST(3,2))*EQQ(1,5)+(-ST(2,1)*ST(2,3))*EQQ(1,9)+(-ST(1,2)*ST(3,2))*EQQ(5,5)+(ST(1,2)*ST(2,3))*EQQ(5,9)...
+EvRwpvRwpt(1,3) = (ST(2,1)*ST(3,2))*EQQ(1,5)+(-ST(2,1)*ST(2,3))*EQQ(1,9)+(-ST(1,2)*ST(3,2))*EQQ(5,5)+(ST(1,2)*ST(2,3))*EQQ(5,9)...
     +(-ST(1,1)*ST(3,1))*EQQ(2,2)+(ST(2,2)*ST(3,1))*EQQ(2,4)+(-ST(2,1)*ST(2,3))*EQQ(3,7)+(-ST(1,3)*ST(3,3))*EQQ(6,6)+(ST(1,3)*ST(2,2))*EQQ(6,8);
-EvRpvRpt(2,1) = (-ST(3,1)*ST(3,2))*EQQ(1,5)+(ST(2,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)*ST(3,2))*EQQ(5,9)+(-ST(1,3)*ST(2,3))*EQQ(9,9)...
+EvRwpvRwpt(2,1) = (-ST(3,1)*ST(3,2))*EQQ(1,5)+(ST(2,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)*ST(3,2))*EQQ(5,9)+(-ST(1,3)*ST(2,3))*EQQ(9,9)...
     +(-ST(3,1)*ST(3,2))*EQQ(2,4)+(-ST(1,1)*ST(2,1))*EQQ(3,3)+(ST(2,1)*ST(3,3))*EQQ(3,7) +(-ST(1,2)*ST(2,2))*EQQ(6,6)+(ST(1,2)*ST(3,3))*EQQ(6,8);
-EvRpvRpt(2,2) = (ST(3,1)^2)*EQQ(1,1)+(-2*ST(1,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)^2)*EQQ(9,9)...
+EvRwpvRwpt(2,2) = (ST(3,1)^2)*EQQ(1,1)+(-2*ST(1,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)^2)*EQQ(9,9)...
     +(ST(3,2)^2)*EQQ(2,2)+(ST(1,1)^2+ST(3,3)^2)*EQQ(3,3)+(-2*ST(1,1)*ST(3,3))*EQQ(3,7)+(ST(1,2)^2)*EQQ(6,6);
-EvRpvRpt(2,3) = (-ST(2,1)*ST(3,1))*EQQ(1,1)+(ST(1,2)*ST(3,1))*EQQ(1,5)+(ST(1,3)*ST(2,1))*EQQ(1,9)+(-ST(1,2)*ST(1,3))*EQQ(5,9)...
+EvRwpvRwpt(2,3) = (-ST(2,1)*ST(3,1))*EQQ(1,1)+(ST(1,2)*ST(3,1))*EQQ(1,5)+(ST(1,3)*ST(2,1))*EQQ(1,9)+(-ST(1,2)*ST(1,3))*EQQ(5,9)...
     +(-ST(2,2)*ST(3,2))*EQQ(2,2)+(ST(1,1)*ST(3,2))*EQQ(2,4)+(-ST(2,3)*ST(3,3))*EQQ(3,3)+(ST(1,1)*ST(2,3))*EQQ(3,7)+(-ST(1,2)*ST(1,3))*EQQ(6,8);
-EvRpvRpt(3,1) = (ST(2,1)*ST(3,2))*EQQ(1,5)+(-ST(2,1)*ST(2,3))*EQQ(1,9)+(-ST(1,2)*ST(3,2))*EQQ(5,5)+(ST(1,2)*ST(2,3))*EQQ(5,9)...
+EvRwpvRwpt(3,1) = (ST(2,1)*ST(3,2))*EQQ(1,5)+(-ST(2,1)*ST(2,3))*EQQ(1,9)+(-ST(1,2)*ST(3,2))*EQQ(5,5)+(ST(1,2)*ST(2,3))*EQQ(5,9)...
     +(-ST(1,1)*ST(3,1))*EQQ(2,2)+(ST(2,2)*ST(3,1))*EQQ(2,4)+(-ST(2,1)*ST(2,3))*EQQ(3,7)+(-ST(1,3)*ST(3,3))*EQQ(6,6)+(ST(1,3)*ST(2,2))*EQQ(6,8);
-EvRpvRpt(3,2) = (-ST(2,1)*ST(3,1))*EQQ(1,1)+(ST(1,2)*ST(3,1))*EQQ(1,5)+(ST(1,3)*ST(2,1))*EQQ(1,9)+(-ST(1,2)*ST(1,3))*EQQ(5,9)...
+EvRwpvRwpt(3,2) = (-ST(2,1)*ST(3,1))*EQQ(1,1)+(ST(1,2)*ST(3,1))*EQQ(1,5)+(ST(1,3)*ST(2,1))*EQQ(1,9)+(-ST(1,2)*ST(1,3))*EQQ(5,9)...
     +(-ST(2,2)*ST(3,2))*EQQ(2,2)+(ST(1,1)*ST(3,2))*EQQ(2,4)+(-ST(2,3)*ST(3,3))*EQQ(3,3)+(ST(1,1)*ST(2,3))*EQQ(3,7)+(-ST(1,2)*ST(1,3))*EQQ(6,8);
-EvRpvRpt(3,3) = (ST(2,1)^2)*EQQ(1,1)+(-2*ST(1,2)*ST(2,1))*EQQ(1,5)+(ST(1,2)^2)*EQQ(5,5)...
+EvRwpvRwpt(3,3) = (ST(2,1)^2)*EQQ(1,1)+(-2*ST(1,2)*ST(2,1))*EQQ(1,5)+(ST(1,2)^2)*EQQ(5,5)...
     +(ST(1,1)^2+ST(2,2)^2)*EQQ(2,2)+(-2*ST(1,1)*ST(2,2))*EQQ(2,4)+(ST(2,3)^2)*EQQ(3,3)+(ST(1,3)^2)*EQQ(6,6);
 
-EvRpvRpt = UT*EvRpvRpt*UT';
+EvRwpvRwpt = UT*EvRwpvRwpt*UT';
 
-% EvRpvRhatxpt
+% EvRwpvRhatxwpt
 EQ3a(1,1) = (ST(3,1)*ST(3,2)*uV(3)-ST(3,2)*ST(3,3)*uV(1))*EQQ(5,5)...
     + (ST(2,1)*ST(3,2)*uV(2)-ST(2,2)*ST(3,2)*uV(1)-ST(2,3)*ST(3,1)*uV(3)+ST(2,3)*ST(3,3)*uV(1))*EQQ(5,9)...
     + (ST(2,2)*ST(2,3)*uV(1)-ST(2,1)*ST(2,3)*uV(2))*EQQ(9,9)...
@@ -430,9 +431,9 @@ EQ3b(3,3) = (PV(3,3)*ST(2,2)^2*s(2)-PV(3,3)*ST(2,1)^2*s(2)-PV(3,2)*ST(1,1)*ST(2,
     + (PV(1,1)*ST(2,3)^2*s(3)-PV(1,1)*ST(2,2)^2*s(3)+PV(1,2)*ST(2,1)*ST(2,2)*s(3)-PV(2,1)*ST(1,2)*ST(2,2)*s(3)+PV(2,2)*ST(1,1)*ST(2,2)*s(3)-PV(1,3)*ST(2,1)*ST(2,3)*s(3)+PV(2,1)*ST(1,3)*ST(2,3)*s(3)-PV(2,3)*ST(1,3)*ST(2,1)*s(3)+PV(3,1)*ST(1,2)*ST(2,3)*s(2)+PV(3,1)*ST(1,3)*ST(2,2)*s(2)-PV(3,2)*ST(1,1)*ST(2,3)*s(2)-PV(3,2)*ST(1,3)*ST(2,1)*s(2))*EQQQ(2,6,3)...
     + (PV(2,2)*ST(1,1)^2*s(1)+PV(1,1)*ST(2,2)^2*s(2)-PV(1,1)*ST(2,3)^2*s(2)-PV(2,2)*ST(1,3)^2*s(1)-PV(2,1)*ST(1,1)*ST(1,2)*s(1)+PV(2,3)*ST(1,2)*ST(1,3)*s(1)-PV(1,2)*ST(2,1)*ST(2,2)*s(2)+PV(1,3)*ST(2,1)*ST(2,3)*s(2))*EQQQ(3,8,2);
 
-EvRpvRhatxpt = UT*(EQ3a+EQ3b)*UT';
+EvRwpvRhatxwpt = UT*(EQ3a+EQ3b)*UT';
 
-% EvRpvRhatHWpt
+% EvRwpvRhatHWwpt
 EQ3c(1,1) = (ST(3,2)*STT(3,2))*EQQ(5,5)+(-ST(2,3)*STT(3,2)-ST(3,2)*STT(2,3))*EQQ(5,9)+(ST(2,3)*STT(2,3))*EQQ(9,9)...
     +(ST(3,1)*STT(3,1))*EQQ(2,2)+(ST(2,1)*STT(2,1))*EQQ(3,3)+(ST(2,2)*STT(2,2)+ST(3,3)*STT(3,3))*EQQ(6,6)+(-ST(2,2)*STT(3,3)-ST(3,3)*STT(2,2))*EQQ(6,8);
 EQ3c(1,2) = (-ST(3,2)*STT(3,1))*EQQ(1,5)+(ST(2,3)*STT(3,1))*EQQ(1,9)+(ST(3,2)*STT(1,3))*EQQ(5,9)+(-ST(2,3)*STT(1,3))*EQQ(9,9)...
@@ -451,11 +452,11 @@ EQ3c(3,2) = (-ST(2,1)*STT(3,1))*EQQ(1,1)+(ST(1,2)*STT(3,1))*EQQ(1,5)+(ST(2,1)*ST
     +(-ST(2,2)*STT(3,2))*EQQ(2,2)+(ST(1,1)*STT(3,2))*EQQ(2,4)+(-ST(2,3)*STT(3,3))*EQQ(3,3)+(ST(2,3)*STT(1,1))*EQQ(3,7)+(-ST(1,3)*STT(1,2))*EQQ(6,8);
 EQ3c(3,3) = (ST(2,1)*STT(2,1))*EQQ(1,1)+(-ST(1,2)*STT(2,1)-ST(2,1)*STT(1,2))*EQQ(1,5)+(ST(1,2)*STT(1,2))*EQQ(5,5)...
     +(ST(1,1)*STT(1,1)+ST(2,2)*STT(2,2))*EQQ(2,2)+(-ST(1,1)*STT(2,2)-ST(2,2)*STT(1,1))*EQQ(2,4)+(ST(2,3)*STT(2,3))*EQQ(3,3)+(ST(1,3)*STT(1,3))*EQQ(6,6);
-EvRpvRGpt = UT*EQ3c*UT';
+EvRwpvRGwpt = UT*EQ3c*UT';
 
-EvRpvRhatHWpt = dt*EvRpvRGpt - dt*trace(G)*EvRpvRpt;
+EvRwpvRhatHWwpt = dt*EvRwpvRGwpt - dt*trace(G)*EvRwpvRwpt;
 
-% EvRhatHWpvRhatHWpt
+% EvRhatHWwpvRhatHWwpt
 GT = V'*G*V;
 
 EQ3d(1,1) = (GT(1,1)*ST(3,3)^2+GT(3,3)*ST(3,1)^2-GT(1,3)*ST(3,1)*ST(3,3)-GT(3,1)*ST(3,1)*ST(3,3))*EQQ(5,5)...
@@ -534,11 +535,32 @@ EQ3d(3,3) = (GT(2,2)*ST(2,3)^2+GT(3,3)*ST(2,2)^2-GT(2,3)*ST(2,2)*ST(2,3)-GT(3,2)
     + (GT(1,1)*ST(2,2)^2+GT(2,2)*ST(2,1)^2-GT(1,2)*ST(2,1)*ST(2,2)-GT(2,1)*ST(2,1)*ST(2,2))*EQQ(3,3)...
     + (GT(1,1)*ST(1,2)^2+GT(2,2)*ST(1,1)^2-GT(1,2)*ST(1,1)*ST(1,2)-GT(2,1)*ST(1,1)*ST(1,2))*EQQ(6,6);
 
-EvRhatHWpvRhatHWpt = dt*UT*EQ3d*UT';
+EvRhatHWwpvRhatHWwpt = dt*UT*EQ3d*UT';
 
 % final result
-EvRpvRptdt = EvRpvRpt + dt*(EvRpvRhatxpt+EvRpvRhatxpt')...
-    + 0.5*(EvRpvRhatHWpt+EvRpvRhatHWpt') + EvRhatHWpvRhatHWpt;
+EvRpvRptdt = EvRwpvRwpt + dt*(EvRwpvRhatxwpt+EvRwpvRhatxwpt')...
+    + 0.5*(EvRwpvRhatHWwpt+EvRwpvRhatHWwpt') + EvRhatHWwpvRhatHWwpt;
+
+%% maximum likelihood estimation
+% other necessary moments
+EvRvRt(1,1) = (s(2)^2+s(3)^2)*EQQ(6,6)-2*s(2)*s(3)*EQQ(6,8);
+EvRvRt(2,2) = (s(1)^2+s(3)^2)*EQQ(3,3)-2*s(1)*s(3)*EQQ(3,7);
+EvRvRt(3,3) = (s(1)^2+s(2)^2)*EQQ(2,2)-2*s(1)*s(2)*EQQ(2,4);
+Exxt = Sigmac+Miu*Miu'+P*EvRvRt*P';
+covxxtdt = Exxt-Miu*Miu';
+
+EvRhatxwpt = UT*EQ2b'*Miu+UT*EQ2c';
+EvRGwpt = UT*vee(EQ*STT'-STT*EQ');
+EvRhatHWpt = dt*(EvRGwpt-trace(G)*EvRwpt);
+EvRptdt = EvRwpt + dt*EvRhatxwpt + 0.5*EvRhatHWpt;
+covxvRptdt = ExvRptdt-Miu*EvRptdt';
+
+covvRpvRptdt = EvRpvRptdt-EvRptdt*EvRptdt';
+
+% estimation
+Ptdt = covxvRptdt*covvRpvRptdt^-1;
+Miutdt = Miu-Ptdt*EvRptdt;
+Sigmatdt = covxxtdt-Ptdt*covxvRptdt'+Ptdt*(trace(Stdt)*eye(3)-Stdt)*Ptdt' + SigmaWx;
 
 end
 
