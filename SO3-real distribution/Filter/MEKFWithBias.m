@@ -1,4 +1,4 @@
-function [ R, x, G ] = MEKFWithBias( gyro, RInit, RMea, sf )
+function [ R, x, G, stepT ] = MEKFWithBias( gyro, RMea, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -6,24 +6,28 @@ if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     addpath(getAbsPath('..\..\rotation3d',filePath));
 end
 
-dt = 1/sf;
 N = size(gyro,2);
+dt = parameters.dt;
 
 % noise parameters
-randomWalk = 10*pi/180;
-biasInstability = 500/3600*pi/180;
-rotMeaNoise = 0.2;
+randomWalk = parameters.randomWalk;
+biasInstability = parameters.biasInstability;
+rotMeaNoise = parameters.rotMeaNoise;
 
 % initialize distribution
-Sigma = [eye(3)/200,zeros(3);zeros(3),eye(3)*0.1^2];
+Sigma = [eye(3)*parameters.initRsigma^2,zeros(3)
+    zeros(3),eye(3)*parameters.initXsigma^2];
 
 % data containers
 G.Sigma = zeros(6,6,N); G.Sigma(:,:,1) = Sigma;
-R = zeros(3,3,N); R(:,:,1) = RInit*expRot([pi,0,0]);
-x = zeros(3,N);
+R = zeros(3,3,N); R(:,:,1) = parameters.RInit;
+x = zeros(3,N); x(:,1) = parameters.xInit;
+stepT = zeros(N-1,1);
 
 % filter iteration
 for n = 2:N
+    tic;
+    
     % propagate
     av = (gyro(:,n-1)+gyro(:,n))/2-x(:,n-1);
     Rp = R(:,:,n-1)*expRot(av*dt);
@@ -47,6 +51,8 @@ for n = 2:N
     
     % record covariance
     G.Sigma(:,:,n) = Sigma;
+    
+    stepT(n-1) = toc;
 end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))

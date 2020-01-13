@@ -1,4 +1,4 @@
-function [ R, MFG ] = MFGUnscentedWithBias( gyro, RInit, RMea, sf )
+function [ R, MFG, stepT ] = MFGUnscentedWithBias( gyro, RMea, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -12,23 +12,23 @@ if ~any(strcmp(pathCell,getAbsPath('..\',filePath)))
     addpath(getAbsPath('..\',filePath));
 end
 
-dt = 1/sf;
 N = size(gyro,2);
+dt = parameters.dt;
 
 % noise parameters
-randomWalk = 10*pi/180;
-biasInstability = 500/3600*pi/180;
-rotMeaNoise = 0.2;
+randomWalk = parameters.randomWalk;
+biasInstability = parameters.biasInstability;
+rotMeaNoise = parameters.rotMeaNoise;
 
 SM = Gau2MF(rotMeaNoise);
 
 % initialize distribution
-Miu = [0;0;0];
-Sigma = eye(3)*0.1^2;
+Miu = parameters.xInit;
+Sigma = eye(3)*parameters.initXsigma^2;
 P = zeros(3);
-U = RInit*expRot([pi,0,0]);
+U = parameters.RInit;
 V = eye(3);
-S = Gau2MF(sqrt(1/200));
+S = Gau2MF(parameters.initRsigma);
 
 % data containers
 MFG.Miu = zeros(3,N); MFG.Miu(:,1) = Miu;
@@ -37,14 +37,17 @@ MFG.P = zeros(3,3,N); MFG.P(:,:,1) = P;
 MFG.U = zeros(3,3,N); MFG.U(:,:,1) = U;
 MFG.V = zeros(3,3,N); MFG.V(:,:,1) = V;
 MFG.S = zeros(3,N); MFG.S(:,1) = diag(S);
-R = zeros(3,3,N); R(:,:,1) = RInit*expRot([pi,0,0]);
+R = zeros(3,3,N); R(:,:,1) = U*V';
+stepT = zeros(N-1,1);
 
 % filter iteration
 for n = 2:N
+    tic;
+    
     % unscented transform for last step
     [xl,Rl,wl] = MFGGetSigmaPoints(Miu,Sigma,P,U,S,V);
-    [xav,wav] = GGetSigmaPoints([0;0;0],eye(3)*randomWalk^2*sf);
-    [xb,wb] = GGetSigmaPoints([0;0;0],eye(3)*biasInstability^2*sf);
+    [xav,wav] = GGetSigmaPoints([0;0;0],eye(3)*randomWalk^2/dt);
+    [xb,wb] = GGetSigmaPoints([0;0;0],eye(3)*biasInstability^2/dt);
     
     % propagate sigma points
     xp = zeros(3,13*7*7);
@@ -78,6 +81,8 @@ for n = 2:N
     MFG.V(:,:,n) = V;
     MFG.S(:,n) = diag(S);
     R(:,:,n) = U*V';
+    
+    stepT(n-1) = toc;
 end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))

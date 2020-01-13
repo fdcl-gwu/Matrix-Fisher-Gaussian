@@ -1,4 +1,4 @@
-function [ R, MFG ] = MFGAnaWithBias( gyro, RInit, RMea, sf )
+function [ R, MFG, stepT ] = MFGAnaWithBias( gyro, RMea, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -12,23 +12,23 @@ if ~any(strcmp(pathCell,getAbsPath('..\',filePath)))
     addpath(getAbsPath('..\',filePath));
 end
 
-dt = 1/sf;
 N = size(gyro,2);
+dt = parameters.dt;
 
 % noise parameters
-randomWalk = 10*pi/180;
-biasInstability = 500/3600*pi/180;
-rotMeaNoise = 0.2;
+randomWalk = parameters.randomWalk;
+biasInstability = parameters.biasInstability;
+rotMeaNoise = parameters.rotMeaNoise;
 
 SM = Gau2MF(rotMeaNoise);
 
 % initialize distribution
-Miu = [0;0;0];
-Sigma = eye(3)*0.1^2;
+Miu = -parameters.xInit;
+Sigma = eye(3)*parameters.initXsigma^2;
 P = zeros(3);
-U = RInit*expRot([pi,0,0]);
+U = parameters.RInit;
 V = eye(3);
-S = Gau2MF(sqrt(1/200));
+S = Gau2MF(parameters.initRsigma);
 S(2,2) = S(2,2)+1e-5;
 S(3,3) = S(3,3)+2e-5;
 
@@ -39,10 +39,12 @@ MFG.P = zeros(3,3,N); MFG.P(:,:,1) = P;
 MFG.U = zeros(3,3,N); MFG.U(:,:,1) = U;
 MFG.V = zeros(3,3,N); MFG.V(:,:,1) = V;
 MFG.S = zeros(3,N); MFG.S(:,1) = diag(S);
-R = zeros(3,3,N); R(:,:,1) = RInit*expRot([pi,0,0]);
+R = zeros(3,3,N); R(:,:,1) = U*V';
+stepT = zeros(N-1,1);
 
 % filter iteration
 for n = 2:N
+    tic;
     % uncertainty propagation
     omega = (gyro(:,n-1)+gyro(:,n))/2;
     [Miu,Sigma,P,U,S,V] = MFGGyroProp(omega,Miu,Sigma,P,U,S,V,randomWalk*eye(3),biasInstability^2*dt*eye(3),dt);
@@ -60,6 +62,8 @@ for n = 2:N
     MFG.V(:,:,n) = V;
     MFG.S(:,n) = diag(S);
     R(:,:,n) = U*V';
+    
+    stepT(n-1) = toc;
 end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))

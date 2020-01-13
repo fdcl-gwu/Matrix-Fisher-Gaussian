@@ -1,4 +1,4 @@
-function [ gyroMea, RMea, RTrue, biasTrue ] = genTrigWithBias( t, sf )
+function [ gyroMea, RMea, RTrue, biasTrue ] = genTrigWithBias( t, sf, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -14,9 +14,15 @@ E.fr = 0.35; E.fp = 0.35; E.fh = 0.35;
 E.magr = pi; E.magp = pi/2; E.magh = pi;
 
 % noise parameters
-randomWalk = 10*pi/180;
-biasInstability = 500/3600*pi/180;
-rotMeaNoise = 0.2;
+if exist('parameters','var')
+    randomWalk = parameters.randomWalk;
+    biasInstability = parameters.biasInstability;
+    rotMeaNoise = parameters.rotMeaNoise;
+else
+    randomWalk = 10*pi/180;
+    biasInstability = 500/3600*pi/180;
+    rotMeaNoise = 0.2;
+end
 
 % true state
 roll = @(t)E.magr*sin(E.fr*2*pi*t);
@@ -54,7 +60,7 @@ gyro = [w2(time);w3(time);w4(time)];
 
 % add noise
 biasNoise = randn(3,N)*biasInstability*sqrt(sf);
-biasTrue = cumsum(biasNoise/sf,2)+0.2;
+biasTrue = cumsum(biasNoise/sf,2);
 
 gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
 gyroMea = gyro+gyroNoise+biasTrue;
