@@ -44,14 +44,17 @@ for i = 1:3
         (1/c*(dc(cyc{i}(1))-dc(cyc{i}(2))-dc(cyc{i}(3))));
 end
 
+% minimum of sigma {cos(theta_i)>-1/2}
 options = optimoptions('fsolve','Display','off');
-sumwm = @(sigma)2*(wm{1}(sigma)+wm{2}(sigma)+wm{3}(sigma));
-sigma = fsolve(@(sigma)sumwm(sigma)-wM,0.1,options);
+sigmaMin = max(cellfun(@(eqn)fsolve(@(sigma)eqn(sigma)+1/2,0,options),cost));
 
-if s(1)==0
-    for i = 1:3
-        wm{i} = @(sigma)1/13;
-    end
+% calculate sigma
+sumwm = @(sigma)2*(wm{1}(sigma)+wm{2}(sigma)+wm{3}(sigma));
+sigma = fsolve(@(sigma)sumwm(sigma)-wM,0,options);
+if sigma <= sigmaMin
+    sigma = sigmaMin;
+    wM = sumwm(sigma);
+    w0 = (1-wM)/(2*n+1);
 end
 
 % calculate sigma points and weights
