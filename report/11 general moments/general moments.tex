@@ -1,0 +1,369 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+\title{\vspace{-4ex}\textbf{High order moments for Matrix Fisher distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+\section{General formula}
+
+The general moments for Matrix Fisher distribution is given by
+\begin{equation} \label{eqn:Eraw}
+	\expect{Q_{i_1j_1} \cdots Q_{i_nj_n}} = \left. \frac{\partial^n M_Q(T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} \right|_{T=0} = \frac{1}{c(S)} \left. \frac{\partial^n c(S+T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} \right|_{T=0},
+\end{equation}
+where $S = \mathrm{diag}([s_1,s_2,s_3])$, and $c$ is the normalizing constant.
+In order to evaluate this derivative, $c(S+T)$ is regarded as a function of the three singular values $\{s_1,s_2,s_3\}$ of $S+T$, and the derivative is first taken through $\{s_1,s_2,s_3\}$.
+
+Expanding \eqref{eqn:Eraw} requires some non-trivial combinatorics. First, define a notation $\mathcal{C}(n,k)$ such that
+\begin{equation}
+	\mathcal{C}(n,k) = \left\{ (l_1,\ldots,l_k) \,|\, l_1,\ldots,l_k \text{ form a partition of } \{1,\ldots,n\} \right\}/e,
+\end{equation}
+where $e$ is an equivalence relationship such that the partition is unordered.
+For example, $(\{1,2\},\{3,4\},\{5\})$ and $(\{3,4\},\{5\},\{1,2\})$ are considered as the same partition.
+
+\begin{example}
+	\begin{align*}
+		\mathcal{C}(5,3) = \big\{&(\{1,2,3\},\{4\},\{5\}), (\{1,2,4\},\{3\},\{5\}), (\{1,2,5\},\{3\},\{4\}), (\{1,3,4\},\{2\},\{5\}), \\
+		&(\{1,3,5\},\{2\},\{4\}), (\{1,4,5\},\{2\},\{3\}), (\{2,3,4\},\{1\},\{5\}), (\{2,3,5\},\{1\},\{4\}), \\
+		&(\{2,4,5\},\{1\},\{3\}), (\{3,4,5\},\{1\},\{2\}), (\{1,2\},\{3,4\},\{5\}), (\{1,3\},\{2,4\},\{5\}), \\
+		&(\{1,4\},\{2,3\},\{5\}), (\{1,2\},\{3,5\},\{4\}), (\{1,3\},\{2,5\},\{4\}), (\{1,5\},\{2,3\},\{4\}), \\
+		&(\{1,2\},\{4,5\},\{3\}), (\{1,4\},\{2,5\},\{3\}), (\{1,5\},\{2,4\},\{3\}), (\{1,3\},\{4,5\},\{2\}), \\
+		&(\{1,4\},\{3,5\},\{2\}), (\{1,5\},\{3,4\},\{2\}), (\{2,3\},\{4,5\},\{1\}), (\{2,4\},\{3,5\},\{1\}), \\
+		&(\{2,5\},\{3,4\},\{1\}) \big\}
+	\end{align*}
+\end{example}
+
+Then, we state the how to expand \eqref{eqn:Eraw}.
+\begin{theorem}
+	\begin{align} \label{eqn:EDerivatives}
+		\frac{\partial^n c(S+T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &= \sum_{\alpha_1=1}^{3} \frac{\partial c(S+T)}{\partial s_{\alpha_1}} \frac{\partial^n s_{\alpha_1}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} + \cdots \nonumber \\
+		&+ \sum_{\alpha_1=1}^{3}\cdots\sum_{\alpha_k=1}^{3} \frac{\partial^k c(S+T)}{\partial s_{\alpha_1} \cdots \partial s_{\alpha_k}} \left( \sum_{(l_1,\ldots,l_k)\in\mathcal{C}(n,k)} \partial_{l_1}s_{\alpha_1} \cdots \partial_{l_k}s_{\alpha_k} \right) + \cdots \nonumber \\
+		&+ \sum_{\alpha_1=1}^{3}\cdots\sum_{\alpha_n=1}^{3} \frac{\partial^n c(S+T)}{\partial s_{\alpha_1}\cdots\partial s_{\alpha_n}} \frac{\partial s_{\alpha_1}}{\partial T_{i_1j_1}} \cdots \frac{\partial s_{\alpha_n}}{\partial T_{i_nj_n}},
+	\end{align}
+	where $\partial_{l_r}s_{\alpha_r} = \frac{\partial^t s_{\alpha_r}}{\partial T_{i_{l_r^1}j_{l_r^1}} \cdots \partial T_{i_{l_r^t}j_{l_r^t}}}$ if $l_r = \{l_r^1,\ldots,l_r^t\}$.
+\end{theorem}
+\begin{proof}
+	Clearly when $n=1$, \eqref{eqn:EDerivatives} is true.
+	Suppose for $n-1$, \eqref{eqn:EDerivatives} is also true.
+	Then for $n$, the $k$-th term is composed of two parts, one from the $k$-th term for $n-1$, and one from the $(k-1)$-th term for $n-1$.
+	More specifically, it is written as
+	\begin{align}
+		\frac{\partial^n c(S+T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &= \cdots + \sum_{\alpha_1=1}^{3}\cdots\sum_{\alpha_k=1}^{3} \frac{\partial^k c(S+T)}{\partial s_{\alpha_1} \cdots \partial s_{\alpha_k}} \frac{\partial}{\partial T_{i_nj_n}}\left( \sum_{(l_1,\ldots,l_k)\in\mathcal{C}(n-1,k)} \partial_{l_1}s_{\alpha_1} \cdots \partial_{l_k}s_{\alpha_k} \right) \nonumber \\
+		&\qquad + \sum_{\alpha_1=1}^{3}\cdots\sum_{\alpha_k=1}^{3} \frac{\partial^k c(S+T)}{\partial s_{\alpha_1} \cdots \partial s_{\alpha_k}} \left( \sum_{(l_1,\ldots,l_k)\in\mathcal{C}(n-1,k-1)} \partial_{l_1}s_{\alpha_1} \cdots \partial_{l_{k-1}}s_{\alpha_{k-1}} \right) \frac{\partial s_{\alpha_k}}{\partial T_{i_nj_n}} + \cdots \nonumber \\
+		&\triangleq \cdots + \sum_{\alpha_1=1}^{3}\cdots\sum_{\alpha_k=1}^{3} \frac{\partial^k c(S+T)}{\partial s_{\alpha_1} \cdots \partial s_{\alpha_k}} \left( \sum_{(l_1,\ldots,l_k)\in\mathcal{C}'(n,k)} \partial_{l_1}s_{\alpha_1} \cdots \partial_{l_{k}}s_{\alpha_{k}} \right)
+	\end{align}
+	From the above equation, the new index set $\mathcal{C}'(n,k)$ can be written as
+	\begin{align}
+		\mathcal{C}'(n,k) &= \left\{ (l_1,\ldots,l_{k-1},\{n\}) \,|\, (l_1,\ldots,l_{k-1})\in\mathcal{C}(n-1,k-1) \right\} \nonumber \\
+		&\quad \cup \left\{ (l_1\cup\{n\},l_2,\ldots,l_k) \,|\, (l_1,\ldots,l_n)\in\mathcal{C}(n-1,k) \right\} \cup \cdots \nonumber \\
+		&\quad \cup \left\{ (l_1,\ldots,l_{k-1},l_k\cup\{n\}) \,|\, (l_1,\ldots,l_n)\in\mathcal{C}(n-1,k) \right\} \nonumber \\
+		&= \mathcal{C}(n,k),
+	\end{align}
+	which finishes the proof.
+\end{proof}
+
+\section{Derivatives of singular values}
+In \eqref{eqn:EDerivatives}, a lot of $\partial_l s_\alpha$ are zeros, which we are to specify.
+\begin{lemma} \label{lemma:zeroDsDT}
+	Let $\partial_l s_\alpha$ = $\frac{\partial^t s_\alpha}{\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}}$.
+	Suppose $\{i_{l^1},j_{l^1},\ldots,i_{l^t},j_{l^t}\}$ have $n_1$ 1's, $n_2$ 2's and $n_3$ 3's, then $\partial_l s_\alpha = 0$ if $n_1,n_2,n_3$ have odd numbers.
+\end{lemma}
+\begin{proof}
+	Let $s_1,s_2,s_3$ be (proper) singular values of $S+T$, let $(\gamma_1,\gamma_2,\gamma_3) \in \{(1,-1,-1),(-1,1,-1),(-1,-1,1)\}$ and $\Gamma = \mathrm{diag}(\gamma_1,\gamma_2,\gamma_3)$.
+	Clearly $\Gamma\in\SO$, so $\Gamma^T(S+T)\Gamma = S+\Gamma^TT\Gamma$.
+	In general, let $S+T = U\mathrm{diag}(s_1,s_2,s_3)V^T$ be its (proper) singular value decomposition, then $S+\Gamma^TT\Gamma = \Gamma^TU\mathrm{diag}(s_1,s_2,s_3)(\Gamma^TV)^T$.
+	Note that $\Gamma^T$ does not change the polarity of $U$ or $V$, so $s_1,s_2,s_3$ are the (proper) singular values of $S+\Gamma^TT\Gamma$.
+	This proves
+	\begin{equation*}
+		\frac{\partial^t s_\alpha(S+T)}{\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}} = \frac{\partial^t s_\alpha(S+\Gamma^TT\Gamma)}{\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}}.
+	\end{equation*}
+	On the other hand, since $(\Gamma^TT\Gamma)_{ij} = \gamma_i\gamma_jT_{ij}$, we have $\frac{\partial (\Gamma^TT\Gamma)_{i'j'}}{\partial T_{ij}} = \delta_i^{i'}\delta_j^{j'}\gamma_i\gamma_j$.
+	Therefore,
+	\begin{align*}
+		\frac{\partial^t s_\alpha(S+\Gamma^TT\Gamma)}{\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}} &= \frac{\partial^t s_\alpha(S+\Gamma^TT\Gamma)}{\partial (\Gamma^TT\Gamma)_{i_{l^1}j_{l^1}} \cdots \partial (\Gamma^TT\Gamma)_{i_{l^t}j_{l^t}}} \frac{\partial (\Gamma^TT\Gamma)_{i_{l^1}j_{l^1}}}{\partial T_{i_{l^1}j_{l^1}}} \cdots \frac{\partial (\Gamma^TT\Gamma)_{i_{l^t}j_{l^t}}}{\partial T_{i_{l^t}j_{l^t}}} \\
+		&= \frac{\partial^t s_\alpha(S+T)}{\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}} \gamma_{i_{l^1}}\gamma_{j_{l^1}} \cdots \gamma_{i_{l^t}}\gamma_{j_{l^t}}. \\
+		&= \frac{\partial^t s_\alpha(S+T)}{\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}} \gamma_1^{n_1} \gamma_2^{n_2} \gamma_3^{n_3}.
+	\end{align*}
+	Without loss of generality, suppose $n_1$ is odd. Since $n_1+n_2+n_3$ must be even, then either $n_2$ or $n_3$ is also odd, suppose $n_2$ is odd, then $n_3$ is even.
+	Substitute $(\gamma_1,\gamma_2,\gamma_3) = (1,-1,-1)$ into the above two equations, we have $\partial_l s_\alpha = -\partial_l s_\alpha$, so $\partial_l s_\alpha = 0$.
+	Other cases can be similarly proved.
+\end{proof}
+
+\begin{corollary}
+	$\expect{Q_{i_1j_1} \cdots Q_{i_nj_n}} = 0$ if $\{i_1,j_1,\ldots,i_n,j_n\}$ has odd number of 1's, 2's, or 3's.
+\end{corollary}
+\begin{proof}
+	If $\{i_1,j_1,\ldots,i_n,j_n\}$ has odd number of 1's, 2's, or 3's, then there is a particular $l_m$ in $(l_1,\ldots,l_k) \in \mathcal{C}(n,k)$ such that $\{i_{l_m^1},j_{l_m^1},\ldots,i_{l_m^t},j_{l_m^t}\}$ has odd number of 1's, 2's, or 3's, and by Lemma \ref{lemma:zeroDsDT} the corresponding $\partial_{l_m} s_\alpha = 0$.
+	Since $n$, $k$ and $(l_1,\ldots,l_k)$ are arbitrary, $\expect{Q_{i_1j_1} \cdots Q_{i_nj_n}} = 0$ by \eqref{eqn:EDerivatives}.
+\end{proof}
+
+Lemma \ref{lemma:zeroDsDT} simplifies \eqref{eqn:EDerivatives} substantially.
+We show this by looking for some ``building blocks'' of a nonzero $\partial_l s_\alpha$, given in the next lemma.
+\begin{lemma} \label{lemma:basicForms}
+	If $\partial_l s_\alpha \neq 0$, then $\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}$ can be grouped into clusters of the following basic forms: (i) $\partial T_{ii}$, (ii) $\partial T_{ij} \partial T_{ij}$, $\partial T_{ij} \partial T_{ji}$, and (iii) $\partial T_{ij} \partial T_{jk} \partial T_{ki}$,  $\partial T_{ij} \partial T_{jk} \partial T_{ik}$ for $i,j,k\in\{1,2,3\}$.
+\end{lemma}
+\begin{proof}
+	Perform induction on $t$.
+	When $t=1,2,3$, clearly the nonzero terms are of the forms (i)-(iii) by Lemma \ref{lemma:zeroDsDT}.
+	Consider $t>3$ and assume for $t-1$, $t-2$, $t-3$ the lemma is correct.
+	Then if $i_{l^1}=j_{l^1}$, $\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}$ can be separated into $\partial T_{i_{l^1}i_{l^1}}$ which is of the form (i), and $\partial T_{i_{l^2}j_{l^2}} \cdots \partial T_{i_{l^t}j_{l^t}}$ which is taken care of by the induction assumption.
+	
+	Now suppose $i_{l^1} \neq j_{l^1}$, then if $i_{l^2} = j_{l^2}$, $\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}$ can be similarly separated into $\partial T_{i_{l^2}j_{l^2}}$ and $\partial T_{i_{l^1}j_{l^1}} \partial T_{i_{l^3}j_{l^3}} \cdots \partial T_{i_{l^t}j_{l^t}}$, where the first term is of form (i) and the second term is dealt with by the induction assumption.
+	If $i_{l^2} \neq j_{l^2}$, but $i_{l^1}=i_{l^2}, j_{l^1}=j_{l^2}$ or $i_{l^1}=j_{l^2}, i_{l^1}=j_{l^2}$, then the first twice differentiation $\partial T_{i_{l^1}j_{l^1}} \partial T_{i_{l^2}j_{l^2}}$ are separated out and are of the form (ii), whereas the rest $t-2$ fold differentiation is taken care of by the induction assumption.
+	
+	Finally, if none of the above cases happens, we must have all $\{1,2,3\}$ attained by $i_{l^1},j_{l^1},i_{l^2},j_{l^2}$.
+	Without loss of generality, suppose 1 appears twice in $i_{l^1},j_{l^1},i_{l^2},j_{l^2}$.
+	Then if $i_{l^3}=j_{l^3}$, the very same thing happens as in the first paragraph.
+	If otherwise $i_{l^3} \neq j_{l^3}$, and they are $\{1,2\}$ or $\{1,3\}$, then since $i_{l^1} \neq j_{l^1}$ and $i_{l^2} \neq j_{l^2}$, $i_{l^1},j_{l^1}$ and $i_{l^2},j_{l^2}$ must be $\{1,2\}$ or $\{1,3\}$.
+	Either way, we can find a form (ii) differentiation from $\partial T_{i_{l^1}j_{l^1}} \partial T_{i_{l^2}j_{l^2}} \partial T_{i_{l^3}j_{l^3}}$ and separate it out.
+	At last, if $i_{l^3},j_{l^3}$ are $\{2,3\}$, then $\partial T_{i_{l^1}j_{l^1}} \partial T_{i_{l^2}j_{l^2}} \partial T_{i_{l^3}j_{l^3}}$ is of form (iii) since $1,2,3$ each appears twice.
+	So $\partial T_{i_{l^1}j_{l^1}} \partial T_{i_{l^2}j_{l^2}} \partial T_{i_{l^3}j_{l^3}}$ is separated and the rest is the $t-3$ case for induction assumption.
+\end{proof}
+
+\begin{remark}
+	The grouping of $\partial T_{i_{l^1}j_{l^1}} \cdots \partial T_{i_{l^t}j_{l^t}}$ is not in general unique. For example, $\partial T_{ij} \partial T_{ji} \partial T_{jk} \partial T_{jk} \partial T_{ki} \partial T_{ki} = (\partial T_{ij} \partial T_{ji}) (\partial T_{jk} \partial T_{jk}) (\partial T_{ki} \partial T_{ki}) = (\partial T_{ij} \partial T_{jk} \partial T_{ki}) (\partial T_{ji} \partial T_{jk} \partial T_{ki})$.
+\end{remark}
+
+Also, we can show that the derivative of $s_\alpha$ remains the same after exchanging the indices of $T_{ij}$.
+\begin{lemma}
+	$\frac{\partial^n s_\alpha}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} = \frac{\partial^n s_\alpha}{\partial T_{j_1i_1} \cdots \partial T_{j_ni_n}}$.
+\end{lemma}
+\begin{proof}
+	The proof is very similar to Lemma \ref{lemma:zeroDsDT}.
+	It is straightforward to show $S+T$ and $S+T^T$ have the same (proper) singular values since if $S+T = U\mathrm{diag}(s_1,s_2,s_3)V^T$, then $S+T^T = V\mathrm{diag}(s_1,s_2,s_3)U^T$.
+	Thus,
+	\begin{equation*}
+		\frac{\partial^n s_\alpha(S+T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} = \frac{\partial^n s_\alpha(S+T^T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}.
+	\end{equation*}
+	On the other hand, because $\frac{\partial (T^T)_{i'j'}}{\partial T_{ij}} = \delta_i^{j'}\delta_j^{i'}$, we have
+	\begin{align*}
+		 \frac{\partial^n s_\alpha(S+T^T)}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &= \sum_{i'_1,j'_1=1}^3 \cdots \sum_{i'_n,j'_n=1}^3 \frac{\partial^n s_\alpha(S+T^T)}{\partial (T^T)_{i'_1j'_1} \cdots \partial (T^T)_{i'_nj'_n}} \frac{\partial (T^T)_{i'_1j'_1}}{\partial T_{i_1j_1}} \cdots \frac{\partial (T^T)_{i'_nj'_n}}{\partial T_{i_nj_n}} \\
+		 &= \frac{\partial^n s_\alpha(S+T')}{\partial (T^T)_{j_1i_1} \cdots \partial (T^T)_{j_ni_n}} \\
+		 &= \frac{\partial^n s_\alpha(S+T)}{\partial T_{j_1i_1} \cdots \partial T_{j_ni_n}}.
+	\end{align*}
+	Combining the above two equations finishes the proof.
+\end{proof}
+
+\begin{corollary}
+	$\expect{Q_{i_1j_1} \cdots Q_{i_nj_n}} = \expect{Q_{j_1i_1} \cdots Q_{j_ni_n}}$.
+\end{corollary}
+
+Next, we give a recursive way to calculate $\frac{\partial s_{\alpha}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}$.
+\begin{lemma} \label{lemma:derivSVD}
+	\begin{equation}
+		\frac{\partial s_\alpha}{\partial T_{ij}} = U_{i\alpha}V_{j_\alpha}
+	\end{equation}
+	\begin{equation}
+		\frac{\partial U_{kl}}{\partial T_{ij}} = \left( U\Omega_U^{ij} \right)_{kl} \qquad
+		\frac{\partial U_{kl}}{\partial T_{ij}} = -\left( V\Omega_V^{ij} \right)_{kl},
+	\end{equation}
+	where $\Omega_U^{ij}$ and $\Omega_V^{ij}$ are skew-symmetric matrices with each element given by
+	\begin{align}
+		s_l\Omega_{U_{kl}}^{ij} + s_k\Omega_{V_{kl}}^{ij} &= U_{ik}V_{jl} \nonumber \\
+		s_k\Omega_{U_{kl}}^{ij} + s_l\Omega_{V_{kl}}^{ij} &= -U_{il}V_{jk}
+	\end{align}
+\end{lemma}
+
+\begin{lemma} \label{lemma:generalLeibniz}
+	Suppose $f,g\in C^\infty(\real{N})$, then for any $\{i_1,\ldots,i_n\}\subset\{1,\ldots,N\}$
+	\begin{equation}
+		\frac{\partial^n (fg)}{\partial x_{i_1} \cdots \partial x_{i_n}} = f\frac{\partial^{n} g}{\partial x_{i_1} \cdots \partial x_{i_n}} + g\frac{\partial^{n} f}{\partial x_{i_1} \cdots \partial x_{i_n}} + \sum_{(l_1,l_2)\in\mathcal{C}(n,2)} \left( \partial_{l_1}f\partial_{l_2}g + \partial_{l_2}f\partial_{l_1}g \right)
+	\end{equation}
+\end{lemma}
+\begin{proof}
+	This is only a reformulation of the generalized Leibniz rule using the notation in this paper.
+\end{proof}
+
+\begin{theorem} \label{thm:dsdTRecursion}
+	$\frac{\partial s_{\alpha}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}$ can be calculated recursively by the following equations:
+	\begin{equation}
+		\frac{\partial^n s_{\alpha}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} = \frac{\partial^{n-1} (U_{i_1\alpha}V_{j_1\alpha})}{\partial T_{i_2j_2} \cdots \partial T_{i_nj_n}}
+	\end{equation}
+	\begin{align}
+		\frac{\partial^n U_{kl}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &= \frac{\partial^{n-1} \left( U_{kp}\Omega_{U_{pl}}^{i_1j_1} \right)}{\partial T_{i_2j_2} \cdots \partial T_{i_nj_n}} + \frac{\partial^{n-1} \left( U_{kq}\Omega_{U_{ql}}^{i_1j_1} \right)}{\partial T_{i_2j_2} \cdots \partial T_{i_nj_n}} \nonumber \\
+		\frac{\partial^n V_{kl}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &= -\frac{\partial^{n-1} \left( V_{kp}\Omega_{V_{pl}}^{i_1j_1} \right)}{\partial T_{i_2j_2} \cdots \partial T_{i_nj_n}} - \frac{\partial^{n-1} \left( V_{kq}\Omega_{V_{ql}}^{i_1j_1} \right)}{\partial T_{i_2j_2} \cdots \partial T_{i_nj_n}},
+	\end{align}
+	where $\{p,q\} = \{1,2,3\}-\{l\}$, and
+	\begin{align}
+		s_l \frac{\partial^{n} \Omega_{U_{kl}}^{ij}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &+ s_k \frac{\partial^{n} \Omega_{V_{kl}}^{ij}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} = \frac{\partial^n (U_{ik}V_{jl})}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} - \frac{\partial^n s_l}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}\Omega_{U_{kl}}^{ij} - \frac{\partial^n s_k}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}\Omega_{V_{kl}}^{ij} \nonumber \\
+		&- \sum_{(l_1,l_2)\in\mathcal{C}(n,2)} \left( \partial_{l_1}s_l\partial_{l_2}\Omega_{U_{kl}}^{ij} + \partial_{l_2}s_l\partial_{l_1}\Omega_{U_{kl}}^{ij} \right) - \sum_{(l_1,l_2)\in\mathcal{C}(n,2)} \left( \partial_{l_1}s_k\partial_{l_2}\Omega_{V_{kl}}^{ij} + \partial_{l_2}s_k\partial_{l_1}\Omega_{V_{kl}}^{ij} \right) \nonumber \\
+		s_k \frac{\partial^{n} \Omega_{U_{kl}}^{ij}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} &+ s_l \frac{\partial^{n} \Omega_{V_{kl}}^{ij}}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} = \frac{-\partial^n (U_{il}V_{jk})}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}} - \frac{\partial^n s_k}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}\Omega_{U_{kl}}^{ij} - \frac{\partial^n s_l}{\partial T_{i_1j_1} \cdots \partial T_{i_nj_n}}\Omega_{V_{kl}}^{ij} \nonumber \\
+		&- \sum_{(l_1,l_2)\in\mathcal{C}(n,2)} \left( \partial_{l_1}s_k\partial_{l_2}\Omega_{U_{kl}}^{ij} + \partial_{l_2}s_k\partial_{l_1}\Omega_{U_{kl}}^{ij} \right) - \sum_{(l_1,l_2)\in\mathcal{C}(n,2)} \left( \partial_{l_1}s_l\partial_{l_2}\Omega_{V_{kl}}^{ij} + \partial_{l_2}s_l\partial_{l_1}\Omega_{V_{kl}}^{ij} \right).
+	\end{align}
+\end{theorem}
+\begin{proof}
+	The above three recursive equations are obtained directly by differentiating the equations in Lemma \ref{lemma:derivSVD} using the generalized Leibniz rule in Lemma \ref{lemma:generalLeibniz}.
+	For the first two recursive equations, the differentiation on right hand side is one fold less than the left hand side.
+	For the third recursive equation, note that $\partial_{l_1}$ and $\partial_{l_2}$ are at most $n-1$ fold differentiation for $(l_1,l_2)\in\mathcal{C}(n,2)$, so the last two terms in each subequation have less folds than the left hand side.
+	Also, the $n$ fold differentiation of $U$ and $V$ is reduced to at most the $n-1$ fold differentiation of $\Omega_U$ and $\Omega_V$ as shown in the second equation.
+	Similarly, the $n$ fold differentiation of $s_\alpha$ corresponds to the $n-1$ fold differentiation of $U$ and $V$, and thus the $n-2$ fold differentiation of $\Omega_U$ and $\Omega_V$.
+	So in general, the differentiation on right hand side has less folds than that on left hand side in the third equation.
+	Therefore, the recursion finally bottoms out when $n$ reaches $1$, the case given explicitly in Lemma \ref{lemma:derivSVD}.
+\end{proof}
+
+The recursion stated in the above theorem is very difficult to untwist into a non-recursive expression, if it exists.
+We try to untwist a very special branch of this recursion to have a glimpse into its complexity.
+\begin{theorem} \label{thm:smallRecursion}
+	\begin{align} \label{eqn:dsisjdT}
+		\left.\left( \frac{\partial^{2n}s_i}{\partial T_{ij}^{2n}} + \frac{\partial^{2n}s_j}{\partial T_{ij}^{2n}} \right)\right|_{T=0} &= \frac{a(n)}{(s_i+s_j)^{2n-1}} \nonumber \\
+		\left.\left( \frac{\partial^{2n}s_i}{\partial T_{ij}^{2n}} - \frac{\partial^{2n}s_j}{\partial T_{ij}^{2n}} \right)\right|_{T=0} &= \frac{a(n)}{(s_i-s_j)^{2n-1}},
+	\end{align}
+	where $a(n)$ is an integer function of $n$.
+\end{theorem}
+
+Before proving this theorem, we need a lemma for differentiating $U$ and $V$.
+\begin{lemma}
+	\begin{equation}
+		\left. \frac{\partial^n U_{kl}}{\partial T_{ij}^n} \right|_{T=0} = 0 \qquad
+		\left. \frac{\partial^n V_{kl}}{\partial T_{ij}^n} \right|_{T=0} = 0
+	\end{equation}
+	if $\{k,l\}$ include a number different from $\{i,j\}$.
+\end{lemma}
+\begin{proof}
+	Without loss of generality, suppose $i=1,j=2$, and let $\begin{bmatrix} s_1 & T_{12} \\ 0 & s_2 \end{bmatrix} = \begin{bmatrix} U'_{11} & U'_{12} \\ U'_{21} & U'_{22} \end{bmatrix} \begin{bmatrix} s'_1 & 0 \\ 0 & s'_2 \end{bmatrix} \begin{bmatrix} V'_{11} & V'_{12} \\ V'_{21} & V'_{22} \end{bmatrix}^T$ be the (proper) singular value decomposition of the upper 2-by-2 diagonal block of $S+T$.
+	Then by direct calculation, $S+T$ has (proper) singular value decomposition as
+	\begin{equation*}
+		\begin{bmatrix}
+			s_1 & T_{12} & 0 \\
+			0 & s_2 & 0 \\
+			0 & 0 & s_3
+		\end{bmatrix} = \begin{bmatrix}
+			U'_{11} & U'_{12} & 0 \\
+			U'_{21} & U'_{22} & 0 \\
+			0 & 0 & 1
+		\end{bmatrix} \begin{bmatrix}
+			s'_1 & 0 & 0 \\
+			0 & s'_2 & 0 \\
+			0 & 0 & s_3
+		\end{bmatrix} \begin{bmatrix}
+			V'_{11} & V'_{12} & 0 \\
+			V'_{21} & V'_{22} & 0 \\
+			0 & 0 & 1
+		\end{bmatrix}^T.
+	\end{equation*}
+	This means if the indices of $U$ or $V$ contain $3$ which is different from $\{1,2\}$, it is constantly zero, so the differentiation with respect to any order of $T_{12}$ is zero. 
+\end{proof}
+
+Now we give a proof for Theorem \ref{thm:smallRecursion}.
+\begin{proof}
+	By direct calculation, we have
+	\begin{align*}
+		\frac{\partial (s_i+s_j)}{\partial T_{ij}} &= U_{ii}V_{ji} + U_{ij}V_{jj} \triangleq X_1 \\
+		\frac{\partial (s_i-s_j)}{\partial T_{ij}} &= U_{ii}V_{ji} - U_{ij}V_{jj} \triangleq X_2.
+	\end{align*}
+	Next, the second order differentiation is given by
+	\begin{align*}
+		\frac{\partial X_1}{\partial T_{ij}}
+		&= (U_{ii}V_{jj}-U_{ij}V_{ji})(\Omega_{U_{ij}}^{ij}+\Omega_{V_{ij}}^{ij}) + U_{ik}V_{ji}\Omega_{U_{ki}}^{ij} - U_{ii}V_{jk}\Omega_{V_{ki}}^{ij} + U_{ik}V_{jj}\Omega_{U_{kj}}^{ij} - U_{ij}V_{jk}\Omega_{V_{kj}}^{ij} \\
+		\frac{\partial X_2}{\partial T_{ij}} &= (U_{ii}V_{jj}+U_{ij}V_{ji})(-\Omega_{U_{ij}}^{ij}+\Omega_{V_{ij}}^{ij}) + U_{ik}V_{ji}\Omega_{U_{ki}}^{ij} - U_{ii}V_{jk}\Omega_{V_{ki}}^{ij} - U_{ik}V_{jj}\Omega_{U_{kj}}^{ij} + U_{ij}V_{jk}\Omega_{V_{kj}}^{ij},
+	\end{align*}
+	where $k$ is such that $\{i,j,k\} = \{1,2,3\}$.
+	The crucial observation is that if we further differentiate the above two equations with respect to $T_{ij}$ and evaluate at $T=0$, the last four terms in each subequation yields terms involving either $U_{ik}$, $V_{jk}$, or their differentiation with respect to $T_{ij}$.
+	However, the previous lemma says that after evaluating at $T=0$, all these terms vanish.
+	This means when calculating \eqref{eqn:dsisjdT}, the last four terms can be simply omitted, which implies
+	\begin{align*}
+		\frac{\partial X_1}{\partial T_{ij}} &= (U_{ii}V_{jj}-U_{ij}V_{ji})(\Omega_{U_{ij}}^{ij}+\Omega_{V_{ij}}^{ij}) = \frac{(U_{ii}V_{jj}-U_{ij}V_{ji})^2}{s_i+s_j} \triangleq \frac{Y_1^2}{s_i+s_j} \\
+		\frac{\partial X_2}{\partial T_{ij}} &= (U_{ii}V_{jj}+U_{ij}V_{ji})(-\Omega_{U_{ij}}^{ij}+\Omega_{V_{ij}}^{ij}) = \frac{(U_{ii}V_{jj}+U_{ij}V_{ji})^2}{s_i-s_j} \triangleq \frac{Y_2^2}{s_i-s_j}
+	\end{align*}
+	If we differentiate the above two equations with respect to $T_{ij}$ again, they are only composed of differentiation of $s_i \pm s_j$ which have been calculated, and differentiation of $Y_1$, $Y_2$ which are calculated as follows.
+	For the same reason, the terms which have index $k$ are omitted.
+	\begin{align*}
+		\frac{Y_1}{\partial T_{ij}} &= -\frac{(V_{ii}V_{ji}+U_{ij}V_{jj})(U_{ii}V_{jj}-U_{ij}V_{ji})}{s_i+s_j} = -\frac{X_1Y_1}{s_i+s_j} \\
+		\frac{Y_2}{\partial T_{ij}} &= -\frac{(U_{ii}V_{ji}-U_{ij}V_{ji})(U_{ii}V_{jj}+U_{ij}V_{ji})}{s_i-s_j} = -\frac{X_2Y_2}{s_i-s_j}
+	\end{align*}
+	
+	Now, we have distilled a very special branch of smaller recursion from the large recursion stated in Theorem \ref{thm:dsdTRecursion}, which reads
+	\begin{align}
+		\frac{\partial (s_i+s_j)}{\partial T_{ij}} &= X_1; \qquad \frac{\partial X_1}{\partial T_{ij}} = \frac{Y_1^2}{s_i+s_j}; \qquad \frac{\partial Y_1}{\partial T_{ij}} = -\frac{X_1Y_1}{s_i+s_j} \nonumber \\
+		\frac{\partial (s_i-s_j)}{\partial T_{ij}} &= X_2; \qquad \frac{\partial X_2}{\partial T_{ij}} = \frac{Y_2^2}{s_i-s_j}; \qquad \frac{\partial Y_2}{\partial T_{ij}} = -\frac{X_2Y_2}{s_i-s_j}.
+	\end{align}
+	Since the recursive structure for $s_i+s_j$ and $s_i-s_j$ are the same, we now write the recursion as
+	\begin{equation*}
+		\frac{\partial s_{ij}}{\partial T_{ij}} = X; \qquad \frac{\partial X}{\partial T_{ij}} = \frac{Y^2}{s_{ij}}; \qquad \frac{\partial Y}{\partial T_{ij}} = -\frac{XY}{s_{ij}}.
+	\end{equation*}
+	To prove the theorem, we claim that $\frac{\partial^{2n} s_{ij}}{\partial T_{ij}^{2n}} = \frac{c_0Y^{2n} + c_1Y^{2n-2}X^2 + \cdots + c_{n-1}Y^2X^{2n-2}}{s_{ij}^{2n-1}}$ where $c_m$'s are some integer coefficients for $m=0,\ldots,n-1$.
+	This claim is proved by induction.
+	When $n=1$, it is clearly seen from the recursive equations.
+	Suppose for case $n$ it is true, then differentiate $T_{ij}$ one more time, we have
+	\begin{align*}
+		\frac{\partial^{2n+1} s_{ij}}{\partial T_{ij}^{2n+1}} &= \frac{\left[ -2nc_0Y^{2n}X/s_{ij} + \sum_{m=1}^{n-1}c_m\left( -2(n-m)Y^{2(n-m)}X^{2m+1} + 2mY^{2n-2m+2}X^{2m-1} \right)/s_{ij} \right] s_{ij}^{2n-1}}{s_{ij}^{4n-2}} \\
+		&- \frac{(2n-1) \sum_{m=0}^{n-1}c_mY^{2(n-m)}X^{2m} s_{ij}^{2n-2}X}{s_{ij}^{4n-2}} \\
+		&\triangleq \frac{c'_0Y^{2n}X + c'_1Y^{2n-2}X^3 + \cdots + c'_{n-1}Y^2X^{2n-1}}{\partial s_{ij}^{2n}},
+	\end{align*}
+	where $c'_m = (-4n+2m+1)c_m + 2(m+1)c_{m+1}$ for $m=0,\ldots,n-2$, and $c'_{n-1} = (-2n-1)c_{n-1}$.
+	Then, differentiate $T_{ij}$ once again, we have
+	\begin{align*}
+		\frac{\partial^{2n+2} s_{ij}}{\partial T_{ij}^{2n+2}} &= \frac{\left[ \sum_{m=0}^{n-1}c'_m\left( -2(n-m)Y^{2(n-m)}X^{2(m+1)} + (2m+1)Y^{2n-2m+2}X^{2m} \right)/s_{ij} \right]s_{ij}^{2n}}{s_{ij}^{4n}} \\
+		&- \frac{2n\left( \sum_{m=0}^{n-1}c'_mY_{2(n-m)}X^{2m+1} \right)s_{ij}^{2n-1}X }{s_{ij}^4} \\
+		&\triangleq \frac{c''_0Y^{2(n+1)} + c''_1Y^{2n}X^2 + \cdots + c''_{n}Y^2X^{2n}}{s_{ij}^{2n+1}},
+	\end{align*}
+	where $c''_0 = c'_0$, $c''_m = (-4n+2m-2)c'_{m-1} + (2m+1)c'_m$ for $m=0,\ldots,n-1$, and $c''_n = (-2n-2)c'_{n-1}$.
+	This finishes the proof for the claim.
+	Now, note that when evaluated at $T=0$, we have $Y=1$, $X=0$, so $\left. \frac{\partial^{2n}s_{ij}}{\partial T_{ij}^{2n}} \right|_{T=0} = \frac{c_0}{s_{ij}^{2n-1}}$, which finishes the proof for Theorem \ref{thm:smallRecursion} by noting $c_0$ is an integer function of $n$.
+\end{proof}
+
+\section{Derivatives of the normalizing constant}
+
+In previous section, we give a recursive calculation of $\partial_l s_\alpha$.
+However, in order to evaluate the moments of $Q$ using \eqref{eqn:EDerivatives}, the derivatives of $c(S)$ also needs to be calculated.
+In this section, we show that the higher order derivatives of $c(S)$ can be calculated recursively using only its first order derivatives.
+To do this, we first need to establish an equivalence between the derivatives of $c(S)$ to some of the moments of $Q$.
+\begin{lemma}
+	$\left. \frac{\partial^n s_\alpha}{\partial T_{i_1i_1}} \right|_{T=0} = \delta_{i_1}^\alpha$, and $\left. \frac{\partial^n s_\alpha}{\partial T_{i_1i_1} \cdots \partial T_{i_ni_n}} \right|_{T=0} = 0$ if $n>1$.
+\end{lemma}
+\begin{proof}
+	When $T = \mathrm{diag}(T_{11},T_{22},T_{33})$ and it is small enough, the (proper) singular value decomposition of $S+T$ is $I_{3\times 3} \mathrm{diag}(s_1+T_{11}, s_2+T_{22}, s_3+T_{33}) I_{3\times 3}$, so $\left. \frac{\partial^n s_\alpha}{\partial T_{i_1i_1}} \right|_{T=0} = \delta_{i_1}^\alpha$.
+	And the higher order derivatives vanish because $\delta_{i_1}^\alpha$ is not a constant function of $T$.
+\end{proof}
+
+\begin{corollary} \label{cor:EQ=DcDs}
+	$\expect{Q_{i_1i_1} \cdots Q_{i_ni_n}} = \frac{1}{c(S)} \frac{\partial^n c(S)}{\partial s_{i_1} \cdots \partial s_{i_n}}$.
+\end{corollary}
+
+Next, we give a recursive calculation for $\frac{\partial^n c(S)}{\partial s_{i_1} \cdots \partial s_{i_n}}$.
+
+\begin{theorem}
+	$\frac{\partial^n c(S)}{\partial s_{i_1} \cdots \partial s_{i_n}}$ can be calculated using: (i) if $i_1 = i_2$
+	\begin{equation} \label{eqn:dcdsisi}
+		\frac{\partial^n c(S)}{\partial s_{i_1}^2 \partial s_{i_3} \cdots \partial s_{i_n}} = \frac{\partial^{n-2} c(S)}{\partial s_{i_3} \cdots \partial s_{i_n}} - \left. \frac{\partial^n c(S+T)}{\partial T_{i_1j_1}^2 \partial T_{i_3i_3} \cdots \partial T_{i_ni_n}} \right|_{T=0} - \left. \frac{\partial^n c(S+T)}{\partial T_{i_1k_1}^2 \partial T_{i_3i_3} \cdots \partial T_{i_ni_n}} \right|_{T=0},
+	\end{equation}
+	where $\{i_1,j_1,k_1\} = {1,2,3}$, and (2) if $i_1 \neq i_2$
+	\begin{equation}
+		\frac{\partial^n c(S)}{\partial s_{i_1} \partial s_{i_2} \cdots \partial s_{i_n}} = \left. \frac{\partial^{n-1} c(S+T)}{\partial T_{k_1k_1} \partial T_{i_3i_3} \cdots \partial T_{i_ni_n}} \right|_{T=0} + \left. \frac{\partial^n c(S+T)}{\partial T_{i_1i_2} \partial T_{i_2i_1} \partial T_{i_3i_3} \cdots \partial T_{i_ni_n}} \right|_{T=0},
+	\end{equation}
+	where $\{i_1,i_2,k_1\} = \{1,2,3\}$.
+\end{theorem}
+\begin{proof}
+	For (i), note that $Q_{i_1i_1}^2 = 1 - Q_{i_1j_1}^2 - Q_{i_1k_1}^2$, so $\expect{Q_{i_1i_1}^2Q_{i_3i_3} \cdots Q_{i_ni_n}} = \expect{Q_{i_3i_3} \cdots Q_{i_ni_n}} - \expect{Q_{i_1j_1}^2Q_{i_3i_3} \cdots Q_{i_ni_n}} - \expect{Q_{i_1k_1}^2Q_{i_3i_3} \cdots Q_{i_ni_n}}$, and \eqref{eqn:dcdsisi} follows from \eqref{eqn:Eraw} and Corollary \ref{cor:EQ=DcDs}.
+	The crucial observation is that the right hand side of \eqref{eqn:dcdsisi} only involves derivatives of $c(S)$ that have lower order than $n$, which is immediate from \eqref{eqn:EDerivatives} and $\left.\frac{\partial s_\alpha}{\partial T_{i_1j_1}}\right|_{T=0} = \left.\frac{\partial s_\alpha}{\partial T_{i_1k_1}}\right|_{T=0} = 0$ since $i_1 \neq j_1 \neq k_1$.
+	Thus, \eqref{eqn:dcdsisi} defines a recursion which terminates in finite steps when $n$ hits 1.
+	
+	For (ii), note that $Q_{k_1k_1} = (Q^{-1})_{k_1k_1} = Q_{i_1i_1}Q_{i_2i_2}-Q_{i_1i_2}Q_{i_2i_1}$, and hereafter the proof is the same as case (i).
+\end{proof}
+
+\end{document}
+
