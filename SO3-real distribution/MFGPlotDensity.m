@@ -13,15 +13,15 @@ n1 = 1;
 
 Miu = 0;
 Sigma = 1;
-U = expRot([0.2,0.3,0.4]);
-V = expRot([-0.1,0.5,0.7]);
+U = expRot([0,0,0]);
+V = expRot([0,0,0]);
 S = diag([25,25,25]);
 F = U*S*V';
 P = [0,0,0.7]/sqrt(25+25);
 
 % intermediate parameters
-[U,S,V] = usvd(F);
-Sigma2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
+[U,S,V] = psvd(F);
+Sigma2Inv = trace(S)*eye(3)-S;
 
 % other intermediate parameters
 Q = @(R)U'*R*V;
@@ -30,7 +30,7 @@ Sigmac = Sigma-P*Sigma2Inv*P';
 
 % Normalizing constant
 c1 = 1/sqrt((2*pi)^n1*det(Sigmac));
-c2 = pdf_MF_normal([S(1,1),S(2,2),S(3,3)]);
+c2 = pdf_MF_normal(diag(S));
 
 % density
 f = @(x1,R)1/c1*exp(-1/2*(x1-Miuc(R))'*Sigmac^-1*(x1-Miuc(R)))*...
@@ -66,12 +66,6 @@ for nx1 = 1:Nx1
     plot3([0,M(1,2)*1.1],[0,M(2,2)*1.1],[0,M(3,2)*1.1],'r');
     plot3([0,M(1,3)*1.1],[0,M(2,3)*1.1],[0,M(3,3)*1.1],'y');
     
-    plot3([0,U(1,1)*1.1],[0,U(2,1)*1.1],[0,U(3,1)*1.1],'b');
-    plot3([0,U(1,2)*1.1],[0,U(2,2)*1.1],[0,U(3,2)*1.1],'r');
-    plot3([0,U(1,3)*1.1],[0,U(2,3)*1.1],[0,U(3,3)*1.1],'y');
-    scatter3(U(1,1)*1.1,U(2,1)*1.1,U(3,1)*1.1,[],'b');
-    scatter3(U(1,2)*1.1,U(2,2)*1.1,U(3,2)*1.1,[],'r');
-    scatter3(U(1,3)*1.1,U(2,3)*1.1,U(3,3)*1.1,[],'y');
     axis equal;
     view([1,1,1]);
     caxis([0,cmax]);
