@@ -1,4 +1,4 @@
-function [ R, Sigma ] = MEKF( gyro, RInit, RMea, sf )
+function [ R, x, G, stepT ] = MEKF( gyro, RMea, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -6,40 +6,87 @@ if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     addpath(getAbsPath('..\..\rotation3d',filePath));
 end
 
-dt = 1/sf;
 N = size(gyro,2);
+dt = parameters.dt;
 
 % noise parameters
-randomWalk = 10*pi/180;
-rotMeaNoise = 0.2;
+randomWalk = parameters.randomWalk;
+biasInstability = parameters.biasInstability;
+if parameters.GaussMea
+    rotMeaNoise = parameters.rotMeaNoise;
+else
+    rotMeaNoise = MF2Gau(parameters.rotMeaNoise);
+end
+
+% initialize distribution
+if parameters.GaussMea
+    Sigma = [parameters.initRNoise,zeros(3)
+        zeros(3),parameters.initXNoise];
+else
+    Sigma = [MF2Gau(parameters.initRNoise),zeros(3)
+        zeros(3),parameters.initXNoise];
+end
 
 % data containers
-R = zeros(3,3,N);
-Sigma = zeros(3,3,N);
-
-% initialize
-R(:,:,1) = RInit*expRot([pi,0,0]);
-Sigma(:,:,1) = eye(3)*10^2;
+G.Sigma = zeros(6,6,N); G.Sigma(:,:,1) = Sigma;
+R = zeros(3,3,N); R(:,:,1) = parameters.RInit;
+x = zeros(3,N); x(:,1) = parameters.xInit;
+stepT = zeros(N-1,1);
 
 % filter iteration
 for n = 2:N
+    tic;
+    
     % propagate
-    av = (gyro(:,n-1)+gyro(:,n))/2;
-    F = expRot(av*dt)';
-    R(:,:,n) = R(:,:,n-1)*expRot(av*dt);
-    Sigma(:,:,n) = F*Sigma(:,:,n-1)*F'+eye(3)*randomWalk^2*dt;
+    av = (gyro(:,n-1)+gyro(:,n))/2-x(:,n-1);
+    Rp = R(:,:,n-1)*expRot(av*dt);
+    F = [expRot(av*dt)',-eye(3)*dt;zeros(3),eye(3)];
+    Sigma = F*Sigma*F'+[eye(3)*randomWalk^2*dt,zeros(3);
+        zeros(3),eye(3)*biasInstability^2*dt];
     
     % update
     if rem(n,5)==0
-        K = Sigma(:,:,n)*(Sigma(:,:,n)+eye(3)*rotMeaNoise^2)^-1;
-        dx = K*logRot(R(:,:,n)'*RMea(:,:,n),'v');
-        R(:,:,n) = R(:,:,n)*expRot(dx);
-        Sigma(:,:,n) = (eye(3)-K)*Sigma(:,:,n);
+        H = [eye(3),zeros(3)];
+        K = Sigma*H'*(H*Sigma*H'+rotMeaNoise)^-1;
+        dx = K*logRot(Rp'*RMea(:,:,n),'v');
+        Sigma = (eye(6)-K*H)*Sigma;
+
+        R(:,:,n) = Rp*expRot(dx(1:3));
+        x(:,n) = x(:,n-1)+dx(4:6);
+    else
+        R(:,:,n) = Rp;
+        x(:,n) = x(:,n-1);
     end
+    
+    % record covariance
+    G.Sigma(:,:,n) = Sigma;
+    
+    stepT(n-1) = toc;
 end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     rmpath(getAbsPath('..\..\rotation3d',filePath));
+end
+
+end
+
+
+function [ Sigma ] = MF2Gau( S )
+
+filePath = mfilename('fullpath');
+pathCell = regexp(path, pathsep, 'split');
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
+end
+
+N = 100000;
+R = pdf_MF_sampling(S,N);
+
+v = logRot(R,'v');
+Sigma = cov(v');
+
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
 end
 
 end

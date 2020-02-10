@@ -1,4 +1,4 @@
-function [ R, MFG, stepT ] = MFGAnaWithBias( gyro, RMea, parameters )
+function [ R, MFG, stepT ] = MFGUnscented( gyro, RMea, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -21,22 +21,20 @@ biasInstability = parameters.biasInstability;
 if parameters.GaussMea
     SM = Gau2MF(parameters.rotMeaNoise);
 else
-    SM = eye(3)*parameters.rotMeaNoise;
+    SM = parameters.rotMeaNoise;
 end
 
 % initialize distribution
-Miu = -parameters.xInit;
-Sigma = eye(3)*parameters.initXNoise^2;
+Miu = parameters.xInit;
+Sigma = parameters.initXNoise;
 P = zeros(3);
 U = parameters.RInit;
 V = eye(3);
 if parameters.GaussMea
     S = Gau2MF(parameters.initRNoise);
 else
-    S = eye(3)*parameters.initRNoise;
+    S = parameters.initRNoise;
 end
-S(2,2) = S(2,2)+1e-5;
-S(3,3) = S(3,3)+2e-5;
 
 % data containers
 MFG.Miu = zeros(3,N); MFG.Miu(:,1) = Miu;
@@ -51,9 +49,30 @@ stepT = zeros(N-1,1);
 % filter iteration
 for n = 2:N
     tic;
-    % uncertainty propagation
-    omega = (gyro(:,n-1)+gyro(:,n))/2;
-    [Miu,Sigma,P,U,S,V] = MFGGyroProp(omega,Miu,Sigma,P,U,S,V,randomWalk*eye(3),biasInstability^2*dt*eye(3),dt);
+    
+    % unscented transform for last step
+    [xl,Rl,wl] = MFGGetSigmaPoints(Miu,Sigma,P,U,S,V);
+    [xav,wav] = GGetSigmaPoints([0;0;0],eye(3)*randomWalk^2/dt);
+    [xb,wb] = GGetSigmaPoints([0;0;0],eye(3)*biasInstability^2/dt);
+    
+    % propagate sigma points
+    xp = zeros(3,13*7*7);
+    Rp = zeros(3,3,13*7*7);
+    wp = zeros(1,13*7*7);
+    for i = 1:13
+        for j = 1:7
+            for k = 1:7
+                ind = 7*7*(i-1)+7*(j-1)+k;
+                Rp(:,:,ind) = Rl(:,:,i)*expRot(((gyro(:,n-1)+gyro(:,n))...
+                    /2-xl(:,i)-xav(:,j))*dt);
+                xp(:,ind) = xl(:,i)+xb(:,k)*dt;
+                wp(ind) = wl(i)*wav(j)*wb(k);
+            end
+        end
+    end
+    
+    % recover prior distribution
+    [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp);
     
     % update
     if rem(n,5)==0
@@ -85,17 +104,16 @@ end
 end
 
 
-function [ S ] = Gau2MF( sigma )
+function [ S ] = Gau2MF( Sigma )
 
 N = 100000;
-v = sigma*randn(3,N);
+v = mvnrnd([0;0;0],Sigma,N);
 
 R = expRot(v);
 ER = mean(R,3);
 [~,D,~] = psvd(ER);
 
-S = pdf_MF_M2S(diag(D));
-S = eye(3)*mean(S);
+S = diag(pdf_MF_M2S(diag(D)));
 
 end
 

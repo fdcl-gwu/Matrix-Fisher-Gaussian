@@ -15,12 +15,19 @@ Miu = 0;
 Sigma = 1;
 U = expRot([0,0,0]);
 V = expRot([0,0,0]);
-S = diag([25,25,25]);
-F = U*S*V';
-P = [0,0,0.7]/sqrt(25+25);
+S = diag([25,10,-10]);
+P = [0,0.7,0]/sqrt(15);
+def = 2;
 
 % intermediate parameters
-[U,S,V] = psvd(F);
+F = U*S*V';
+if def==1
+    [U,S,V] = psvd(F);
+elseif def==2
+    [U,S,V] = psvd2(F);
+end
+
+[~,Sc,~] = psvd(F);
 Sigma2Inv = trace(S)*eye(3)-S;
 
 % other intermediate parameters
@@ -30,7 +37,7 @@ Sigmac = Sigma-P*Sigma2Inv*P';
 
 % Normalizing constant
 c1 = 1/sqrt((2*pi)^n1*det(Sigmac));
-c2 = pdf_MF_normal(diag(S));
+c2 = pdf_MF_normal(diag(Sc));
 
 % density
 f = @(x1,R)1/c1*exp(-1/2*(x1-Miuc(R))'*Sigmac^-1*(x1-Miuc(R)))*...
@@ -58,13 +65,12 @@ end
 cmax = max(max(max(c)));
 
 % plot Matrix Fisher
-M = U*V';
 for nx1 = 1:Nx1
     figure; hold on;
     surf(s1,s2,s3,c(:,:,nx1),'LineStyle','none');
-    plot3([0,M(1,1)*1.1],[0,M(2,1)*1.1],[0,M(3,1)*1.1],'b');
-    plot3([0,M(1,2)*1.1],[0,M(2,2)*1.1],[0,M(3,2)*1.1],'r');
-    plot3([0,M(1,3)*1.1],[0,M(2,3)*1.1],[0,M(3,3)*1.1],'y');
+    plot3([0,U(1,1)*1.1],[0,U(2,1)*1.1],[0,U(3,1)*1.1],'b');
+    plot3([0,U(1,2)*1.1],[0,U(2,2)*1.1],[0,U(3,2)*1.1],'r');
+    plot3([0,U(1,3)*1.1],[0,U(2,3)*1.1],[0,U(3,3)*1.1],'y');
     
     axis equal;
     view([1,1,1]);
@@ -80,6 +86,12 @@ Nt1 = 11;
 theta1 = linspace(-pi/8,pi/8,Nt1);
 
 % plot Gaussian
+if def==2 && S(3,3)<0
+    M = U*diag([-1,-1,1])*V';
+else
+    M = U*V';
+end
+
 fLinear = zeros(Nx1,Nt1,3);
 MiuLinear = zeros(Nt1,3);
 for i = 1:3

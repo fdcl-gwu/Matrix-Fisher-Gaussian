@@ -24,7 +24,7 @@ if exist('parameters','var')
 else
     randomWalk = 10*pi/180;
     biasInstability = 500/3600*pi/180;
-    rotMeaNoise = 0.2;
+    rotMeaNoise = 0.2^2*eye(3);
 end
 
 % true state
@@ -69,9 +69,9 @@ gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
 gyroMea = gyro+gyroNoise+biasTrue;
 
 if parameters.GaussMea
-    RNoise = expRot(randn(N,3)*rotMeaNoise);
+    RNoise = expRot(mvnrnd([0;0;0],rotMeaNoise,N));
 else
-    RNoise = pdf_MF_sampling(eye(3)*rotMeaNoise,N);
+    RNoise = pdf_MF_sampling(rotMeaNoise,N);
 end
 RMea = zeros(3,3,N);
 for n = 1:N
