@@ -44,9 +44,9 @@ for i = 1:3
         (1/c*(dc(cyc{i}(1))-dc(cyc{i}(2))-dc(cyc{i}(3))));
 end
 
-% minimum of sigma {cos(theta_i)>-1/2}
+% minimum of sigma {cos(theta_i)>-sqrt(3)/2}
 options = optimoptions('fsolve','Display','off');
-sigmaMin = max(cellfun(@(eqn)fsolve(@(sigma)eqn(sigma)+1/2,0,options),cost));
+sigmaMin = max(cellfun(@(eqn)fsolve(@(sigma)eqn(sigma)+sqrt(3)/2,0,options),cost));
 
 % calculate sigma
 sumwm = @(sigma)2*(wm{1}(sigma)+wm{2}(sigma)+wm{3}(sigma));

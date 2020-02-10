@@ -18,17 +18,23 @@ dt = parameters.dt;
 % noise parameters
 randomWalk = parameters.randomWalk;
 biasInstability = parameters.biasInstability;
-rotMeaNoise = parameters.rotMeaNoise;
-
-SM = Gau2MF(rotMeaNoise);
+if parameters.GaussMea
+    SM = Gau2MF(parameters.rotMeaNoise);
+else
+    SM = eye(3)*parameters.rotMeaNoise;
+end
 
 % initialize distribution
 Miu = -parameters.xInit;
-Sigma = eye(3)*parameters.initXsigma^2;
+Sigma = eye(3)*parameters.initXNoise^2;
 P = zeros(3);
 U = parameters.RInit;
 V = eye(3);
-S = Gau2MF(parameters.initRsigma);
+if parameters.GaussMea
+    S = Gau2MF(parameters.initRNoise);
+else
+    S = eye(3)*parameters.initRNoise;
+end
 S(2,2) = S(2,2)+1e-5;
 S(3,3) = S(3,3)+2e-5;
 

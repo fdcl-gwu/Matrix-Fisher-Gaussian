@@ -5,6 +5,9 @@ pathCell = regexp(path, pathsep, 'split');
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     addpath(getAbsPath('..\..\rotation3d',filePath));
 end
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
+end
 
 time = (0:1/sf:t);
 N = length(time);
@@ -65,7 +68,11 @@ biasTrue = cumsum(biasNoise/sf,2);
 gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
 gyroMea = gyro+gyroNoise+biasTrue;
 
-RNoise = expRot(randn(N,3)*rotMeaNoise);
+if parameters.GaussMea
+    RNoise = expRot(randn(N,3)*rotMeaNoise);
+else
+    RNoise = pdf_MF_sampling(eye(3)*rotMeaNoise,N);
+end
 RMea = zeros(3,3,N);
 for n = 1:N
     RMea(:,:,n) = RTrue(:,:,n)*RNoise(:,:,n)';
@@ -73,6 +80,9 @@ end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     rmpath(getAbsPath('..\..\rotation3d',filePath));
+end
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    rmpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
 end
 
 end

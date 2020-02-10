@@ -12,11 +12,20 @@ dt = parameters.dt;
 % noise parameters
 randomWalk = parameters.randomWalk;
 biasInstability = parameters.biasInstability;
-rotMeaNoise = parameters.rotMeaNoise;
+if parameters.GaussMea
+    rotMeaNoise = parameters.rotMeaNoise;
+else
+    rotMeaNoise = MF2Gau(parameters.rotMeaNoise);
+end
 
 % initialize distribution
-Sigma = [eye(3)*parameters.initRsigma^2,zeros(3)
-    zeros(3),eye(3)*parameters.initXsigma^2];
+if parameters.GaussMea
+    Sigma = [eye(3)*parameters.initRNoise^2,zeros(3)
+        zeros(3),eye(3)*parameters.initXNoise^2];
+else
+    Sigma = [eye(3)*MF2Gau(parameters.initRNoise)^2,zeros(3)
+        zeros(3),eye(3)*parameters.initXNoise^2];
+end
 
 % data containers
 G.Sigma = zeros(6,6,N); G.Sigma(:,:,1) = Sigma;
@@ -57,6 +66,29 @@ end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     rmpath(getAbsPath('..\..\rotation3d',filePath));
+end
+
+end
+
+
+function [ sigma ] = MF2Gau( s )
+
+filePath = mfilename('fullpath');
+pathCell = regexp(path, pathsep, 'split');
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
+end
+
+N = 100000;
+R = pdf_MF_sampling(eye(3)*s,N);
+
+v = logRot(R,'v');
+sigma = std(v,1,2);
+
+sigma = mean(sigma);
+
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
 end
 
 end
