@@ -11,7 +11,7 @@ if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
 end
 
 % default SVD convention is psvd
-if ~exist('convention','var') && isempty(convention)
+if ~exist('convention','var') || isempty(convention)
     convention = 1;
 end
 

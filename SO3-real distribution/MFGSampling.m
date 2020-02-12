@@ -26,5 +26,12 @@ for ns = 1:Ns
     x(:,ns) = sqrtm(Sigmac)*y(:,ns)+Miu+P*gR;
 end
 
+if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
+    rmpath('Matrix-Fisher-Distribution');
+end
+if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
+    rmpath('..\rotation3d');
+end
+
 end
 
