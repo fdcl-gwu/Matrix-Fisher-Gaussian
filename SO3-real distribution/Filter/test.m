@@ -2,8 +2,9 @@ function [] = test()
 
 addpath('..\Generate-Path');
 
-parpool(15);
-parfor n = 1:15
+NWorker = 20;
+parpool(NWorker);
+parfor n = 1:NWorker
     rng(n);
 end
 
@@ -20,9 +21,9 @@ parfor n = 1:N
     parameters.randomWalk = 10*pi/180;
     parameters.biasInstability = 500/3600*pi/180;
     parameters.GaussMea = false;
-    parameters.rotMeaNoise = 20;
-    parameters.initRNoise = 20;
-    parameters.initXNoise = 0.1;
+    parameters.rotMeaNoise = 12*eye(3);
+    parameters.initRNoise = 0*eye(3);
+    parameters.initXNoise = 0.2^2*eye(3);
     parameters.RInit = eye(3);
     parameters.xInit = [0;0;0];
     
@@ -32,9 +33,9 @@ parfor n = 1:N
     parameters.RInit = RTrue(:,:,1)*expRot([pi,0,0]);
     parameters.xInit = [0.2;0.2;0.2];
     
-    [RMEKF,xMEKF,G,TMEKF] = MEKFWithBias(gyro,RMea,parameters);
-    [RMFGA,MFGA,TMFGA] = MFGAnaWithBias(gyro,RMea,parameters);
-    [RMFGU,MFGU,TMFGU] = MFGUnscentedWithBias(gyro,RMea,parameters);
+    [RMEKF,xMEKF,G,TMEKF] = MEKF(gyro,RMea,parameters);
+    [RMFGA,MFGA,TMFGA] = MFGAnalytic(gyro,RMea,parameters);
+    [RMFGU,MFGU,TMFGU] = MFGUnscented(gyro,RMea,parameters);
     
     parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,G,TMEKF,...
         RMFGA,MFGA,TMFGA,RMFGU,MFGU,TMFGU);
@@ -48,7 +49,7 @@ end
 function [] = parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,G,TMEKF,...
     RMFGA,MFGA,TMFGA,RMFGU,MFGU,TMFGU)
 
-save(strcat('D:\result-SO3Euclid\1-16-2020-3\',num2str(n),'.mat'),...
+save(strcat('D:\result-SO3Euclid\2-26-2020\',num2str(n),'.mat'),...
     'gyro','RMea','RTrue','xTrue','parameters','RMEKF','xMEKF','G','TMEKF',...
     'RMFGA','MFGA','TMFGA','RMFGU','MFGU','TMFGU','-v7.3');
 

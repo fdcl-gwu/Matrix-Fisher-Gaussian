@@ -75,7 +75,7 @@ end
 wM = sum(w(2*n+1:2*n+6));
 
 %% Gaussian part
-wG = 1-w0-wM;
+wG = max(1-w0-wM,1e-16);  % numerical issues when wG is around zero
 SigmaTildeInv = diag([s(2)+s(3),s(1)+s(3),s(1)+s(2)]);
 Sigmac = Sigma-P*SigmaTildeInv*P';
 for i = 1:n
