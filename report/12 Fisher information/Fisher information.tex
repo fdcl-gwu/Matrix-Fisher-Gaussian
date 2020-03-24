@@ -1,0 +1,122 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+
+\title{\vspace{-4ex}\textbf{Fisher's Information for Matrix Fisher Distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+\section{Some notes}
+
+Let $(\Omega,\mathcal{F},\mu_i)$ for $i=1,2$ be two probability spaces, with $\mu_1$ and $\mu_2$ being absolutely continuous with respect to each other.
+Let $\diff{\mu_1} = f_1(x,y)\diff{x}\diff{y}$ and $\diff{\mu_2} = f_2(x,y)\diff{x}\diff{y}$, where $f_1$ and $f_2$ are the density functions for $\mu_1$ and $\mu_2$ with respect to $\diff{x}\diff{y}$.
+Then the KL-divergence (relative entropy) from $\mu_1$ to $\mu_2$ is
+\begin{equation}
+	I(1:2;X,Y) = \int\int f_1(x,y) \frac{\log f_1(x,y)}{\log f_2(x,y)} \diff{x}\diff{y}.
+\end{equation}
+
+Let the probability measure $\mu$ be parameterized by $\theta_1, \ldots, \theta_n$, and denote the respective density functions by $f(x,y|\theta)$.
+Let the Fisher Information matrix be denoted by $[g_{ij}(X,Y)]_{i,j=1}^n$, then under some regularity conditions, the KL-divergence and Fisher Information have the following relationship:
+\begin{equation}
+	I(\theta,\theta+\Delta\theta;X,Y) = \frac{1}{2}\sum_{i,j=1}^{n} g_{ij}(X,Y)\Delta\theta_i\Delta\theta_j.
+\end{equation}
+Namely, the Fisher Information quantifies how easily it is to discriminate the parameters with their nearby values from an observation.
+In the context of statistical inference, it gives the information of the parameters contained in one observation.
+
+The KL-divergence and Fisher Information matrix can be defined with respect to marginal and conditional densities.
+More specifically, the marginal KL-divergence is defined as
+\begin{equation}
+	I(1:2;X) = \int g_1(x)\frac{\log g_1(x)}{\log g_2(x)} \diff{x} \triangleq \int \diff{x} \int f_1(x,y) \diff{y} \frac{\log\int f_1(x,y) \diff{y}}{\log\int f_2(x,y) \diff{y}},
+\end{equation}
+where $g_1(x)$ and $g_2(x)$ are the marginal densities for $f_1(x,y)$ and $f_2(x,y)$.
+Similarly, denote the marginal Fisher Information by $[g_{ij}(X)]_{i,j=1}^n$, then
+\begin{equation}
+	I(\theta:\theta+\Delta\theta,X) = \frac{1}{2}\sum_{i,j=1}^n g_{ij}(X) \Delta\theta_i \Delta\theta_j.
+\end{equation}
+In general, $I(\theta,\theta+\Delta\theta;X) < I(\theta,\theta+\Delta\theta;X,Y)$, so there is loss of information by considering $X$ alone.
+Therefore, $g_{ii}(X)/g_{ii}(X,Y)$ can be used to quantify the percentage of information of $\theta_i$ contained in $X$ of that in $X$ and $Y$.
+
+\section{Fisher's Information for Cylindrical Distribution}
+If $(x,\theta)\in\real{}\times[-\pi,\pi)$ follows a Von Mises-Gaussian distribution with parameters $(\mu,\sigma,\rho,\theta_0,\kappa)$, it has the following density function
+\begin{equation}
+	p(x,\theta) = \frac{1}{2\pi I_0(\kappa)}e^{\kappa\cos(\theta-\theta_0)} \cdot \frac{1}{\sqrt{2\pi}\sigma_c}e^{-\frac{(x-\mu_c)^2}{2\sigma_c^2}},
+\end{equation}
+where $\sigma_c^2 = \sigma^2-\rho^2\sigma^2$, and $\mu_c = \mu + \rho\sigma\sqrt{\kappa}\sin(\theta-\theta_0)$.
+The log-likelihood function is
+\begin{equation} \label{eqn:VMGLogLikelihood}
+	\log p(x,\theta) = -\log I_0(\kappa) + \kappa\cos(\theta-\theta_0) - \log\sigma_c - \frac{(x-\mu_c)^2}{2\sigma_c^2} + c.
+\end{equation}
+Now let us calculate some elements of the Fisher information matrix.
+\begin{align}
+	g_{\theta_0\theta_0} &= \expect{-\frac{\partial^2 \log p(x,\theta)}{\partial \theta_0^2}} \nonumber \\
+	&= \expect{\kappa\cos(\theta-\theta_0) + \frac{\rho^2\sigma^2\kappa}{\sigma_c^2}\cos^2(\theta-\theta_0) + \frac{x-\mu_c}{\sigma_c^2}\rho\sigma\sqrt{\kappa}\sin(\theta-\theta_0)} \nonumber \\
+	&= \frac{\kappa I_1(\kappa)}{I_0(\kappa)} + \frac{\rho^2\kappa}{2(1-\rho^2)}\left(1+\frac{I_2(\kappa)}{I_0(\kappa)}\right)
+\end{align}
+\begin{align}
+	g_{\kappa\kappa} &= \expect{-\frac{\partial^2 \log p(x,\theta)}{\partial \kappa^2}} \nonumber \\
+	&= \frac{I_0^2(\kappa)+I_0(\kappa)I_2(\kappa)-2I_1^2(\kappa)}{2I^2_0(\kappa)} + \expect{\frac{\rho^2\sigma^2}{4\kappa\sigma_c^2}\sin^2(\theta-\theta_0) + \frac{x-\mu_c}{\sigma_c^2}\frac{\rho\sigma}{4\kappa^{3/2}}\sin(\theta-\theta_0)} \nonumber \\
+	&= \frac{I_0^2(\kappa)+I_0(\kappa)I_2(\kappa)-2I_1^2(\kappa)}{2I^2_0(\kappa)} + \frac{\rho^2}{8\kappa(1-\rho^2)}\left(1 - \frac{I_2(\kappa)}{I_0(\kappa)}\right)
+\end{align}
+
+The marginal density function for $\theta$ is $p(\theta) = \frac{1}{2\pi I_0(\kappa)}e^{\kappa\cos(\theta-\theta_0)}$, and its log-likelihood is the first two terms of \eqref{eqn:VMGLogLikelihood}
+As a result, the marginal Fisher Information is
+\begin{align}
+	g_{\theta_0\theta_0}(\theta) &= \frac{\kappa I_1(\kappa)}{I_0(\kappa)}, \\
+	g_{\kappa\kappa}(\theta) &= \frac{I_0^2(\kappa)+I_0(\kappa)I_2(\kappa)-2I_1^2(\kappa)}{2I^2_0(\kappa)}.
+\end{align}
+Since the Fisher Information follows the chain rule: $g_{ij}(X,Y) = g_{ij}(X) + g_{ij}(Y|X)$, we use $g_{ii}(X)/g_{ii}(Y|X)$ to quantify the information of parameter $\theta_i$ contained in $X$ against $Y$.
+For this cylindrical distribution, the information $\theta_0$ and $\kappa$ contained in $\theta$ versus $x$ are
+\begin{align}
+	\frac{g_{\theta_0\theta_0}(\theta)}{g_{\theta_0\theta_0}(x|\theta)} &= \frac{2(1-\rho^2)}{\rho^2} \frac{I_1(\kappa)}{I_0(\kappa)+I_2(\kappa)} \\
+	\frac{g_{\kappa\kappa}(\theta)}{g_{\kappa\kappa}(x|\theta)} &= \frac{4(1-\rho^2)}{\rho^2} \frac{\kappa(I_0^2(\kappa)+I_0(\kappa)I_2(\kappa)-2I_1^2(\kappa))}{I_0(\kappa)(I_0(\kappa)-I_2(\kappa))}
+\end{align}
+From these two equations, it is seen that if $\kappa$ is large or $\rho$ is small, the information of $\kappa$ is mainly contained in $\theta$; if $\rho$ is small, the information of $\theta_0$ is mainly contained in $\theta$.
+
+\section{Fisher's Information for Matrix Fisher-Gaussian Distribution}
+
+$(x,R)\in\real{n}\times\SO$ follows a Matrix Fisher-Gaussian distribution with parameters $(\mu,\Sigma,P,U,S,V)$ if it has the following density function
+\begin{equation}
+	p(x,R) = \frac{1}{c(F)}\etr{FR^T} \cdot \frac{1}{\sqrt{(2\pi)^n\det(\Sigma_c)}}e^{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)},
+\end{equation}
+where $\Sigma_c = \Sigma-P(\tr{S}I-S)P^T$, $\mu_c = \mu+P\nu_R$ with $\nu_R = (QS-SQ^T)^\vee$ and $Q=U^TRV$.
+Its log-likelihood function is
+\begin{equation}
+	\log p(x,R) = -\log c(F) + \tr{FR^T} - \frac{1}{2}\log(\det(\Sigma_c)) - \frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)
+\end{equation}
+
+Similarly, we calculate the Fisher Information matrix
+\begin{align}
+	g_{s_is_i} &= \expect{-\frac{\partial^2 \log p(x,R)}{\partial s_i^2}} \nonumber \\
+	&= \frac{1}{c(S)}\frac{\partial^2 c(S)}{\partial s_i^2} - \frac{1}{c(S)^2}\left(\frac{\partial c(S)}{\partial s_i}\right)^2 + \expect{\left(\frac{\partial \nu_R}{\partial s_i}\right)^TP^T\Sigma_c^{-1}P\frac{\partial \nu_R}{\partial s_i}}
+\end{align}
+To make things easier, let $n=1$, $\Sigma = \sigma^2$, $P = \frac{\rho\sigma}{\sqrt{2s}}\begin{bmatrix} 1 & 1 & 1 \end{bmatrix}$ and $S=sI_{3\times3}$, where $\rho$ can be interpreted as the correlation coefficient as in the cylindrical case.
+Then the above equation can be simplified as
+\begin{equation}
+	g_{ss} = \frac{1}{c(S)}\frac{\partial^2 c(S)}{\partial s^2} - \frac{1}{c(S)^2}\left(\frac{\partial c(S)}{\partial s}\right)^2 + \frac{\rho^2}{1-3\rho^2} \frac{2\partial_ic(S) + 2s\partial_{ii}c(S) - s\partial_{ij}c(S) - s\partial_{ik}c(S)}{4s^2C(s)}.
+\end{equation}
+
+\end{document}
+

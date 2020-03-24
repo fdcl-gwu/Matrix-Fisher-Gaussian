@@ -26,7 +26,7 @@ if nargin < 2
     elseif min(abs(d)) > 0.5
         s0 = pdf_MF_M2S_approx(d,1);
     else
-        s0=rand(3,1).*sign(d);
+        s0=[0;0;0];
     end
 end
 
@@ -76,7 +76,7 @@ while nf > eps && NITER < MAX_ITER
             if poly_coff_2 > 0
                 poly_coff_1=1/(lam2-lam3)*(-lam3*(norm(f2)-norm(f))/lam2+lam2*(norm(f3)-norm(f))/lam3);
                 lambda_t=-poly_coff_1/2/poly_coff_2;
-                lambda=saturation(lambda_t,sigma0*lam3,sigma1*lam3)              
+                lambda=saturation(lambda_t,sigma0*lam3,sigma1*lam3)
             else
                 lambda=sigma1*lam3;
             end
