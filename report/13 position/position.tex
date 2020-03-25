@@ -1,0 +1,164 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=1in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Position Estimation Using MFG\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+\section{Uncertainty Propagation}
+
+Consider the following kinematics model:
+\begin{align}
+	R\diff{R} &= (\hat{\omega}+\hat{b}_g)\diff{t} + H_{gu}\diff{W_{gu}}, \\
+	\diff{b_g} &= H_{gv}\diff{W_{gv}}, \\
+	\diff{p} &= v\diff{t}, \\
+	R^T\diff{v} &= (a+ba)\diff{t} + H_{au}\diff{W_{au}}, \\
+	\diff{b_a} &= H_{av}\diff{W_{av}},
+\end{align}
+where $(R,bg,p,v,ba)$ are attitude, gyroscope bias, position, velocity, and accelerometer bias of the IMU.
+$\omega$ and $a$ are the measured angular velocity and linear velocity in IMU-frame, $(W_{gu},W_{gv},W_{au},W_{av})$ are velocity white noises and random walks for the gyroscope and accelerometer.
+The discretized kinematics are
+\begin{align}
+	R(h) &= R(0)\exp\left\{ (\hat{\omega}(0) + \hat{b}_g(0))h + H_{gu}\Delta W_{gu} \right\} \\
+	b_g(h) &= b_g(0) + H_{gv}\Delta W_{gv} \\
+	p(h) &= p(0) + v(0)h \\
+	v(h) &= v(0) + R(0)\left( (a(0)+b_a(0))h + H_{au}\Delta W_{au} \right)\\
+	b_a(h) &= b_a(0) + H_{av}\Delta W_{av}
+\end{align}
+
+Assume $(R,(b_g,p,v,b_a))$ follows a Matrix Fisher-Gaussian distribution at $t=0$ with parameters $(\mu,\Sigma,P,U,S,V)$, we wish to find the new distribution at $t=h$ with $h$ small.
+We have calculated $\expect{R(h)}$, and therefore $U',S',V'$ at $t=h$, and also $\expect{\nu'_R}$, $\expect{b_g(h)\nu'^T_R}$, $\expect{\nu'_R\nu'^T_R}$ where $\nu'_R = (Q'S'-S'Q'^T)^\vee$ with $Q' = U'^TR(h)V'$.
+
+\subsection{$\expect{x(h)}$}
+It is clear that
+\begin{align*}
+	\expect{b_g(h)} &= \expect{b_g(0)} \\
+	\expect{b_a(h)} &= \expect{b_a(0)} \\
+	\expect{p(h)} &= \expect{p(0)}+h\expect{v(0)}.
+\end{align*}
+So the only non-trivial calculation is $\expect{v(h)}$.
+Let
+\begin{gather*}
+	\mu = \begin{bmatrix}
+		\mu_{b_g} \\ \mu_p \\ \mu_v \\ \mu_{b_a}
+	\end{bmatrix}, \qquad
+	P = \begin{bmatrix}
+		P_{b_g} \\ P_p \\ P_v \\ P_{b_a}
+	\end{bmatrix}, \\
+	\Sigma = \begin{bmatrix}
+		\Sigma_{b_gb_g} & \Sigma_{b_gp} & \Sigma_{b_gv} & \Sigma_{b_gb_a} \\
+		\Sigma_{pb_g} & \Sigma_{pp} & \Sigma_{pv} & \Sigma_{pb_a} \\
+		\Sigma_{vb_g} & \Sigma_{vp} & \Sigma_{vv} & \Sigma_{vb_a} \\
+		\Sigma_{b_ab_g} & \Sigma_{b_ap} & \Sigma_{b_av} & \Sigma_{b_ab_a}
+	\end{bmatrix}.
+\end{gather*}
+
+\begin{lemma}
+	If $(R,x)\in\SO\times\real{3}$ follows $\mathcal{MG}(\mu,\Sigma,P,U,S,V)$, then $\expect{Rx} = \expect{R}\mu + \expect{RP\nu_R}$.
+\end{lemma}
+\begin{proof}
+	This is immediate by integrating $x$ first.
+\end{proof}
+
+Then it is immediate that
+\begin{equation}
+	\expect{v(t)} = \expect{v(0)} + h\expect{R(0)}(a(0)+\mu_{b_a}) + h\expect{R(0)P_{b_a}\nu_R}.
+\end{equation}
+
+\subsection{$\expect{x(h)x(h)^T}$}
+
+Again only the terms involving $v(h)$ are non-trivial, in fact
+\begin{align}
+	\expect{b_g(h)b_g^T(h)} &= \expect{b_g(0)b_g^T(0)} + hG_{gv}, \\
+	\expect{b_g(h)p^T(h)} &= \expect{b_g(0)p^T(0)} + h\expect{b_g(0)v^T(0)}, \\
+	\expect{b_g(h)b_a^T(h)} &= \expect{b_g(0)b_a^T(0)}, \\
+	\expect{p(h)p^T(h)} &= \expect{p(0)p^T(0)} + h\left(\expect{p(0)v^T(0)} + \expect{v(0)p^T(0)}\right) + h^2\expect{v(0)v^T(0)}, \\
+	\expect{p(h)b_a^T(h)} &= \expect{p(0)b_a^T(0)} + h\expect{v(0)b_a^T(0)}, \\
+	\expect{b_a(h)b_a^T(h)} &= \expect{b_a(0)b_a^T(0)} + hG_{av},
+\end{align}
+where $G_{gv} = H_{gv}H_{gv}^T$ and $G_{av} = H_{av}H_{av}^T$.
+The terms involving $v(h)$ are calculated as follows:
+\begin{align}
+	\expect{v(h)b_g^T(h)} &= \expect{v(0)b_g^T(0)} + h\expect{R(0)a(0)b_g^T(0)} + h\expect{R(0)b_a(0)b_g^T(0)},
+\end{align}
+where
+\begin{align*}
+	\expect{R(0)a(0)b_g^T(0)} &= \expect{R(0)}a(0)\mu_{b_g}^T + \expect{R(0)a(0)\nu^T_R}P^T_{b_g} \\
+	\expect{R(0)b_a(0)b_g^T(0)} &= \expect{R(0)} \left( \Sigma_{b_ab_g} + \mu_{b_a}\mu_{b_g}^T - P_{b_a}(\tr{S}I-S)P_{b_g}^T \right) \\
+	&\quad + \expect{R(0)\mu_{b_a}\nu^T_R}P^T_{b_g} + \expect{R(0)P_{b_a}\nu_R}\mu_{b_g}^T + \expect{R(0)P_{b_a}\nu_R\nu_R^T}P_{b_g}^T.
+\end{align*}
+Also,
+\begin{align}
+	\expect{v(h)p(h)^T} &= \expect{v(0)p^T(0)} + h\left( \expect{v(0)v^T(0)} + \expect{R(0)a(0)p^T(0)} + \expect{R(0)b_a(0)p^T(0)} \right) \nonumber \\
+	&\quad + h^2\left( \expect{R(0)a(0)v^T(0)} + \expect{R(0)b_a(0)v^T(0)} \right) \\
+	\expect{v(h)b_a^T(0)} &= \expect{v(0)b_a^T(0)} + h\expect{R(0)a(0)b_a^T(0)} + h\expect{R(0)b_a(0)b_a^T(0)}.
+\end{align}
+And the most difficult one,
+\begin{align}
+	\expect{v(h)v(h)^T} &= \expect{v(0)v(0)^T} + h\expect{R(0)(a(0)+b_a(0))v(0)^T} + h\expect{R(0)(a(0)+b_a(0))v(0)^T}^T \nonumber \\
+	&\quad + h^2\expect{R(0)(a(0)+b_a(0))(a(0)+b_a(0))^TR(0)^T} + hG_{au}\expect{R(0)R(0)^T},
+\end{align}
+where $G_{au} = H_{au}H_{au}^T$, and
+\begin{align*}
+	&\expect{R(0)b_a(0)b_a^T(0)R(0)^T} = \expect{R(0)\left( \Sigma_{b_ab_a} - P_{b_a}(\tr{S}I-S)P_{b_a}^T + \mu_{b_a}\mu_{b_a}^T \right)R(0)^T} \\
+	&\qquad + \expect{R(0)\mu_{b_a}\nu_R^TP_{b_a}^TR(0)^T} + \expect{R(0)\mu_{b_a}\nu_R^TP_{b_a}^TR(0)^T}^T + \expect{R(0)P_{b_a}\nu_R\nu_R^TP_{b_a}^TR(0)^T}.
+\end{align*}
+
+\subsection{$\expect{x(h)\nu'^T_R}$}
+
+We have already shown that
+\begin{align}
+	\expect{x(h)\nu'^T_R} = \expect{x(h)\nu'^T_{R(0)\delta R}} + h\expect{x(h)\nu'^T_{R(0)(\hat{b}_g(0)-\hat{\mu}_{b_g})\delta R}} + \frac{1}{2}\expect{x(h)\nu'^T_{R(0)((H_{gu}\Delta W_{gu})^\wedge)^2\delta R}} + O(h^2),
+\end{align}
+where $\nu'_A = (U'^TAV'S'-S'V'^TA^TU')^\vee$, and $\delta R = \exp((\hat{\omega}(0)+\hat{\mu}_{b_g})h)$.
+If we only need to be accurate up to the first order, we may replace $x(h)$ by $x(0)$ in the last two terms in the above equation.
+We have also shown that $\nu'_{R(0)\delta R} = \tilde{U}(Q\tilde{S}^T - \tilde{S}Q^T)^\vee$, where $\tilde{U} = U'^TU$, $\tilde{V} = V'^Te^{-h(\hat{\omega}(0)+\hat{\mu}_{b_g})}V$, and $\tilde{S} = \tilde{U}^TS'\tilde{V}$.
+Then, the first term is calculated as follows
+\begin{align}
+	\expect{b_g(h)\nu'^T_{R(0)\delta R}} &= \expect{b_g(0)\nu'^T_{R(0)\delta R}}, \\
+	\expect{p(h)\nu'^T_{R(0)\delta R}} &= \expect{p(0)\nu'^T_{R(0)\delta R}} + h\expect{v(0)\nu'^T_{R(0)\delta R}}, \\
+	\expect{v(h)\nu'^T_{R(0)\delta R}} &= \expect{v(0)\nu'^T_{R(0)\delta R}} + h\expect{R(0)(a(0)+b_a(0))\nu'^T_{R(0)\delta R}}, \\
+	\expect{b_a(h)\nu'^T_{R(0)\delta R}} &= \expect{b_a(0)\nu'^T_{R(0)\delta R}}.
+\end{align}
+
+We give some example calculations:
+\begin{equation}
+	\expect{p(0)\nu'^T_{R(0)\delta R}} = \mu_p\expect{\nu'_{R(0)\delta R}}^T + P_p\expect{(QS-SQ^T)^\vee \left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T} \tilde{U}^T.
+\end{equation}
+\begin{align}
+	\expect{R(0)b_a(0)\nu'^T_{R(0)\delta R}} &= U\expect{QV^T\mu_{b_a}\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T}\tilde{U}^T \nonumber \\
+	&\quad + U\expect{QV^TP_{b_a}(QS-SQ^T)^\vee \left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T} \tilde{U}^T
+\end{align}
+\begin{align}
+	\expect{x(0)\nu'^T_{R(0)(\hat{b}_g(0)-\hat{\mu}_{b_g})\delta R}} &= \expect{x(0)\left( b_g^T(0) - \mu^T_{b_g} \right)V\Gamma_Q^T} \tilde{U}^T \nonumber \\
+	&= \expect{\left( \Sigma_{c,xb_g} + \mu\nu^T_RP_{b_g}^T + P\nu_R\nu_R^TP_{b_g}^T\right)V\Gamma_Q^T} \tilde{U}^T
+\end{align}
+\begin{align}
+	\expect{x(0)\nu'^T_{R(0)((H_{gu}\Delta W_{gu})^\wedge)^2\delta R}} = h\expect{x(0)\nu'^T_{R(0)G_{gu}\delta R}} - \tr{G_{gu}}h\expect{x(0)\nu'^T_{R(0)\delta R}}.
+\end{align}
+
+\end{document}
+
