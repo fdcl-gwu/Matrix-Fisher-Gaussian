@@ -1,0 +1,160 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Manipulations of Gaussian Densities\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\begin{document}
+
+\maketitle
+
+\section{Product of Gaussian Densities}
+
+\subsection{One Dimensional}
+
+\begin{align*}
+	&\expb{-\frac{1}{2}\frac{(x_1-\mu_1)^2}{\sigma_1^2}} \cdot \expb{-\frac{1}{2}\frac{(x_1-\mu_m)^2}{\sigma_m^2}} \\
+	= \ &\expb{-\frac{1}{2} \frac{\sigma_m^2(x_1-\mu_1)^2 + \sigma_1^2(x_1-\mu_m)^2}{\sigma_1^2\sigma_m^2}} \\
+	= \ &\expb{-\frac{1}{2} \frac{(\sigma_1^2+\sigma_m^2)x_1^2 - 2(\sigma_m^2\mu_1 + \sigma_1^2\mu_m)x_1 + \sigma_m^2\mu_1^2 + \sigma_1^2\mu_m^2}{\sigma_1^2\sigma_m^2}} \\
+	= \ &\expb{-\frac{1}{2} \frac{x_1^2 - 2x_1\frac{\sigma_m^2\mu_1 + \sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} + \left(\frac{\sigma_m^2\mu_1 + \sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2}\right)^2 - \left(\frac{\sigma_m^2\mu_1 + \sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2}\right)^2 + \frac{\sigma_m^2\mu_1^2+\sigma_1^2\mu_m^2}{\sigma_1^2+\sigma_m^2} }{\frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2}}} \\
+	\propto \ &\expb{-\frac{1}{2} \frac{\left( x_1 - \frac{\sigma_m^2\mu_1 + \sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} \right)^2}{\frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2}}}
+\end{align*}
+
+\subsection{Bi-variate}
+The density for a bi-variate Gaussian is
+\begin{equation*}
+	\expb{-\frac{1}{2} \frac{(x_2-\mu_2)^2}{\sigma_2^2}} \expb{-\frac{1}{2} \frac{(x_1-\mu_1-p/\sigma_2^2(x_2-\mu_2))^2}{\sigma_1^2-p^2/\sigma_2^2}}
+\end{equation*}
+
+Focus on the conditional part first
+\begin{align*}
+	&\expb{-\frac{1}{2} \frac{(x_1-\mu_1-p/\sigma_2^2(x_2-\mu_2))^2}{\sigma_1^2-p^2/\sigma_2^2}} \cdot \expb{-\frac{1}{2} \frac{(x_1-\mu_m)^2}{\sigma_m^2}} \\
+	= \ &\expb{-\frac{1}{2} \frac{\sigma_m^2(x_1-\mu_1-p/\sigma_2^2(x_2-\mu_2))^2 + (\sigma_1^2-p^2/\sigma_2^2)(x_1-\mu_m)^2}{(\sigma_1^2-p^2/\sigma_2^2)\sigma_m^2}} \\
+	= \ &\expb{-\frac{1}{2} \frac{\sigma_m^2(x_1-\mu_1)^2 - 2p\sigma_m^2/\sigma_2^2(x_1-\mu_1)(x_2-\mu_2) + (\sigma_1^2-p^2/\sigma_2^2)(x_1-\mu_m)^2 + p^2\sigma_m^2/\sigma_2^4(x_2-\mu_2)^2}{(\sigma_1^2-p^2/\sigma_2^2)\sigma_m^2}} \\
+	\propto \ &\expb{-\frac{1}{2} \frac{(\sigma_m^2+\sigma_1^2-p^2/\sigma_2^2)x_1^2 - 2x_1\big( \sigma_m^2\mu_1 + \sigma_1^2\mu_m + p\sigma_m^2/\sigma_2^2(x_2-\mu_2) - p^2/\sigma_2^2\mu_m \big) + \text{some function of }x_2}{(\sigma_1^2-p^2/\sigma_2^2)\sigma_m^2}} \\
+	\propto \ &\expb{-\frac{1}{2} \frac{\left( x_1-\frac{\sigma_m^2\mu_1 + \sigma_1^2\mu_m + p\sigma_m^2/\sigma_2^2(x_2-\mu_2)-p^2/\sigma_2^2\mu_m}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} \right)^2 + f(x_2)}{\frac{(\sigma_1^2-p^2/\sigma_2^2)\sigma_m^2}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2}}},
+\end{align*}
+where
+\begin{align*}
+	f(x_2) = &\frac{2p\sigma_m^2\mu_1/\sigma_2^2(x_2-\mu_2) + p^2\sigma_m^2/\sigma_2^4(x_2-\mu_2)^2}{\sigma_m^2+\sigma_1^2-p^2/\sigma_2^2} \\
+	&- \frac{p^2\sigma_m^4/\sigma_2^4(x_2-\mu_2)^2 + 2p\sigma_m^2/\sigma_2^2(\sigma_m^2\mu_1+\sigma_1^2\mu_m-p^2/\sigma_2^2\mu_m)(x_2-\mu_2)}{(\sigma_m^2+\sigma_1^2-p^2/\sigma_2^2)^2}
+\end{align*}
+Let's now focus  on the new conditional mean of $x_1$
+\begin{align*}
+	&\frac{\sigma_m^2\mu_1 + \sigma_1^2\mu_m + p\sigma_m^2/\sigma_2^2(x_2-\mu_2)-p^2/\sigma_2^2\mu_m}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} \\
+	= \ &\frac{\sigma_m^2\mu_1+\sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} \frac{\sigma_1^2+\sigma_m^2}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} + \frac{p\sigma_m^2/\sigma_2^2(x_2-\mu_2)-p^2/\sigma_2^2\mu_m}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} \\
+	= \ &\frac{\sigma_m^2\mu_1+\sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} + \frac{p^2/\sigma_2^2(\sigma_m^2\mu_1+\sigma_1^2\mu_m)}{(\sigma_1^2+\sigma_m^2)(\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2)} + \frac{p\sigma_m^2/\sigma_2^2(x_2-\mu_2)-p^2/\sigma_2^2\mu_m}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} \\
+	= \ &\frac{\sigma_m^2\mu_1+\sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} + \frac{p^2(\sigma_m^2\mu_1+\sigma_1^2\mu_m) + (\sigma_1^2+\sigma_m^2)(p\sigma_m^2(x_2-\mu_2)-p^2\mu_m)}{(\sigma_1^2+\sigma_m^2)(\sigma_2^2(\sigma_1^2+\sigma_m^2)-p^2)} \\
+	= \ &\frac{\sigma_m^2\mu_1+\sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} + \frac{p\sigma_m^2}{\sigma_2^2(\sigma_1^2+\sigma_m^2)-p^2} \left(x_2-\mu_2-\frac{p}{\sigma_1^2+\sigma_m^2}(\mu_m-\mu_1)\right) \\
+	= \ &\frac{\sigma_m^2\mu_1+\sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2} + \frac{p\sigma_m^2/(\sigma_1^2+\sigma_2^2)}{\sigma_2^2-p^2/(\sigma_1^2+\sigma_m^2)} \left(x_2-\mu_2-\frac{p}{\sigma_1^2+\sigma_m^2}(\mu_m-\mu_1)\right).
+\end{align*}
+This calculation makes sense if we set $\mu'_1 = \frac{\sigma_m^2\mu_1+\sigma_1^2\mu_m}{\sigma_1^2+\sigma_m^2}$, $\mu'_2 = \mu_2+\frac{p}{\sigma_1^2+\sigma_m^2}(\mu_m-\mu_1)$, $p' = p\frac{\sigma_m^2}{\sigma_1^2+\sigma_m^2}$, and $\sigma'^2_2 = \sigma_2^2 - \frac{p^2}{\sigma_1^2+\sigma_m^2}$.
+Now focus on the conditional variance of $x_1$
+\begin{align*}
+	\frac{(\sigma_1^2-p^2/\sigma_2^2)\sigma_m^2}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} &= \frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2} \frac{\sigma_1^2+\sigma_m^2}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} - \frac{p^2\sigma_m^2/\sigma_2^2}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} \\
+	&= \frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2} + \frac{p^2\sigma_1^2\sigma_m^2/\sigma_2^2}{(\sigma_1^2+\sigma_m^2)(\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2)} - \frac{p^2\sigma_m^2/\sigma_2^2}{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2} \\
+	&= \frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2} + \frac{p^2\sigma_1^2\sigma_m^2-p^2\sigma_m^2(\sigma_1^2+\sigma_m^2)}{(\sigma_1^2+\sigma_m^2)(\sigma_2^2(\sigma_1^2+\sigma_m^2)-p^2)} \\
+	&= \frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2} - \frac{(p\sigma_m^2/(\sigma_1^2+\sigma_m^2))^2}{\sigma_2^2-p^2/(\sigma_1^2+\sigma_m^2)},
+\end{align*}
+which also makes sense if we set $\sigma'^2_1 = \frac{\sigma_1^2\sigma_m^2}{\sigma_1^2+\sigma_m^2}$.
+Finally, focus on the marginal distribution of $x_2$
+\begin{align*}
+	&\expb{-\frac{1}{2}\frac{(x_2-\mu_2)^2}{\sigma_2^2} - \frac{1}{2}\frac{\sigma_1^2+\sigma_m^2-p^2/\sigma_2^2}{(\sigma_1^2-p^2/\sigma_2^2)\sigma_m^2}f(x_2)} \\
+	= \ &\expb{-\frac{1}{2}\frac{(x_2-\mu_2)^2}{\sigma_2^2} - \frac{1}{2}\frac{p^2/\sigma_2^4(x_2-\mu_2)^2 - 2p/\sigma_2^2(\mu_1-\mu_m)(x_2-\mu_2)}{\sigma_m^2+\sigma_1^2-p^2/\sigma_2^2}}\\
+	= \ &\expb{-\frac{1}{2} \frac{(\sigma_m^2+\sigma_1^2-p^2/\sigma_2^2)(x_2-\mu_2)^2 + p^2/\sigma_2^2(x_2-\mu_2)^2 - 2p(\mu_1-\mu_m)(x_2-\mu_2)}{\sigma_2^2(\sigma_1^2+\sigma_m^2)-p^2}} \\
+	= \ &\expb{-\frac{1}{2} \frac{(\sigma_1^2+\sigma_m^2)(x_2-\mu_2)^2 + 2p(\mu_m-\mu_1)(x_2-\mu_2)}{\sigma_2^2(\sigma_1^2+\sigma_m^2)-p^2}} \\
+	\propto \ &\expb{-\frac{1}{2} \frac{\left( x_2-\mu_2+\frac{p}{\sigma_1^2+\sigma_m^2}(\mu_m-\mu_1) \right)^2}{\sigma_2^2 - \frac{p^2}{\sigma_1^2+\sigma_m^2}}}
+\end{align*}
+
+\subsection{Multi-dimensional}
+
+\begin{align*}
+	&\expb{-\frac{1}{2}(x_1-\mu_1)^T\Sigma_1^{-1}(x_1-\mu_1)} \cdot \expb{-\frac{1}{2}(x_1-\mu_m)^T\Sigma_m^{-1}(x_1-\mu_m)} \\
+	\propto \ &\expb{-\frac{1}{2}\left( x_1^T(\Sigma_1^{-1}+\Sigma_m^{-1})x_1 - 2x_1^T(\Sigma_1^{-1}\mu_1 + \Sigma_m^{-1}\mu_m) \right)} \\
+	\propto \ &\expb{-\frac{1}{2} \left(x_1-\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_1^{-1}\mu_1+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_1^{-1}+\Sigma_m^{-1}) \left(x_1-\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_1^{-1}\mu_1+\Sigma_m^{-1}\mu_m\right)\right) }.
+\end{align*}
+
+In the last equality we used the fact that for any real symmetric, positive definite matrix $A$
+\begin{equation*}
+	x^TAx - 2x^Ty = (x-A^{-1}y)^TA(x-A^{-1}y) - y^TA^{-1}y.
+\end{equation*}
+
+\subsection{Splitting Multi-dimensional}
+
+Write a multi-variate Gaussian into marginal-conditional form
+\begin{equation*}
+	\expb{-\frac{1}{2}(x_2-\mu_2)^T\Sigma_2^{-1}(x_2-\mu_2)} \expb{-\frac{1}{2}(x_1-\mu_c)^T\Sigma_c^{-1}(x_1-\mu_c)}
+\end{equation*}
+where $\mu_c = \mu_1 + \Sigma_{12}\Sigma_2^{-1}(x_2-\mu_2)$, and $\Sigma_c = \Sigma_1 - \Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T$.
+Now multiply the density with another Gaussian density of $x_1$, and focus on the conditional part first.
+\begin{align*}
+	&\expb{-\frac{1}{2}(x_1-\mu_c)^T\Sigma_c^{-1}(x_1-\mu_c)} \cdot \expb{-\frac{1}{2}(x_1-\mu_m)^T\Sigma_m^{-1}(x_1-\mu_m)} \\
+	\propto \ &\expb{-\frac{1}{2} \left( x_1^T\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)x_1 - 2x_1^T\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right) + \mu_c^T\Sigma_c^{-1}\mu_c \right)} \\
+	= \ &\expb{-\frac{1}{2}\left(x_1-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(x_1-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)} \\
+	\quad &\times \expb{\frac{1}{2} \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c }
+\end{align*}
+Let the last exponential term be denoted by $f(x_2)$, focus on the conditional mean first
+\begin{align*}
+	&\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1} \left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right) \\
+	= \ &\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1} \left( \left(\Sigma_1^{-1} + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1}\right)\left(\mu_1+\Sigma_{12}\Sigma_2^{-1}(x_2-\mu_2)\right) + \Sigma_m^{-1}\mu_m \right) \\
+	= \ &\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1} \left( \Sigma_1^{-1}\mu_1 + \Sigma_m^{-1}\mu_m + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1} \Sigma_{12}\Sigma_2^{-1} \left( x_2-\mu_2+\Sigma_{12}^T\Sigma_2^{-1}\mu_1 \right) \right) \\
+	= \ &\left( \Sigma_1^{-1} + \Sigma_m^{-1} + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right)^{-1} \\
+	&\times \left( \Sigma_1^{-1}\mu_1 + \Sigma_m^{-1}\mu_m + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1} \Sigma_{12}\Sigma_2^{-1} \left( x_2-\mu_2+\Sigma_{12}^T\Sigma_1^{-1}\mu_1 \right) \right) \\
+	= \ &\left( \left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} - \left( \Sigma_1^{-1} + \Sigma_m^{-1} + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right)^{-1} \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right. \\
+	&\times \left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} \bigg) \left( \Sigma_1^{-1}\mu_1 + \Sigma_m^{-1}\mu_m + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1} \Sigma_{12}\Sigma_2^{-1} \left( x_2-\mu_2+\Sigma_{12}^T\Sigma_1^{-1}\mu_1 \right) \right) \\
+	= \ &\left( \left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} - \left( \Sigma_1^{-1} + \Sigma_m^{-1} + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right)^{-1} \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right. \\
+	&\times \left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} \bigg) \left( \Sigma_1^{-1}\mu_1 + \Sigma_m^{-1}\mu_m \right) + \left( \Sigma_1^{-1}+\Sigma_m^{-1} + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right)^{-1} \\
+	&\times \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1} \left(x_1-\mu_2+\Sigma_{12}^T\Sigma_1^{-1}\mu_1\right) \\
+	= \ &\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_1^{-1}\mu_1+\Sigma_m^{-1}\mu_m\right) + \left( \Sigma_1^{-1}+\Sigma_m^{-1} + \left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\Sigma_1^{-1} \right)^{-1}\left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1} \\
+	&\times \Sigma_{12}\Sigma_2^{-1} \left( x_2-\mu_2 + \Sigma_{12}^T\Sigma_1^{-1}\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1}\Sigma_m^{-1}(\mu_1-\mu_m) \right) \\
+	= \ &\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} \left(\Sigma_1^{-1}\mu_1+\Sigma_m^{-1}\mu_m\right) + \Sigma_m\left( \Sigma_m+\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T \right)^{-1}\Sigma_{12}\Sigma_2^{-1} \left( x_2-\mu_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}(\mu_m-\mu_1) \right) \\
+	= \ &\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} \left(\Sigma_1^{-1}\mu_1+\Sigma_m^{-1}\mu_m\right) + \left(\Sigma_{12}-\Sigma_1(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right) \left(\Sigma_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right)^{-1} \\
+	&\times \left( x_2-\mu_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}(\mu_m-\mu_1) \right)
+\end{align*}
+which makes sense if we set $\mu'_1 = \left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} \left(\Sigma_1^{-1}\mu_1+\Sigma_m^{-1}\mu_m\right)$, $\mu'_2 = \mu_2 + \Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}(\mu_m-\mu_1)$, $\Sigma'_{12} = \Sigma_{12}-\Sigma_1(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}$, and $\Sigma'_2 = \Sigma_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}$.
+Calculations for the last two equalities are greatly abbreviated, and we used the following facts: for any invertible $A$ and $A+B$, we have $(A+B)^{-1} = A^{-1}-(A+B)^{-1}BA^{-1}$; if $B$ is also invertible, we further have $(A+B)^{-1} = A^{-1}(A^{-1}+B^{-1})^{-1}B^{-1}$.
+Next, let us focus on the conditional variance
+\begin{align*}
+	&\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1} \\
+	= \ &\left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right) \left(\Sigma_1+\Sigma_m-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}\right)^{-1}\Sigma_m \\
+	= \ &\left(\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right) \left( (\Sigma_1+\Sigma_m)^{-1} + \left(\Sigma_1+\Sigma_m-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1} \right)\Sigma_m \\
+	= \ &\Sigma_1(\Sigma_1+\Sigma_m)^{-1}\Sigma_m^{-1} - \Sigma_m\left(\Sigma_1+\Sigma_m-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)^{-1}\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}\Sigma_m \\
+	= \ &\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} - \Sigma_m\left(\Sigma_1+\Sigma_m-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T\right)\Sigma_{12}\Sigma_2^{-1} \left(\Sigma_{12}-\Sigma_1(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right)^T \\
+	= \ &\left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1} - \left(\Sigma_{12}-\Sigma_1(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right) \left(\Sigma_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right)^{-1}\left(\Sigma_{12}-\Sigma_1(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right)^T
+\end{align*}
+which makes sense if we set $\Sigma'_1 = \left(\Sigma_1^{-1}+\Sigma_m^{-1}\right)^{-1}$.
+The last equality comes from the last equality in the condition mean.
+Finally, let us focus on the marginal density of $x_2$.
+\begin{align*}
+	&\expb{-\frac{1}{2}(x_2-\mu_2)^T\Sigma_2^{-1}(x_2-\mu_2)+f(x_2)} \\
+	= \ &\expb{-\frac{1}{2}(x_2-\mu_2)^T\Sigma_2^{-1}(x_2-\mu_2) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c + \frac{1}{2}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)^T \left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1} \left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)} \\
+	\propto \ &\expb{-\frac{1}{2}(x_2-\mu_2)^T\Sigma_2^{-1}(x_2-\mu_2) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c + \frac{1}{2}\left( \mu_c^T(\Sigma_c+\Sigma_m)^{-1}\Sigma_m\Sigma_c^{-1}\mu_c + 2\mu_c^T(\Sigma_c+\Sigma_m)^{-1}\mu_m \right)} \\
+	\propto \ &\expb{-\frac{1}{2}(x_2-\mu_2)^T\Sigma_2^{-1}(x_2-\mu_2) - \frac{1}{2}(\mu_c-\mu_m)^T(\Sigma_c+\Sigma_m)^{-1}(\mu_c-\mu_m)} \\
+	\propto \ &\expb{-\frac{1}{2}\left( (x_2-\mu_2)^T\left(\Sigma_2^{-1} + \Sigma_2^{-1}\Sigma_{12}^T(\Sigma_c+\Sigma_m)^{-1}\Sigma_{12}\Sigma_2^{-1}\right)(x_2-\mu_2) - 2(x_2-\mu_2)^T\Sigma_2^{-1}\Sigma_{12}^T(\Sigma_c+\Sigma_m)^{-1}(\mu_m-\mu_1) \right)} \\
+	= \ &\expb{-\frac{1}{2} \left( (x_2-\mu_2)^T\left(\Sigma_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right)^{-1}(x_2-\mu_2) - 2(x_2-\mu_2)^T\Sigma_2^{-1}\Sigma_{12}^T(\Sigma_c+\Sigma_m)^{-1}(\mu_m-\mu_1) \right)} \\
+	\propto \ &\expb{-\frac{1}{2}\left(x_2-\mu_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}(\mu_m-\mu_1)\right)^T \left(\Sigma_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}\Sigma_{12}\right)^{-1} \left(x_2-\mu_2-\Sigma_{12}^T(\Sigma_1+\Sigma_m)^{-1}(\mu_m-\mu_1)\right)}
+\end{align*}
+
+\end{document}
+
