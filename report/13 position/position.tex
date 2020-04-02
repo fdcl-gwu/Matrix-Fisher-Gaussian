@@ -1,6 +1,6 @@
 \documentclass[10pt]{article}
 
-\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[letterpaper,margin=0.5in]{geometry}
 
 \usepackage{amssymb,amsmath,amsthm}
 \usepackage{bm}
@@ -23,6 +23,7 @@
 \newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
 \newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
 \newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
 
 \begin{document}
 
@@ -159,6 +160,24 @@ We give some example calculations:
 \begin{align}
 	\expect{x(0)\nu'^T_{R(0)((H_{gu}\Delta W_{gu})^\wedge)^2\delta R}} = h\expect{x(0)\nu'^T_{R(0)G_{gu}\delta R}} - \tr{G_{gu}}h\expect{x(0)\nu'^T_{R(0)\delta R}}.
 \end{align}
+
+\section{Measurement Update}
+
+Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigma,P,U,S,V)$, and a measurement of $x$ follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$, then the conditional posterior distribution of $x$ is
+\begin{align}
+	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x-\mu_m)^T\Sigma_m^{-1}(x-\mu_m)} \\
+	\propto \ &\expb{-\frac{1}{2} \left( x^T\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)x - 2x^T\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right) + \mu_c^T\Sigma_c^{-1}\mu_c \right)} \\
+	= \ &\expb{-\frac{1}{2}\left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)} \\
+	\quad &\times \expb{\frac{1}{2} \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c }
+\end{align}
+Note that only the first exponential term has $x$, however, the second exponential term has $\nu_R$ in $\mu_c$, therefore it cannot be discarded as a constant.
+Denote $\expb{f(R)}$ as the second exponential term, then the posterior marginal 
+distribution of $R$ becomes
+\begin{equation}
+	\expb{\tr{FR^T}+f(R)}.
+\end{equation}
+This density is a matrix Fisher-Bingham distribution on $\SO$, since $f(R)$ clearly involves the second order term of $R$.
+Intuitively, if we think of the matrix Fisher distribution as a Gaussian distribution in $\real{9}$, then the measurement of $x$ makes some correction to $R$, thus its mean is no longer in $\SO$, and conditioning the corrected Gaussian distribution no longer yields a matrix Fisher distribution.
 
 \end{document}
 

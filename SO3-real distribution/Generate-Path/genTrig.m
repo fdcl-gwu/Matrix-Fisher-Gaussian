@@ -1,9 +1,12 @@
-function [ gyroMea, RMea, RTrue ] = genTrig( t, sf )
+function [ gyroMea, RMea, RTrue, biasTrue ] = genTrig( t, sf, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     addpath(getAbsPath('..\..\rotation3d',filePath));
+end
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
 end
 
 time = (0:1/sf:t);
@@ -14,8 +17,15 @@ E.fr = 0.35; E.fp = 0.35; E.fh = 0.35;
 E.magr = pi; E.magp = pi/2; E.magh = pi;
 
 % noise parameters
-randomWalk = 10*pi/180;
-rotMeaNoise = 0.2;
+if exist('parameters','var')
+    randomWalk = parameters.randomWalk;
+    biasInstability = parameters.biasInstability;
+    rotMeaNoise = parameters.rotMeaNoise;
+else
+    randomWalk = 10*pi/180;
+    biasInstability = 500/3600*pi/180;
+    rotMeaNoise = 0.2^2*eye(3);
+end
 
 % true state
 roll = @(t)E.magr*sin(E.fr*2*pi*t);
@@ -52,17 +62,27 @@ w4 = @(t)(q1(t).*dq4(t)-q2(t).*dq3(t)+q3(t).*dq2(t)-q4(t).*dq1(t))*2;
 gyro = [w2(time);w3(time);w4(time)];
 
 % add noise
-gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
-gyroMea = gyro+gyroNoise;
+biasNoise = randn(3,N)*biasInstability*sqrt(sf);
+biasTrue = cumsum(biasNoise/sf,2);
 
-RNoise = expRot(randn(N,3)*rotMeaNoise);
+gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
+gyroMea = gyro+gyroNoise+biasTrue;
+
+if parameters.GaussMea
+    RNoise = expRot(mvnrnd([0;0;0],rotMeaNoise,N));
+else
+    RNoise = pdf_MF_sampling(rotMeaNoise,N);
+end
 RMea = zeros(3,3,N);
 for n = 1:N
-    RMea(:,:,n) = RTrue(:,:,n)*RNoise(:,:,n);
+    RMea(:,:,n) = RTrue(:,:,n)*RNoise(:,:,n)';
 end
 
 if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
     rmpath(getAbsPath('..\..\rotation3d',filePath));
+end
+if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
+    rmpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
 end
 
 end

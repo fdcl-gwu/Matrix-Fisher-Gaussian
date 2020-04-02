@@ -1,4 +1,4 @@
-function [ gyroMea, RMea, RTrue, biasTrue ] = genTrigWithBias( t, sf, parameters )
+function [ gyroMea, acceMea, RMea, pMea, RTrue, xTrue ] = genTrigIMU( t, sf, parameters )
 
 filePath = mfilename('fullpath');
 pathCell = regexp(path, pathsep, 'split');
@@ -15,18 +15,29 @@ N = length(time);
 % motion parameters
 E.fr = 0.35; E.fp = 0.35; E.fh = 0.35;
 E.magr = pi; E.magp = pi/2; E.magh = pi;
+E.radius = 5;
+E.fs = 0.2;
+E.mags = 5;
+E.meds = 5;
 
 % noise parameters
 if exist('parameters','var')
     randomWalk = parameters.randomWalk;
     biasInstability = parameters.biasInstability;
+    acceRandomWalk = parameters.acceRandomWalk;
+    acceBiasInstability = parameters.acceBiasInstability;
     rotMeaNoise = parameters.rotMeaNoise;
+    posMeaNoise = parameters.posMeaNoise;
 else
     randomWalk = 10*pi/180;
     biasInstability = 500/3600*pi/180;
+    acceRandomWalk = 0.1;
+    acceBiasInstability = 200/3600;
     rotMeaNoise = 0.2^2*eye(3);
+    posMeaNoise = 1*eye(3);
 end
 
+%% rotation
 % true state
 roll = @(t)E.magr*sin(E.fr*2*pi*t);
 pitch = @(t)E.magp*sin(E.fp*2*pi*t);
@@ -78,12 +89,34 @@ for n = 1:N
     RMea(:,:,n) = RTrue(:,:,n)*RNoise(:,:,n)';
 end
 
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    rmpath(getAbsPath('..\..\rotation3d',filePath));
+%% linear motion
+% true state
+speed = E.meds + E.mags*sin(2*pi*E.fs*time-pi/2);
+dist = E.meds*time - E.mags/(2*pi*E.fs)*cos(2*pi*E.fs*time-pi/2);
+distAng = dist/E.radius;
+pTrue = [E.radius*cos(distAng);E.radius*sin(distAng);zeros(1,N)];
+vTrue = [-sin(distAng).*speed;cos(distAng).*speed;zeros(1,N)];
+
+aTrue(1,:) = -cos(distAng).*speed.^2/E.radius - sin(distAng).*(E.mags*2*pi*E.fs*cos(2*pi*E.fs*time-pi/2));
+aTrue(2,:) = -sin(distAng).*speed.^2/E.radius + cos(distAng).*(E.mags*2*pi*E.fs*cos(2*pi*E.fs*time-pi/2));
+aTrue(3,:) = 9.8*ones(1,N);
+
+acce = zeros(3,N);
+for n = 1:N
+    acce(:,n) = RTrue(:,:,n)'*aTrue(:,n);
 end
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    rmpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
+
+% add noises
+acceBiasNoise = randn(3,N)*acceBiasInstability*sqrt(sf);
+acceBiasTrue = cumsum(acceBiasNoise/sf,2);
+
+acceNoise = randn(3,N)*acceRandomWalk*sqrt(sf);
+acceMea = acce+acceNoise+acceBiasTrue;
+
+posNoise = mvnrnd([0;0;0],posMeaNoise,N)';
+pMea = pTrue+posNoise;
+
+xTrue = [biasTrue;pTrue;vTrue;acceBiasTrue];
 
 end
 

@@ -27,7 +27,7 @@ parfor n = 1:N
     parameters.RInit = eye(3);
     parameters.xInit = [0;0;0];
     
-    [gyro,RMea,RTrue,xTrue] = genTrigWithBias(t,sf,parameters);
+    [gyro,RMea,RTrue,xTrue] = genTrig(t,sf,parameters);
     
     % stachastic settings
     parameters.RInit = RTrue(:,:,1)*expRot([pi;0;0]);
