@@ -86,6 +86,10 @@ for n = 2:N
     stepT(n-1) = toc;
 end
 
+if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
+    rmpath(getAbsPath('..\..\rotation3d',filePath));
+end
+
 end
 
 

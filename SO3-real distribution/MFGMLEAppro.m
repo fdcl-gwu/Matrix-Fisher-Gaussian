@@ -48,8 +48,8 @@ vR = vee(mulRot(Q,S,0)-mulRot(S,permute(Q,[2,1,3]),0));
 % other empirical moments
 EvR = sum(vR.*w,2);
 
-covxvR = zeros(N,N);
-covvRvR = zeros(N,N);
+covxvR = zeros(N,3);
+covvRvR = zeros(3,3);
 for ns = 1:Ns
     covxvR = covxvR+(x(:,ns)-Ex)*(vR(:,ns)-EvR)'*w(ns);
     covvRvR = covvRvR+(vR(:,ns)-EvR)*(vR(:,ns)-EvR)'*w(ns);
