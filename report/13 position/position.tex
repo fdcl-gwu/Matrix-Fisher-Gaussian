@@ -36,7 +36,7 @@ Consider the following kinematics model:
 	R\diff{R} &= (\hat{\omega}+\hat{b}_g)\diff{t} + H_{gu}\diff{W_{gu}}, \\
 	\diff{b_g} &= H_{gv}\diff{W_{gv}}, \\
 	\diff{p} &= v\diff{t}, \\
-	R^T\diff{v} &= (a+ba)\diff{t} + H_{au}\diff{W_{au}}, \\
+	\diff{v} &= (R(a+ba)-g)\diff{t} + RH_{au}\diff{W_{au}}, \\
 	\diff{b_a} &= H_{av}\diff{W_{av}},
 \end{align}
 where $(R,bg,p,v,ba)$ are attitude, gyroscope bias, position, velocity, and accelerometer bias of the IMU.
@@ -46,7 +46,7 @@ The discretized kinematics are
 	R(h) &= R(0)\exp\left\{ (\hat{\omega}(0) + \hat{b}_g(0))h + H_{gu}\Delta W_{gu} \right\} \\
 	b_g(h) &= b_g(0) + H_{gv}\Delta W_{gv} \\
 	p(h) &= p(0) + v(0)h \\
-	v(h) &= v(0) + R(0)\left( (a(0)+b_a(0))h + H_{au}\Delta W_{au} \right)\\
+	v(h) &= v(0)-gh + R(0)\left( (a(0)+b_a(0))h + H_{au}\Delta W_{au} \right)\\
 	b_a(h) &= b_a(0) + H_{av}\Delta W_{av}
 \end{align}
 
@@ -86,7 +86,7 @@ Let
 
 Then it is immediate that
 \begin{equation}
-	\expect{v(t)} = \expect{v(0)} + h\expect{R(0)}(a(0)+\mu_{b_a}) + h\expect{R(0)P_{b_a}\nu_R}.
+	\expect{v(t)} = \expect{v(0)} + h\expect{R(0)}(a(0)+\mu_{b_a}) + h\expect{R(0)P_{b_a}\nu_R} - gh.
 \end{equation}
 
 \subsection{$\expect{x(h)x(h)^T}$}
@@ -103,7 +103,7 @@ Again only the terms involving $v(h)$ are non-trivial, in fact
 where $G_{gv} = H_{gv}H_{gv}^T$ and $G_{av} = H_{av}H_{av}^T$.
 The terms involving $v(h)$ are calculated as follows:
 \begin{align}
-	\expect{v(h)b_g^T(h)} &= \expect{v(0)b_g^T(0)} + h\expect{R(0)a(0)b_g^T(0)} + h\expect{R(0)b_a(0)b_g^T(0)},
+	\expect{v(h)b_g^T(h)} &= \expect{v(0)b_g^T(0)} + h\expect{R(0)a(0)b_g^T(0)} + h\expect{R(0)b_a(0)b_g^T(0)} - hg\expect{b_g(0)}^T,
 \end{align}
 where
 \begin{align*}
@@ -114,13 +114,14 @@ where
 Also,
 \begin{align}
 	\expect{v(h)p(h)^T} &= \expect{v(0)p^T(0)} + h\left( \expect{v(0)v^T(0)} + \expect{R(0)a(0)p^T(0)} + \expect{R(0)b_a(0)p^T(0)} \right) \nonumber \\
-	&\quad + h^2\left( \expect{R(0)a(0)v^T(0)} + \expect{R(0)b_a(0)v^T(0)} \right) \\
-	\expect{v(h)b_a^T(0)} &= \expect{v(0)b_a^T(0)} + h\expect{R(0)a(0)b_a^T(0)} + h\expect{R(0)b_a(0)b_a^T(0)}.
+	&\quad + h^2\left( \expect{R(0)a(0)v^T(0)} + \expect{R(0)b_a(0)v^T(0)} \right) - hg\expect{p(0)+v(0)h}^T \\
+	\expect{v(h)b_a^T(0)} &= \expect{v(0)b_a^T(0)} + h\expect{R(0)a(0)b_a^T(0)} + h\expect{R(0)b_a(0)b_a^T(0)} - hg\expect{b_a(0)}^T.
 \end{align}
 And the most difficult one,
 \begin{align}
 	\expect{v(h)v(h)^T} &= \expect{v(0)v(0)^T} + h\expect{R(0)(a(0)+b_a(0))v(0)^T} + h\expect{R(0)(a(0)+b_a(0))v(0)^T}^T \nonumber \\
-	&\quad + h^2\expect{R(0)(a(0)+b_a(0))(a(0)+b_a(0))^TR(0)^T} + hG_{au}\expect{R(0)R(0)^T},
+	&\quad + h^2\expect{R(0)(a(0)+b_a(0))(a(0)+b_a(0))^TR(0)^T} + hG_{au}\expect{R(0)R(0)^T} + h^2gg^T \\
+	&\quad - hg\expect{v(0)+hR(0)(a(0)+b_a(0))}^T - h\expect{v(0)+hR(0)(a(0)+b_a(0))}g^T,
 \end{align}
 where $G_{au} = H_{au}H_{au}^T$, and
 \begin{align*}
@@ -141,7 +142,7 @@ Then, the first term is calculated as follows
 \begin{align}
 	\expect{b_g(h)\nu'^T_{R(0)\delta R}} &= \expect{b_g(0)\nu'^T_{R(0)\delta R}}, \\
 	\expect{p(h)\nu'^T_{R(0)\delta R}} &= \expect{p(0)\nu'^T_{R(0)\delta R}} + h\expect{v(0)\nu'^T_{R(0)\delta R}}, \\
-	\expect{v(h)\nu'^T_{R(0)\delta R}} &= \expect{v(0)\nu'^T_{R(0)\delta R}} + h\expect{R(0)(a(0)+b_a(0))\nu'^T_{R(0)\delta R}}, \\
+	\expect{v(h)\nu'^T_{R(0)\delta R}} &= \expect{v(0)\nu'^T_{R(0)\delta R}} + h\expect{R(0)(a(0)+b_a(0))\nu'^T_{R(0)\delta R}} - hg\expect{\nu'^T_{R(0)\delta R}}, \\
 	\expect{b_a(h)\nu'^T_{R(0)\delta R}} &= \expect{b_a(0)\nu'^T_{R(0)\delta R}}.
 \end{align}
 
@@ -165,9 +166,9 @@ We give some example calculations:
 
 Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigma,P,U,S,V)$, and a measurement of $x$ follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$, then the conditional posterior distribution of $x$ is
 \begin{align}
-	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x-\mu_m)^T\Sigma_m^{-1}(x-\mu_m)} \\
-	\propto \ &\expb{-\frac{1}{2} \left( x^T\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)x - 2x^T\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right) + \mu_c^T\Sigma_c^{-1}\mu_c \right)} \\
-	= \ &\expb{-\frac{1}{2}\left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)} \\
+	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x-\mu_m)^T\Sigma_m^{-1}(x-\mu_m)} \nonumber \\
+	\propto \ &\expb{-\frac{1}{2} \left( x^T\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)x - 2x^T\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right) + \mu_c^T\Sigma_c^{-1}\mu_c \right)} \nonumber \\
+	= \ &\expb{-\frac{1}{2}\left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)} \nonumber \\
 	\quad &\times \expb{\frac{1}{2} \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c }
 \end{align}
 Note that only the first exponential term has $x$, however, the second exponential term has $\nu_R$ in $\mu_c$, therefore it cannot be discarded as a constant.
