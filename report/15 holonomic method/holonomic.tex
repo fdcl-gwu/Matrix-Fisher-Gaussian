@@ -1,0 +1,139 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Holonomic Method for Matrix Fisher Distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+\newcommand{\sgn}[1]{\ensuremath{\mathrm{sgn}\left(#1\right)}}
+
+\begin{document}
+
+\maketitle
+
+\section{Holonomic Gradient Methods}
+
+The holonomic gradient method is used to evaluate a holonomic function by solving an ODE system.
+
+\begin{definition}
+	A function $f:\real{d}\to\real{}$ is called a holonomic function if there exists a function $g:\real{d}\to\real{r}$ which is composed of $f$ and its derivatives such that
+	\begin{equation}
+		\frac{\partial g(\theta)}{\partial \theta_i} = P_i(\theta) g(\theta).
+	\end{equation}
+	This is called the Pafaffian equation for $f$.
+\end{definition}
+
+Suppose we know the value of $g$ at a specific point $\theta_0$, we may evaluate $g$ at any point $\theta$ by choosing a curve $\tilde{\theta}(\tau)$ connecting $\theta_0$ and $\theta$, for example, $\tilde{\theta}(\tau) = (1-\tau)\theta_0+\tau\theta, \, \tau\in[0,1]$, and evaluate the following ODE system:
+\begin{equation}
+	\frac{\diff{\tilde{g}(\tau)}}{\diff{\tau}} = \sum_{i=1}^{d} \frac{\diff{\tilde{\theta}_i(\tau)}}{\diff{\tau}} P_i(\tilde{\theta}_i(\tau)) \tilde{g}(\tau), \qquad \tilde{g}(0) = g(\theta_0),
+\end{equation}
+where $\tilde{g}(\tau) = g(\tilde{\theta}(\tau))$.
+
+\section{Matrix Fisher Distribution}
+
+\subsection{Non-scaled Version}
+Let $c(S)$ be the normalizing constant for the matrix Fisher distribution with parameter $S=\mathrm{diag}(s_1,s_2,s_3)$, and $\partial_i = \partial /\partial s_i$.
+Let $g = (c,\partial_1c,\partial_2c,\partial_3c)$, and suppose $s_1 \neq s_2 \neq |s_3|$, then the Pafaffian equation for $c(S)$ is
+\begin{align}
+	\partial_i\partial_jc &= c\expect{Q_{ii}Q_{jj}} = c(\expect{Q_{kk}}+\expect{Q_{ij}Q_{ji}}) = \frac{s_j}{s_i^2-s_j^2}\partial_ic - \frac{s_i}{s_i^2-s_j^2}\partial_jc + \partial_kc, \\
+	\partial_i\partial_ic &= c\expect{Q_{ii}^2} = c(1-\expect{Q_{ij}^2}-\expect{Q_{ik}^2}) = c - \left(\frac{s_i}{s_i^2-s_j^2}+\frac{s_i}{s_i^2-s_k^2}\right)\partial_ic + \frac{s_j}{s_i^2-s_j^2}\partial_jc + \frac{s_k}{s_i^2-s_k^2}\partial_kc,
+\end{align}
+where $\{i,j,k\}=\{1,2,3\}$.
+
+Next we consider the degenerative case.
+If $|s_i| = |s_j| \neq 0$ and $|s_i| \neq |s_k|$ for some $\{i,j,k\}=\{1,2,3\}$, then
+\begin{align*}
+	\frac{3}{2} \partial_i\partial_jc - \frac{\sgn{s_is_j}}{2} \partial_i\partial_ic &= -\frac{1}{2s_i}\partial_jc + \partial_kc, \\
+	-\frac{\sgn{s_is_j}}{2} \partial_i\partial_jc + \frac{3}{2} \partial_i\partial_ic &= c - \left(\frac{1}{2s_i}+\frac{s_i}{s_i^2-s_k^2}\right) \partial_ic + \frac{s_k}{s_i^2-s_k^2} \partial_kc.
+\end{align*}
+This can be solved as
+\begin{align}
+	\partial_i\partial_jc &= \frac{3}{4} \left( -\frac{1}{2s_i}\partial_jc + \partial_kc \right) + \frac{\sgn{s_is_j}}{4} \left( c - \left(\frac{1}{2s_i}+\frac{s_i}{s_i^2-s_k^2}\right) \partial_ic + \frac{s_k}{s_i^2-s_k^2} \partial_kc \right) \\
+	\partial_i\partial_ic &= \frac{\sgn{s_is_j}}{4} \left( -\frac{1}{2s_i}\partial_jc + \partial_kc \right) + \frac{3}{4} \left( c - \left(\frac{1}{2s_i}+\frac{s_i}{s_i^2-s_k^2}\right) \partial_ic + \frac{s_k}{s_i^2-s_k^2} \partial_kc \right)
+\end{align}
+
+If $|s_i|=|s_j|=0$ and $|s_k|\neq 0$ for some $\{i,j,k\}=\{1,2,3\}$, then
+\begin{align}
+	\partial_i\partial_jc = \frac{1}{2}\partial_kc, \qquad \partial_i\partial_ic = \frac{1}{2}\left(c - \frac{s_i}{s_i^2-s_k^2}\partial_ic + \frac{s_k}{s_i^2-s_k^2}\partial_kc\right).
+\end{align}
+
+If $|s_i|=|s_j|=|s_k| \neq 0$ for some $\{i,j,k\} = \{1,2,3\}$, we have
+\begin{align*}
+	\frac{3}{2} \partial_i\partial_jc - \frac{\sgn{s_is_j}}{2} \partial_i\partial_ic &= -\frac{1}{2s_i}\partial_jc + \partial_kc, \\
+	\frac{3}{2} \partial_i\partial_kc - \frac{\sgn{s_is_k}}{2} \partial_i\partial_ic &= -\frac{1}{2s_i}\partial_kc + \partial_jc, \\
+	-\frac{sgn(s_is_j)}{2} \partial_i\partial_jc - \frac{sgn(s_is_k)}{2} \partial_i\partial_kc + 2\partial_i\partial_ic &= c - \frac{1}{s_i}\partial_i,
+\end{align*}
+which can be solved as
+\begin{align}
+	\partial_i\partial_jc &= \frac{11}{15}\left( -\frac{1}{2s_i}\partial_jc + \partial_kc \right) + \frac{\sgn{s_is_j}\sgn{s_is_k}}{15}\left( -\frac{1}{2s_i}\partial_kc + \partial_jc \right) + \frac{\sgn{s_is_j}}{5}\left( c - \frac{1}{s_i}\partial_ic \right) \\
+	\partial_i\partial_kc &= \frac{\sgn{s_is_j}\sgn{s_is_k}}{15}\left( -\frac{1}{2s_i}\partial_jc + \partial_kc \right) + \frac{11}{15}\left( -\frac{1}{2s_i}\partial_kc + \partial_jc \right) + \frac{\sgn{s_is_k}}{5}\left( c - \frac{1}{s_i}\partial_ic \right) \\
+	\partial_i\partial_ic &= \frac{\sgn{s_is_j}}{5}\left( -\frac{1}{2s_i}\partial_jc + \partial_kc \right) + \frac{\sgn{s_is_k}}{5}\left( -\frac{1}{2s_i}\partial_kc + \partial_jc \right) + \frac{3}{5}\left( c - \frac{1}{s_i}\partial_ic \right)
+\end{align}
+
+If $s_i=s_j=s_k=0$ for some $\{i,j,k\}=\{1,2,3\}$, then
+\begin{align}
+	\partial_i\partial_jc = \frac{1}{2}\partial_k, \qquad \partial_i\partial_ic = \frac{1}{3}c.
+\end{align}
+
+\subsection{Scaled Version}
+Let $\bar{c}(S)$ be the scaled normalizing constant for the matrix Fisher distribution.
+Let $g=(\bar{c}, \partial_1\bar{c}, \partial_2\bar{c}, \partial_3\bar{c})$, then the Pafaffian equation for $\bar{c}(S)$ is
+\begin{align}
+	\partial_i\partial_j \bar{c} &= \bar{c}(1-\expect{Q_{ii}}-\expect{Q_{jj}}+\expect{Q_{ii}Q_{jj}}) \nonumber \\
+	&= e^{-\tr{S}}\left( c - \partial_ic - \partial_jc + \partial_kc + \frac{s_j}{s_i^2-s_j^2}\partial_ic - \frac{s_i}{s_i^2-s_j^2}\partial_jc \right) \nonumber \\
+	&= \bar{c} - \partial_i\bar{c} - \bar{c} - \partial_j\bar{c} - \bar{c} + \partial_k\bar{c} + \bar{c} + \frac{s_j}{s_i^2-s_j^2}(\partial_i\bar{c} + \bar{c}) - \frac{s_i}{s_i^2-s_j^2}(\partial_j\bar{c}+\bar{c}) \nonumber \\
+	&= -\frac{1}{s_i+s_j}\bar{c} +  \left(-1+\frac{s_j}{s_i^2-s_j^2}\right)\partial_i\bar{c} + \left(-1-\frac{s_i}{s_i^2-s_j^2}\right)\partial_j\bar{c} + \partial_k\bar{c}
+\end{align}
+
+\begin{align}
+	\partial_i\partial_i \bar{c} &= \bar{c}(1-2\expect{Q_{ii}}+\expect{Q_{ii}^2}) \nonumber \\
+	&= e^{-\tr{S}}\left( c - 2\partial_ic + c - \left(\frac{s_i}{s_i^2-s_j^2}+\frac{s_i}{s_i^2-s_k^2}\right)\partial_ic + \frac{s_j}{s_i^2-s_j^2}\partial_jc + \frac{s_k}{s_i^2-s_k^2}\partial_kc \right) \nonumber \\
+	&= -2\partial_i\bar{c} - \left(\frac{s_i}{s_i^2-s_j^2}+\frac{s_i}{s_i^2-s_k^2}\right)(\partial_i\bar{c}+\bar{c}) + \frac{s_j}{s_i^2-s_j^2}(\partial_j\bar{c} + \bar{c}) + \frac{s_k}{s_i^2-s_k^2}(\partial_k\bar{c}+\bar{c}) \nonumber \\
+	&= -\left(\frac{1}{s_i+s_j}+\frac{1}{s_i+s_k}\right)\bar{c} - \left(2+\frac{s_i}{s_i^2-s_j^2}+\frac{s_i}{s_i^2-s_k^2}\right)\partial_i\bar{c} + \frac{s_j}{s_i^2-s_j^2}\partial_j\bar{c} + \frac{s_k}{s_i^2-s_k^2}\partial_k\bar{c}
+\end{align}
+
+Next, we consider degenerative cases.
+If $|s_i|=|s_j| \neq 0$ and $|s_i| \neq |s_k|$ for some $\{i,j,k\} = \{1,2,3\}$, then
+\begin{align*}
+	\frac{3}{2}\partial_i\partial_j\bar{c} - \frac{\sgn{s_is_j}}{2}\partial_i\partial_i\bar{c} &= -\left(\frac{1}{2s_i}+\frac{1}{2}-\frac{\sgn{s_is_j}}{2}\right)\bar{c} - \left(\frac{3}{2}-\sgn{s_is_j}\right)\partial_i\bar{c} - \left(\frac{3}{2}+\frac{1}{2s_i}\right)\partial_j\bar{c} + \partial_k\bar{c}, \\
+	-\frac{\sgn{s_is_j}}{2}\partial_i\partial_j\bar{c} + \frac{3}{2}\partial_i\partial_i\bar{c} &= -\left(\frac{1}{2s_i}+\frac{1}{2}-\frac{\sgn{s_is_j}}{2}+\frac{1}{s_i+s_k}\right)\bar{c} - \left(3+\frac{1}{2s_i}-\frac{\sgn{s_is_j}}{2}+\frac{s_i}{s_i^2-s_k^2}\right)\partial_i\bar{c} \\
+	&\qquad + \frac{\sgn{s_is_j}}{2}\partial_j\bar{c} + \frac{s_k}{s_i^2-s_k^2}\partial_k\bar{c}.
+\end{align*}
+
+If $s_i=s_j=0$ and $s_k \neq 0$, then
+\begin{align}
+	\partial_i\partial_j\bar{c} = \frac{1}{2}\bar{c} - \partial_i\bar{c} - \partial_j\bar{c} + \frac{1}{2}\partial_k\bar{c}, \qquad
+	\partial_i\partial_i\bar{c} = -\frac{1}{2}\left(1+\frac{1}{s_i+s_k}\right)\bar{c} - \frac{1}{2}\left(4+\frac{s_i}{s_i^2-s_k^2}\right)\partial_i\bar{c} + \frac{1}{2}\frac{s_k}{s_i^2-s_k^2}\partial_k\bar{c}.
+\end{align}
+
+If $|s_i|=|s_j|=|s_k|$ for some $\{i,j,k\} = \{1,2,3\}$, then
+\begin{align*}
+	\frac{3}{2}\partial_i\partial_j\bar{c} - \frac{\sgn{s_is_j}}{2}\partial_i\partial_i\bar{c} &= -\left(\frac{1}{2s_i}+\frac{1}{2}-\frac{\sgn{s_is_j}}{2}\right)\bar{c} - \left(\frac{3}{2}-\sgn{s_is_j}\right)\partial_i\bar{c} - \left(\frac{3}{2}+\frac{1}{2s_i}\right)\partial_j\bar{c} + \partial_k\bar{c}, \\
+	\frac{3}{2}\partial_i\partial_k\bar{c} - \frac{\sgn{s_is_k}}{2}\partial_i\partial_i\bar{c} &= -\left(\frac{1}{2s_i}+\frac{1}{2}-\frac{\sgn{s_is_k}}{2}\right)\bar{c} - \left(\frac{3}{2}-\sgn{s_is_k}\right)\partial_i\bar{c} + \partial_j\bar{c} - \left(\frac{3}{2}+\frac{1}{2s_i}\right)\partial_k\bar{c}, \\
+	-\frac{\sgn{s_is_j}}{2}\partial_i\partial_j\bar{c} - \frac{\sgn{s_is_j}}{2}\partial_i\partial_k\bar{c} + 2\partial_i\partial_i\bar{c} &= -\left(\frac{1}{s_i}+1-\frac{\sgn{s_is_j}}{2}-\frac{\sgn{s_is_k}}{2}\right)\bar{c} - \left(4+\frac{1}{s_i}-\frac{\sgn{s_is_j}}{2}-\frac{\sgn{s_is_k}}{2}\right)\partial_i\bar{c} \\
+	&\qquad \frac{\sgn{s_is_j}}{2}\partial_j\bar{c} + \frac{\sgn{s_is_k}}{2}\partial_k\bar{c}
+\end{align*}
+
+\section{Matrix Fisher-Bingham Distribution}
+
+\end{document}
+
