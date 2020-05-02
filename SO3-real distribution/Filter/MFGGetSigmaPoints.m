@@ -26,8 +26,7 @@ w = zeros(1,(n+3)*2+1);
 %% Matrix Fisher part
 % calculate sigma (use scaled normalization)
 s = diag(S);
-c = pdf_MF_normal(s,true);
-dc = pdf_MF_normal_deriv(s,false,true);
+[c,dc] = pdf_MF_normal(s,1,1);
 
 cyc = {[1,2,3],[2,3,1],[3,1,2]};
 wm = cell(3,1);

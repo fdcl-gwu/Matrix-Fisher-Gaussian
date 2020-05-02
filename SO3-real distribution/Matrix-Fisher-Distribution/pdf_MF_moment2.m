@@ -1,7 +1,6 @@
 function [ EQQ ] = pdf_MF_moment2( s )
 
-c = pdf_MF_normal(s,true);
-[dc,ddc] = pdf_MF_normal_deriv(s,true,true);
+[c,dc,ddc] = pdf_MF_normal(s,1,1,1);
 
 EQQ = zeros(9,9);
 

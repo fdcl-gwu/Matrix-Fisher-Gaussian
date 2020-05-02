@@ -23,12 +23,10 @@ if nargin < 2
     bool_M2 = false;
 end
 
-c_bar=pdf_MF_normal(s,1);
-
 if ~bool_M2
     % compute the first order moments only
     
-    dc_bar=pdf_MF_normal_deriv(s,0,1);
+    [c_bar,dc_bar]=pdf_MF_normal(s,1,1);
     M1=dc_bar/c_bar+1;
 
     varargout{1}=M1;
@@ -37,7 +35,7 @@ if ~bool_M2
 else
     % compute the first order moments and the second order moments
     
-    [dc_bar, ddc_bar]=pdf_MF_normal_deriv(s,1,1);
+    [c_bar,dc_bar,ddc_bar]=pdf_MF_normal_deriv(s,1,1,1);
     M1=dc_bar/c_bar+1;
     
     for i=1:3

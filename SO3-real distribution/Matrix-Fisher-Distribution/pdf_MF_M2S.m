@@ -125,26 +125,24 @@ end
 
 function varargout=func(s,d,bool_df,bool_scaled)
 if ~bool_scaled
-    c=pdf_MF_normal(s,0);
     if ~bool_df
-        dc=pdf_MF_normal_deriv(s,0,0);
+        [c,dc]=pdf_MF_normal(s,0,1);
         f=dc-c*d;
         varargout{1}=f;
     else
-        [dc, ddc]=pdf_MF_normal_deriv(s,1,0);
+        [c,dc,ddc]=pdf_MF_normal(s,0,1,1);
         f=dc-c*d;
         df=ddc-d*dc';
         varargout{1}=f;
         varargout{2}=df;
     end    
 else
-    c_bar=pdf_MF_normal(s,1);
     if ~bool_df
-        dc_bar=pdf_MF_normal_deriv(s,0,1);
+        [c_bar,dc_bar]=pdf_MF_normal(s,1,1);
         f=dc_bar/c_bar-(d-ones(3,1));
         varargout{1}=f;
     else
-        [dc_bar, ddc_bar]=pdf_MF_normal_deriv(s,1,1);
+        [c_bar,dc_bar,ddc_bar]=pdf_MF_normal(s,1,1,1);
         %f=dc_bar-c_bar*(d-ones(3,1));
         %df=ddc_bar-(d-ones(3,1))*dc_bar';        
         f=dc_bar/c_bar-(d-ones(3,1));

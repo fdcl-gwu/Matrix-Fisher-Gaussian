@@ -1,7 +1,6 @@
 function [ EQ, EQQ, EQQQ ] = pdf_MF_moment123( s )
 
-c = pdf_MF_normal(s,1);
-dc = pdf_MF_normal_deriv(s,0,1);
+[c,dc] = pdf_MF_normal(s,1,1);
 
 % EQ
 EQ = diag(dc/c+1);
