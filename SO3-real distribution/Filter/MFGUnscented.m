@@ -53,26 +53,24 @@ for n = 2:N
     % unscented transform for last step
     [xl,Rl,wl] = MFGGetSigmaPoints(Miu,Sigma,P,U,S,V);
     [xav,wav] = GGetSigmaPoints([0;0;0],eye(3)*randomWalk^2/dt);
-    [xb,wb] = GGetSigmaPoints([0;0;0],eye(3)*biasInstability^2/dt);
     
     % propagate sigma points
-    xp = zeros(3,13*7*7);
-    Rp = zeros(3,3,13*7*7);
-    wp = zeros(1,13*7*7);
+    xp = zeros(3,13*7);
+    Rp = zeros(3,3,13*7);
+    wp = zeros(1,13*7);
     for i = 1:13
         for j = 1:7
-            for k = 1:7
-                ind = 7*7*(i-1)+7*(j-1)+k;
-                Rp(:,:,ind) = Rl(:,:,i)*expRot(((gyro(:,n-1)+gyro(:,n))...
-                    /2-xl(:,i)-xav(:,j))*dt);
-                xp(:,ind) = xl(:,i)+xb(:,k)*dt;
-                wp(ind) = wl(i)*wav(j)*wb(k);
-            end
+            ind = 7*(i-1)+j;
+            Rp(:,:,ind) = Rl(:,:,i)*expRot(((gyro(:,n-1)+gyro(:,n))...
+                /2-xl(:,i)-xav(:,j))*dt);
+            xp(:,ind) = xl(:,i);
+            wp(ind) = wl(i)*wav(j);
         end
     end
     
     % recover prior distribution
     [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp);
+    Sigma = Sigma+eye(3)*biasInstability^2*dt;
     
     % update
     if rem(n,5)==0
