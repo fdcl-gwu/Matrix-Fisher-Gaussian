@@ -1,13 +1,5 @@
 function [ pError ] = testEquivalence(  )
 
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    addpath('Matrix-Fisher-Distribution');
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
-end
-
 %% distribution 1
 % parameters
 Miu1 = 0;
@@ -81,13 +73,6 @@ parfor nt = 1:Nt
 end
 
 pError = max(diffp);
-
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    addpath('Matrix-Fisher-Distribution');
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
-end
 
 end
 

@@ -1,15 +1,6 @@
 function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, convention )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
-filePath = mfilename('fullpath');
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('Matrix-Fisher-Distribution',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
-    addpath(getAbsPath('..\rotation3d',filePath));
-end
-
 % default SVD convention is psvd
 if ~exist('convention','var') || isempty(convention)
     convention = 1;
@@ -63,13 +54,6 @@ SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
 Miu = Ex-P*EvR;
 Sigma = covxx-covxvR*covvRvR^-1*covxvR'+...
     P*SigmaTilde2Inv*P';
-
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution',filePath)))
-    rmpath(getAbsPath('Matrix-Fisher-Distribution',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d',filePath)))
-    rmpath(getAbsPath('..\rotation3d',filePath));
-end
 
 end
 

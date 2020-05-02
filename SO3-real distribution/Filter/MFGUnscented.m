@@ -1,17 +1,5 @@
 function [ R, MFG, stepT ] = MFGUnscented( gyro, RMea, parameters )
 
-filePath = mfilename('fullpath');
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    addpath(getAbsPath('..\..\rotation3d',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\',filePath)))
-    addpath(getAbsPath('..\',filePath));
-end
-
 N = size(gyro,2);
 dt = parameters.dt;
 
@@ -87,16 +75,6 @@ for n = 2:N
     R(:,:,n) = U*V';
     
     stepT(n-1) = toc;
-end
-
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    rmpath(getAbsPath('..\..\rotation3d',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\',filePath)))
-    rmpath(getAbsPath('..\',filePath));
 end
 
 end

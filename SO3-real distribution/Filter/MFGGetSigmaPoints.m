@@ -1,14 +1,5 @@
 function [ x, R, w ] = MFGGetSigmaPoints( Miu, Sigma, P, U, S, V, wM, w0 )
 
-filePath = mfilename('fullpath');
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    addpath(getAbsPath('..\..\rotation3d',filePath));
-end
-
 % default values
 n = size(Miu,1);
 if ~exist('w0','var') || isempty(w0)
@@ -92,14 +83,6 @@ end
 x(:,end) = Miu;
 R(:,:,end) = U*V';
 w(end) = w0;
-
-%%
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    rmpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    rmpath(getAbsPath('..\..\rotation3d',filePath));
-end
 
 end
 

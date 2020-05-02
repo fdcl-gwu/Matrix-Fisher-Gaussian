@@ -1,11 +1,5 @@
 function [ R, x, G, stepT ] = MEKFIMU( gyro, acce, RMea, pMea, parameters)
 
-filePath = mfilename('fullpath');
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    addpath(getAbsPath('..\..\rotation3d',filePath));
-end
-
 N = size(gyro,2);
 dt = parameters.dt;
 
@@ -86,30 +80,16 @@ for n = 2:N
     stepT(n-1) = toc;
 end
 
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    rmpath(getAbsPath('..\..\rotation3d',filePath));
-end
-
 end
 
 
 function [ Sigma ] = MF2Gau( S )
-
-filePath = mfilename('fullpath');
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
 
 N = 100000;
 R = pdf_MF_sampling(S,N);
 
 v = logRot(R,'v');
 Sigma = cov(v');
-
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
 
 end
 

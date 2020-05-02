@@ -1,14 +1,6 @@
 function [ Miu, Sigma, P, U, S, V ] = MFGMLE( x, R, w, U, S, V )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    addpath('Matrix-Fisher-Distribution');
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
-end
-
 N = size(x,1);
 Ns = size(R,3);
 
@@ -126,13 +118,6 @@ while i==1 || abs(l-loldS)>1e-6
             (x(:,ns)-Miu-P*fR(:,ns));
     end
     l
-end
-
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    rmpath('Matrix-Fisher-Distribution');
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    rmpath('..\rotation3d');
 end
 
 end

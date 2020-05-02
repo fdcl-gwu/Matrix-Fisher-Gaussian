@@ -1,13 +1,5 @@
 function [  ] = MFGPlotDensity(  )
 
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('Matrix-Fisher-Distribution')))
-    addpath('Matrix-Fisher-Distribution');
-end
-if ~any(strcmp(pathCell,getAbsPath('..\rotation3d')))
-    addpath('..\rotation3d');
-end
-
 % parameters
 n1 = 1;
 
@@ -118,10 +110,6 @@ for i = 1:3
         annotation('textbox','String',str,'Interpreter','latex');
     end
 end
-
-
-rmpath('Matrix-Fisher-Distribution');
-rmpath('..\rotation3d');
 
 end
 
