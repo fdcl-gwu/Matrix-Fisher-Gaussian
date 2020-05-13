@@ -169,16 +169,23 @@ Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigm
 	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x-\mu_m)^T\Sigma_m^{-1}(x-\mu_m)} \nonumber \\
 	\propto \ &\expb{-\frac{1}{2} \left( x^T\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)x - 2x^T\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right) + \mu_c^T\Sigma_c^{-1}\mu_c \right)} \nonumber \\
 	= \ &\expb{-\frac{1}{2}\left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)} \nonumber \\
-	\quad &\times \expb{\frac{1}{2} \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c }
+	\quad &\times \expb{\frac{1}{2} \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c } \nonumber \\
+	\propto \  &\expb{-\frac{1}{2}\left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)^T (\Sigma_c^{-1}+\Sigma_m^{-1}) \left(x-\left(\Sigma_c^{-1}+\Sigma_m^{-1}\right)^{-1}\left(\Sigma_c^{-1}\mu_c+\Sigma_m^{-1}\mu_m\right)\right)} \nonumber \\
+	\quad &\times \expb{-\frac{1}{2}(\mu_c-\mu_m)^T(\Sigma_c+\Sigma_m)^{-1}(\mu_c-\mu_m)}
 \end{align}
 Note that only the first exponential term has $x$, however, the second exponential term has $\nu_R$ in $\mu_c$, therefore it cannot be discarded as a constant.
 Denote $\expb{f(R)}$ as the second exponential term, then the posterior marginal 
 distribution of $R$ becomes
-\begin{equation}
+\begin{equation} \label{eqn:postAttitude}
 	\expb{\tr{FR^T}+f(R)}.
 \end{equation}
 This density is a matrix Fisher-Bingham distribution on $\SO$, since $f(R)$ clearly involves the second order term of $R$.
 Intuitively, if we think of the matrix Fisher distribution as a Gaussian distribution in $\real{9}$, then the measurement of $x$ makes some correction to $R$, thus its mean is no longer in $\SO$, and conditioning the corrected Gaussian distribution no longer yields a matrix Fisher distribution.
+After omitting some constants, \eqref{eqn:postAttitude} can be simplified as
+
+\begin{align}
+	\expb{\tr{FR^T}+f(R)} \propto \expb{\tr{F^TR} - \nu_R^TP^T(\Sigma_c+\Sigma_m)^{-1}(\mu-\mu_m) - \frac{1}{2}\nu_R^TP^T(\Sigma_c+\Sigma_m)^{-1}P\nu_R}.
+\end{align}
 
 \end{document}
 
