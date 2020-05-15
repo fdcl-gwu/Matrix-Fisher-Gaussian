@@ -1,4 +1,4 @@
-function [ R, MFG, stepT ] = MFGUnscented( gyro, RMea, parameters )
+function [ R, MFG, stepT ] = MFGUnscented( gyro, mea, parameters )
 
 N = size(gyro,2);
 dt = parameters.dt;
@@ -6,10 +6,20 @@ dt = parameters.dt;
 % noise parameters
 randomWalk = parameters.randomWalk;
 biasInstability = parameters.biasInstability;
-if parameters.GaussMea
-    SM = Gau2MF(parameters.rotMeaNoise);
+if parameters.meaIsVec
+    vecMeaNoise = parameters.meaNoise;
 else
-    SM = parameters.rotMeaNoise;
+    if parameters.GaussMea
+        SM = Gau2MF(parameters.rotMeaNoise);
+    else
+        SM = parameters.rotMeaNoise;
+    end
+end
+
+% measurement
+if parameters.meaIsVec
+    vMea = mea{1};
+    vRef = mea{2};
 end
 
 % initialize distribution
@@ -35,6 +45,7 @@ R = zeros(3,3,N); R(:,:,1) = U*V';
 stepT = zeros(N-1,1);
 
 % filter iteration
+try
 for n = 2:N
     tic;
     
@@ -57,12 +68,20 @@ for n = 2:N
     end
     
     % recover prior distribution
-    [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp);
+    [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp,[],diag(S));
     Sigma = Sigma+eye(3)*biasInstability^2*dt;
     
     % update
     if rem(n,5)==0
-        [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,RMea(:,:,n)*SM);
+        if parameters.meaIsVec
+            if size(vRef,1)==3
+                [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,vecMeaNoise*(vRef(:,n)*vMea(:,n)'));
+            else
+                [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,vecMeaNoise*(vRef(1:3,n)*vMea(1:3,n)'+vRef(4:6,n)*vMea(4:6,n)'));
+            end
+        else
+            [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,mea(:,:,n)*SM);
+        end
     end
     
     % record results
@@ -75,6 +94,9 @@ for n = 2:N
     R(:,:,n) = U*V';
     
     stepT(n-1) = toc;
+end
+catch
+    pause(1);
 end
 
 end

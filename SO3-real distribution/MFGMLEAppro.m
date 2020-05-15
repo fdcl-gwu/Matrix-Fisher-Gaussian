@@ -1,4 +1,4 @@
-function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, convention )
+function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, convention, s0 )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
 % default SVD convention is psvd
@@ -24,7 +24,11 @@ end
 
 % Matrix Fisher part
 [U,D,V] = psvd(ER);
-S = diag(pdf_MF_M2S(diag(D)));
+if ~exist('s0','var') || isempty(s0)
+    S = diag(pdf_MF_M2S(diag(D)));
+else
+    S = diag(pdf_MF_M2S(diag(D),s0));
+end
 if convention==2
     if S(3,3)<0
         S(:,1:2) = -S(:,1:2);

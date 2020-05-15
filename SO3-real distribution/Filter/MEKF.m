@@ -1,4 +1,4 @@
-function [ R, x, G, stepT ] = MEKF( gyro, RMea, parameters )
+function [ R, x, G, stepT ] = MEKF( gyro, mea, parameters )
 
 N = size(gyro,2);
 dt = parameters.dt;
@@ -6,10 +6,20 @@ dt = parameters.dt;
 % noise parameters
 randomWalk = parameters.randomWalk;
 biasInstability = parameters.biasInstability;
-if parameters.GaussMea
-    rotMeaNoise = parameters.rotMeaNoise;
+if parameters.meaIsVec
+    vecMeaNoise = parameters.meaNoise;
 else
-    rotMeaNoise = MF2Gau(parameters.rotMeaNoise);
+    if parameters.GaussMea
+        rotMeaNoise = parameters.rotMeaNoise;
+    else
+        rotMeaNoise = MF2Gau(parameters.rotMeaNoise);
+    end
+end
+
+% measurement
+if parameters.meaIsVec
+    vMea = mea{1};
+    vRef = mea{2};
 end
 
 % initialize distribution
@@ -40,13 +50,29 @@ for n = 2:N
     
     % update
     if rem(n,5)==0
-        H = [eye(3),zeros(3)];
-        K = Sigma*H'*(H*Sigma*H'+rotMeaNoise)^-1;
-        dx = K*logRot(Rp'*RMea(:,:,n),'v');
-        Sigma = (eye(6)-K*H)*Sigma;
+        if parameters.meaIsVec
+            if size(vRef,1)==3
+                H = [hat(Rp'*vRef(:,n)),zeros(3)];
+                K = Sigma*H'*(H*Sigma*H'+eye(3)/vecMeaNoise)^-1;
+                dx = K*(vMea(:,n)-Rp'*vRef(:,n));
+            else
+                H = [hat(Rp'*vRef(1:3,n)),zeros(3);hat(Rp'*vRef(4:6,n)),zeros(3)];
+                K = Sigma*H'*(H*Sigma*H'+eye(6)/vecMeaNoise)^-1;
+                dx = K*[vMea(1:3,n)-Rp'*vRef(1:3,n);vMea(4:6,n)-Rp'*vRef(4:6,n)];
+            end
+            Sigma = (eye(6)-K*H)*Sigma;
+            
+            R(:,:,n) = Rp*expRot(dx(1:3));
+            x(:,n) = x(:,n-1)+dx(4:6);
+        else
+            H = [eye(3),zeros(3)];
+            K = Sigma*H'*(H*Sigma*H'+rotMeaNoise)^-1;
+            dx = K*logRot(Rp'*mea(:,:,n),'v');
+            Sigma = (eye(6)-K*H)*Sigma;
 
-        R(:,:,n) = Rp*expRot(dx(1:3));
-        x(:,n) = x(:,n-1)+dx(4:6);
+            R(:,:,n) = Rp*expRot(dx(1:3));
+            x(:,n) = x(:,n-1)+dx(4:6);
+        end
     else
         R(:,:,n) = Rp;
         x(:,n) = x(:,n-1);
