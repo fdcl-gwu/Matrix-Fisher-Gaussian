@@ -1,0 +1,50 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\begin{document}
+
+\section{A New Expression for $\expect{\nu_R\nu_R^T}$}
+
+When $s_j \neq s_k$,
+\begin{align*}
+	\expect{\nu_R\nu_R^T}_{ii} &= (s_j^2+s_k^2)\expect{Q_{jk}^2} - 2s_js_k\expect{Q_{jk}Q_{kj}} \\
+	&= (s_j^2+s_k^2) \frac{1}{c(S)} \left( -\frac{s_j\partial_jc(S)}{s_k^2-s_j^2} + \frac{s_k\partial_kc(S)}{s_k^2-s_j^2} \right) - 2s_js_k \frac{1}{c(S)} \left( -\frac{s_k\partial_jc(S)}{s_k^2-s_j^2} + \frac{s_j\partial_kc(S)}{s_k^2-s_j^2} \right) \\
+	&= \frac{1}{c(S)} \frac{ -s_j(s_j^2+s_k^2)\partial_jc(S) + 2s_js_k^2\partial_jc(S) + s_k(s_j^2+s_k^2)\partial_kc(S) - 2s_j^2s_k\partial_kc(S) }{s_k^2-s_j^2} \\
+	&= \frac{1}{c(S)} \frac{ -s_j(s_j^2-s_k^2)\partial_jc(S) + s_k(-s_j^2+s_k^2)\partial_kc(S) }{s_k^2-s_j^2} \\
+	&= s_j\frac{\partial_jc(S)}{c(S)} + s_k\frac{\partial_kc(S)}{c(S)}.
+\end{align*}
+When $s_j=s_k \neq 0$,
+\begin{align*}
+	\expect{\nu_R\nu_R^T}_{ii} &= (s_j^2+s_k^2) \frac{1}{c(S)} \frac{ \partial_jc(S) + s_j(\partial_{jj}c(S)-\partial_{jk}c(S)) }{2s_j} - 2s_js_k \frac{1}{c(S)} \frac{ -\partial_jc(S) + s_j(\partial_{jj}c(S)) - \partial_{jk}c(S) }{2s_j} \\
+	&= \frac{1}{c(S)} \frac{4s_j^2\partial_jc(S)}{2s_j} = s_j\frac{\partial_jc(S)}{c(S)} + s_k\frac{\partial_kc(S)}{c(S)}
+\end{align*}
+Similarly, when $s_j=-s_k \neq 0$ or $s_j=s_k=0$, $\expect{\nu_R\nu_R^T}_{ii}$ has the same expression.
+Comparing with a Gaussian distribution, $\nu_R$ is analogous to $\Sigma^{-1}(x-\mu)$, therefore $\expect{\nu_R\nu_R^T}$ is analogous to $\Sigma^{-1}\expect{(x-\mu)(x-\mu)^T}\Sigma^{-1} = \Sigma^{-1}$.
+The difference of the above equation with $s_j+s_k$ reflects the difference between a matrix Fisher distribution and a Gaussian distribution, and the fact that in highly concentrated case, they are similar.
+
+\end{document}
+

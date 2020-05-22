@@ -1,0 +1,85 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, margin=0.5in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\title{\vspace{-4ex}\textbf{Analytical Uncertainty Propagation of Matrix Fisher-Gaussian Distribution\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./figs/}}
+
+\begin{document}
+
+\maketitle
+
+Consider the following model
+\begin{align*}
+	R_{k+1} &= R_k\exp(h\hat{x}_k), \\
+	x_{k+1} &= x_k.
+\end{align*}
+Suppose at $t=t_k$, $(R_k,x_k)$ follows a matrix Fisher-Gaussian distribution with parameters $(\mu_k,\Sigma_k,P_k,U_k,S_k,V_k)$, where $\mu_k = 0$, $P_k = 0$, $S_k = \mathrm{diag}(s_1,0,0)$, $U_k=V_k=I_{3\times 3}$.
+Then
+\begin{equation*}
+	\expect{R_{k+1}} = \expect{R_k}\expect{\exp(h\hat{x}_k)} = \expect{R_k}(I+\expect{h\hat{x}_k}+o(h)) = \expect{R_k}+o(h).
+\end{equation*}
+By the marginal-conditional MLE, $U_{k+1}=U_k=I$, $V_{k+1}=V_k=I$, $S_{k+1}=S_k$.
+\begin{align*}
+	\expect{x_{k+1}\nu_{R_{k+1}}^T} &= \expect{x_k \left(( U_{k+1}^TR_{k+1}V_{k+1}S_{k+1} - S_{k+1}V_{k+1}^TR_{k+1}^TU_{k+1} )^\vee\right)^T} \\
+	&= \expect{x_k \left(( R_k\exp(h\hat{x}_k)S_k - S_k\exp(h\hat{x}_k)^TR_k^T )^\vee\right)^T} \\
+	&= \expect{x_k\nu_{R_k}^T} + h\expect{x_k\left(( Q_k\hat{x}_kS_k - S_k\hat{x}_k^TQ_k^T )^\vee\right)^T} + o(h) \\
+	&= \expect{x_k\nu_{R_k}^T} + h\expect{x_k\left( Q_k(\hat{x}S_kQ_k + Q_k^TS_k\hat{x}_k)^\vee \right)^T} + o(h) \\
+	&= \expect{x_k\nu_{R_k}^T} + h\expect{x_k\left( Q_k(\tr{S_kQ_k}I-S_kQ_k)x_k \right)^T} + o(h) \\
+	&= \expect{x_k\nu_{R_k}^T} + h\expect{x_kx_k^T(\tr{S_kQ_k}I-Q_k^TS_k)Q_k^T} + o(h) \\
+	&= P_k\expect{\nu_{R_k}\nu_{R_k}^T} + h\expect{ \left( \Sigma_{c_k} + (\mu_k+P_k\nu_{R_k})(\mu_k+P_k\nu_{R_k})^T \right)(\tr{S_kQ_k}I-Q_k^TS_k)Q_k^T } + o(h) \\
+	&= h\Sigma_{c_k}\expect{(\tr{S_kQ_k}I-Q_k^TS_k)Q_k^T} + o(h) \\
+	&= h\Sigma_{c_k} \expect{\begin{bmatrix}0 & 0 & 0 \\ -s_1Q_{12} & s_1Q_{11} & 0 \\ -s_1Q_{13} & 0 & s_1Q_{11}\end{bmatrix} \cdot \begin{bmatrix} Q_{11} & Q_{21} & Q_{31} \\ Q_{12} & Q_{22} & Q_{32} \\ Q_{13} & Q_{23} & Q_{33} \end{bmatrix}} + o(h) \\
+	&= h\Sigma_{c_k} \expect{\begin{bmatrix} 0 & 0 & 0 \\ -s_1Q_{12}Q_{11}+s_1Q_{11}Q_{12} & -s_1Q_{12}Q_{21}+s_1Q_{11}Q_{22} & -s_1Q_{12}Q_{31}-s_1Q_{11}Q_{32} \\ -s_1Q_{13}Q_{11}+s_1Q_{11}Q_{13} & -s_1Q_{13}Q_{21}+s_1Q_{11}Q_{23} & -s_1Q_{13}Q_{31}+s_1Q_{11}Q_{33} \end{bmatrix}} + o(h) \\
+	&= h\Sigma_{c_k}\expect{\begin{bmatrix} 0 & 0 & 0 \\ 0 & s_1\expect{Q_{33}} & 0 \\ 0 & 0 & s_1\expect{Q_{22}}\end{bmatrix}} + o(h) \\
+	&= o(h).
+\end{align*}
+\begin{align*}
+	\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T} &= \expect{\nu_{R_k}\nu_{R_k}^T} + h\expect{\nu_{R_k}x_k^T(\tr{S_kQ_k}I-Q_k^TS_k)Q_k^T} + h\expect{\cdot}^T + o(h) \\
+	&= \expect{\nu_{R_k}\nu_{R_k}^T} + h\expect{\nu_{R_k}(\mu_k+P_k\nu_{R_k})^T(\tr{S_kQ_k}I-Q_k^TS_k)Q_k^T} + h\expect{\cdot}^T + o(h) \\
+	&= \expect{\nu_{R_k}\nu_{R_k}^T} \\
+	&= \begin{bmatrix} 0 & 0 & 0 \\ 0 & s_1^2\expect{Q_{13}^2} & 0 \\ 0 & 0 & s_1^2\expect{Q_{12}^2} \end{bmatrix}
+\end{align*}
+By the marginal-conditional MLE, $P_{k+1} = \expect{x_{k+1}\nu_{R_{k+1}}^T}\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T}^{-1}$.
+If we use the pseudo-inverse of $\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T}^{-1}$, the first column of $P_{k+1}$ can be arbitrary, and the second and third columns of $P_{k+1}$ are zeros.
+This simply means $x$ and $R$ will never build up proper correlations.
+
+If we consider MEKF, let $(\delta\theta_k,x_k) \sim \mathcal{N}\left( \begin{bmatrix} 0 \\ 0\end{bmatrix}, \begin{bmatrix} \Sigma_{\theta_k} & 0 \\ 0 & \Sigma_k \end{bmatrix} \right)$, let $R^0$ be the estimated attitude.
+Then
+\begin{equation*}
+	R^0_{k+1}\expb{\delta\hat{\theta}_{k+1}} = R^0_k\expb{\delta\hat{\theta}_k}\expb{h\hat{x}_k} = R_k^0\expb{\delta\hat{\theta}_k+h\hat{x}_k + o(h)},
+\end{equation*} 
+therefore we have the following state propagation equations
+\begin{equation*}
+	R^0_{k+1} = R^0_k, \qquad \delta\theta_{k+1} = \delta\theta_k + hx_k + o(h).
+\end{equation*}
+Then the covariance between $\delta\theta_{k+1}$ and $x_{k+1}$ becomes
+\begin{align*}
+	\expect{x_{k+1}\delta\theta_{k+1}^T} &\approx \expect{x_k(\delta\theta_k + hx_k)^T} = \expect{x_k\delta\theta_k^T} + h\expect{x_kx_k^T} \\
+	&= h\left( \Sigma_{c_k}+\expect{\left(\mu_k+P_k\Sigma_{\theta_k}^{-1}(\delta\theta_k-\mu_{\delta\theta_k})\right) \left(\mu_k+P_k\Sigma_{\theta_k}^{-1}(\delta\theta_k-\mu_{\delta\theta_k})\right)^T} \right) \\
+	&= h(\Sigma_k - P_k\Sigma_{\theta_k}^{-1}P_k^T) \\
+	&= h\Sigma_k.
+\end{align*}
+
+\end{document}
+
