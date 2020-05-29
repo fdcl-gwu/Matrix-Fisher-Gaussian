@@ -1,4 +1,4 @@
-function [ gyroMea, RMea, RTrue, biasTrue ] = genTrig( t, sf, parameters )
+function [ gyroMea, RMea, RTrue, biasTrue ] = genTrig_attMea( t, sf, parameters )
 
 time = (0:1/sf:t);
 N = length(time);
@@ -66,7 +66,11 @@ else
 end
 RMea = zeros(3,3,N);
 for n = 1:N
-    RMea(:,:,n) = RTrue(:,:,n)*RNoise(:,:,n)';
+    if parameters.attMeaLocal
+        RMea(:,:,n) = RTrue(:,:,n)*RNoise(:,:,n);
+    else
+        RMea(:,:,n) = RNoise(:,:,n)*RTrue(:,:,n);
+    end
 end
 
 end

@@ -34,6 +34,15 @@ else
     S = parameters.initRNoise;
 end
 
+for i = 1:3
+    k = setdiff([1,2,3],i);
+    if S(k(1),k(1))+S(k(2),k(2))==0
+        P(i,i) = 0;
+    else
+        P(i,i) = 0.1*sqrt(Sigma(i,i))/sqrt(S(k(1),k(1))+S(k(2),k(2)));
+    end
+end
+
 % data containers
 MFG.Miu = zeros(3,N); MFG.Miu(:,1) = Miu;
 MFG.Sigma = zeros(3,3,N); MFG.Sigma(:,:,1) = Sigma;
@@ -45,7 +54,6 @@ R = zeros(3,3,N); R(:,:,1) = U*V';
 stepT = zeros(N-1,1);
 
 % filter iteration
-try
 for n = 2:N
     tic;
     
@@ -80,7 +88,11 @@ for n = 2:N
                 [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,vecMeaNoise*(vRef(1:3,n)*vMea(1:3,n)'+vRef(4:6,n)*vMea(4:6,n)'));
             end
         else
-            [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,mea(:,:,n)*SM);
+            if parameters.attMeaLocal
+                [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,mea(:,:,n)*SM);
+            else
+                [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,SM*mea(:,:,n));
+            end
         end
     end
     
@@ -94,9 +106,6 @@ for n = 2:N
     R(:,:,n) = U*V';
     
     stepT(n-1) = toc;
-end
-catch
-    pause(1);
 end
 
 end

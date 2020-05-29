@@ -6,20 +6,12 @@ n1 = 1;
 Miu = 0;
 Sigma = 1;
 U = expRot([0,0,0]);
-V = expRot([0,0,0]);
-S = diag([25,10,-10]);
-P = [0,0.7,0]/sqrt(15);
-def = 2;
+V = expRot([pi/3,0,0]);
+S = diag([25,0,0]);
+P = [0,0.7,0]/5;
 
 % intermediate parameters
 F = U*S*V';
-if def==1
-    [U,S,V] = psvd(F);
-elseif def==2
-    [U,S,V] = psvd2(F);
-end
-
-[~,Sc,~] = psvd(F);
 Sigma2Inv = trace(S)*eye(3)-S;
 
 % other intermediate parameters
@@ -29,7 +21,7 @@ Sigmac = Sigma-P*Sigma2Inv*P';
 
 % Normalizing constant
 c1 = 1/sqrt((2*pi)^n1*det(Sigmac));
-c2 = pdf_MF_normal(diag(Sc));
+c2 = pdf_MF_normal(diag(S));
 
 % density
 f = @(x1,R)1/c1*exp(-1/2*(x1-Miuc(R))'*Sigmac^-1*(x1-Miuc(R)))*...
@@ -78,11 +70,7 @@ Nt1 = 11;
 theta1 = linspace(-pi/8,pi/8,Nt1);
 
 % plot Gaussian
-if def==2 && S(3,3)<0
-    M = U*diag([-1,-1,1])*V';
-else
-    M = U*V';
-end
+M = U*V';
 
 fLinear = zeros(Nx1,Nt1,3);
 MiuLinear = zeros(Nt1,3);

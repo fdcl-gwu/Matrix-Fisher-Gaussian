@@ -65,7 +65,11 @@ for n = 2:N
             R(:,:,n) = Rp*expRot(dx(1:3));
             x(:,n) = x(:,n-1)+dx(4:6);
         else
-            H = [eye(3),zeros(3)];
+            if parameters.attMeaLocal
+                H = [eye(3),zeros(3)];
+            else
+                H = [Rp,zeros(3)];
+            end
             K = Sigma*H'*(H*Sigma*H'+rotMeaNoise)^-1;
             dx = K*logRot(Rp'*mea(:,:,n),'v');
             Sigma = (eye(6)-K*H)*Sigma;

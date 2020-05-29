@@ -15,6 +15,7 @@
 \newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
 \newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
 \newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\expectbar}[1]{\ensuremath{\bar{\mathrm{E}}\left[ #1 \right]}}
 \newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
 \newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
 \newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
@@ -80,6 +81,56 @@ Then the covariance between $\delta\theta_{k+1}$ and $x_{k+1}$ becomes
 	&= h(\Sigma_k - P_k\Sigma_{\theta_k}^{-1}P_k^T) \\
 	&= h\Sigma_k.
 \end{align*}
+
+\section{MLE for $P\in\real{3 \times 2}$}
+
+Here we assume the first column of $P$ is identically zero and thus is known.
+The MLE is to estimate the last two columns of $P$.
+The log-likelihood function is
+\begin{equation*}
+	l = -log(c(S)) + \tr{F\expectbar{R}^T} - \frac{1}{2}\log(\det(\Sigma_c)) - \frac{1}{2}\expectbar{(x-\mu-P\nu_R)^T\Sigma_c^{-1}(x-\mu-P\nu_R)},
+\end{equation*}
+where $\nu_R = \begin{bmatrix} s_3Q_{13}-s_1Q_{31} & s_1Q_{21}-s_2Q_{12} \end{bmatrix}^T \in \real{2}$, and $\Sigma_c = \Sigma-P\mathrm{diag}([s_1+s_3,s_1+s_2])P^T$.
+Taking the derivatives of $\mu$ and $P$ yields
+\begin{align*}
+	\frac{\partial l}{\partial \mu} &= \Sigma_c^{-1}(\expectbar{x}-\mu-P\expectbar{\nu_R}) \\
+	\frac{\partial l}{\partial P} &= \Sigma_c^{-1}\expectbar{(x-\mu-P\nu_R)\nu_R^T}.
+\end{align*}
+By setting the derivatives to zeros, we get
+\begin{equation*}
+	P = \left( \expectbar{x\nu_R^T}-\expectbar{x}\expectbar{\nu_R}^T \right) \left( \expectbar{\nu_R\nu_R^T}-\expectbar{\nu_R}\expectbar{\nu_R}^T \right)^{-1} = \overline{\mathrm{cov}}(x,\nu_R) \overline{\mathrm{cov}}(\nu_R,\nu_R)^{-1}.
+\end{equation*}
+
+Using the kinematics model and the initial conditions at the beginning, we have
+\begin{align*}
+	\expect{x_{k+1}\nu_{R_{k+1}}^T} = \expect{x_k\begin{bmatrix} s_3R_{13}-s_1R_{31} & s_1R_{21}-s_2R_{12} \end{bmatrix}_{k+1}} = \expect{x_k\begin{bmatrix} -s_1R_{31} & s_1R_{21} \end{bmatrix}_{k+1}}.
+\end{align*}
+Since $R_{k+1} = R_k + hR_k\hat{x}_k + o(h)$, we have
+\begin{align*}
+	\begin{bmatrix} \cdot & R_{12} & R_{13} \\ R_{21} & \cdot & \cdot \\ R_{31} & \cdot & \cdot \end{bmatrix}_{k+1} = \begin{bmatrix} \cdot & R_{12} & R_{13} \\ R_{21} & \cdot & \cdot \\ R_{31} & \cdot & \cdot \end{bmatrix}_k + h\begin{bmatrix} \cdot & -x_3R_{11}+x_1R_{13} & x_2R_{11}-x_1R_{12} \\ x_3R_{22}-x_2R_{23} & \cdot & \cdot \\ x_3R_{32}-x_2R_{33} & \cdot & \cdot \end{bmatrix} + o(h).
+\end{align*}
+Therefore,
+\begin{align*}
+	\expect{x_{k+1}\nu_{R_{k+1}}^T} &= \expect{x_k\begin{bmatrix} s_1R_{31} & s_1R_{21} \end{bmatrix}_k} + h\expect{x_k\begin{bmatrix} -s_1(x_3R_{32}-x_2R_{33}) & s_1(x_3R_{22}-x_2R_{23}) \end{bmatrix}_k} + o(h) \\
+	&= P_k\expect{\nu_{R_k}\begin{bmatrix} s_1R_{31} & s_1R_{21} \end{bmatrix}_k} + hs_1\expect{\begin{bmatrix} x_1(x_2R_{33}-x_3R_{32}) & x_1(x_3R_{22}-x_2R_{23}) \\ x_2(x_2R_{33}-x_3R_{32}) & x_2(x_3R_{22}-x_2R_{23}) \\ x_3(x_2R_{33}-x_3R_{32}) & x_3(x_3R_{22}-x_2R_{23}) \end{bmatrix}_k} + o(h).
+\end{align*}
+Since $\mu_k=0$ and $P_k=0$, $\expect{x_kx_k^T} = \Sigma_{c_k} + \expect{(\mu_k+P_k\nu_{R_k})(\mu_k+P_k\nu_{R_k})^T} = \Sigma_{c_k}$.
+Therefore,
+\begin{align*}
+	\expect{x_{k+1}\nu_{R_{k+1}}^T} = hs_1\begin{bmatrix}  (\Sigma_{c_k})_{12}\expect{R_k}_{33} - (\Sigma_{c_k})_{13}\expect{R_k}_{32} & (\Sigma_{c_k})_{13}\expect{R_k}_{22} - (\Sigma_{c_k})_{12}\expect{R_k}_{23} \\  (\Sigma_{c_k})_{22}\expect{R_k}_{33} - (\Sigma_{c_k})_{23}\expect{R_k}_{32} & (\Sigma_{c_k})_{23}\expect{R_k}_{22} - (\Sigma_{c_k})_{22}\expect{R_k}_{23} \\ (\Sigma_{c_k})_{32}\expect{R_k}_{33} - (\Sigma_{c_k})_{33}\expect{R_k}_{32} & (\Sigma_{c_k})_{33}\expect{R_k}_{22} - (\Sigma_{c_k})_{32}\expect{R_k}_{23} \end{bmatrix} + o(h) = o(h).
+\end{align*}
+This calculation is consistent with the case when $P\in\real{3\times 3}$.
+Also
+\begin{align*}
+	\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T} &= s_1^2 \expect{\begin{bmatrix} R_{31}^2 & -R_{21}R_{31} \\ -R_{21}R_{31} & R_{21}^2 \end{bmatrix}_{k+1}} \\ &= s_1^2 \expect{\begin{bmatrix} (R_{31}+h(x_3R_{32}-x_2R_{33}))^2 & -(R_{21}+h(x_3R_{22}-x_2R_{23}))(R_{31}+h(x_3R_{32}-x_2R_{33})) \\ \cdot & (R_{21}+h(x_3R_{22}-x_2R_{23}))^2 \end{bmatrix}_k} + o(h) \\
+	&= s_1^2 \expect{\begin{bmatrix} R_{31}^2 + 2h(x_3R_{31}R_{32}-x_2R_{31}R_{33}) & -R_{21}R_{31} + h(x_3R_{22}R_{31}+x_3R_{21}R_{32} - x_2R_{23}R_{32}-x_2R_{22}R_{33}) \\ \cdot & R_{21}^2 + 2h(x_3R_{21}R_{22}-x_2R_{21}R_{23}) \end{bmatrix}_k} + o(h).
+\end{align*}
+Since $\expect{x_k} = \mu_k + P_k\expect{\nu_{R_k}} = 0$,
+\begin{equation*}
+	\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T} = s_1^2 \begin{bmatrix} \expect{R_k}_{31}^2 & 0 \\ 0 & \expect{R_k}_{21}^2 \end{bmatrix} \succ 0.
+\end{equation*}
+
+\section{Second order terms of $h$}
 
 \end{document}
 
