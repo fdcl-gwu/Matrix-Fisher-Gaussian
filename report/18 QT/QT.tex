@@ -1,0 +1,191 @@
+\documentclass[10pt,twocolumn]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption,float}
+\usepackage[letterpaper, margin=0.5in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\expectbar}[1]{\ensuremath{\bar{\mathrm{E}}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\title{\vspace{-4ex}\textbf{Q Transpose\vspace{-4ex}}}
+\date{}
+
+\graphicspath{{./Figs/}}
+
+\begin{document}
+
+\maketitle
+
+This document deals with the definition of MFG using $Q^T$ in $\nu_R$, and explains why this definition is suitable for propagating the uncertainty of a gyroscope model.
+The new definition is simply replacing $\nu_R = (QS-SQ^T)^\vee$ in the original definition with $\nu_R = (SQ-Q^TS)^\vee$.
+
+\section{Conditioning Theorem}
+
+First, we show the new definition can be constructed by conditioning a $(9+n)$-variate Gaussian distribution.
+
+\begin{theorem}
+	Consider parameters $(\mu, \Sigma, V, S, U, P)$.
+	Let $M = UV^T\in\SO$ and $K = USU^T\in\real{3\times 3}$, ${\mu}_R = \mathrm{vec}(M)\in\real{9}$, and ${\Sigma}_R^{-1} = I_{3\times 3} \otimes K \in\real{9\times 9}$.
+	Also let ${t}_i = \mathrm{vec}[(M\widehat{Ve_{i}})]$ for $i\in\{1,2,3\}$ be the basis for the tangent space of $\SO$ at $M$  embedded in $\real{9}$.
+	Define $P_R = P[t_1,t_2,t_3]^T\in\real{n\times 9}$. 
+	
+	Suppose $(x_R,x)\in\real{9+n}$ follows the Gaussian distribution with 
+	\begin{align}
+		\begin{bmatrix} x_R \\ x \end{bmatrix} 
+		\sim \mathcal{N} \left(
+		\begin{bmatrix} \mu_R \\ \mu \end{bmatrix},
+		\begin{bmatrix}
+		\Sigma_R & P_R^T \\
+		P_R & \Sigma
+		\end{bmatrix} \right).\label{eqn:xRx_Gaussian}
+	\end{align}
+	Then for $R=\mathrm{vec}^{-1}(x_R)\in\real{3\times 3}$, the distribution of $(R,x)$ conditioned on $R^TR = I_{3\times3}$ and $\mathrm{det}(R)=1$ is $\mathcal{MG}({\mu},{\Sigma},{P},U,S,V)$.
+\end{theorem}
+\begin{proof}
+	The joint density of $(x_R,x)$ can be written in the form of conditional-marginal density as
+	\begin{align} \label{eqn:BlockGaussian}
+		p(x_R,x) = \frac{1}{c}&\mathrm{exp}\left\{-\frac{1}{2}(x-{\mu}_c)^T{\Sigma}_c^{-1}(x-{\mu}_c)\right\} \nonumber \\
+		\times &\mathrm{exp}\left\{-\frac{1}{2}(x_R-{\mu}_R)^T\Sigma_R^{-1}(x_R-{\mu}_R)\right\},
+	\end{align}
+	where $c$ is the normalizing constant,  ${\mu}_c = {\mu}+P_R\Sigma_R^{-1}(x_R-{\mu}_R)\in\real{n}$, and ${\Sigma}_c = {\Sigma}-P_R\Sigma_R^{-1}P_R^T\in\real{n\times n}$.
+	
+	The exponent of the last term of \eqref{eqn:BlockGaussian} can be written as
+	\begin{align*}
+		&-\frac{1}{2}(x_R-\mu_R)^T\Sigma_R^{-1}(x_R-\mu_R) \\
+		= &-\frac{1}{2}\tr{(\mathrm{vec}^{-1}(x_R)-M)^TK(\mathrm{vec}^{-1}(x_R)-M)} \\
+		= &-\frac{1}{2}\tr{K(\mathrm{vec}^{-1}(x_R)-M)(\mathrm{vec}^{-1}(x_R)-M)^T} \\
+		= &-\frac{1}{2}\tr{-KRM^T-KMR^T} + C \\
+		= &\ \tr{KMR^T} + C \\
+		= &\ \tr{FR^T} + C.
+	\end{align*}
+	So the second term on the right hand side of \eqref{eqn:BlockGaussian} reduces to a matrix Fisher density after conditioning.
+	
+	Next, for the first term on the right hand side of \eqref{eqn:BlockGaussian}, the second part of $\Sigma_c$ is
+	\begin{equation*}
+		P_R\Sigma_R^{-1}P_R^T = {P}[{t}_1,{t}_2,{t}_3]^T\Sigma_R^{-1}[{t}_1,{t}_2,{t}_3]{P}^T 
+		\triangleq {P} \tilde{\Sigma}_R^{-1} {P}^T,
+	\end{equation*}
+	for some $\tilde{\Sigma}_R^{-1} \in \real{3 \times 3}$.
+	Then the $i,j$-th entry of $\tilde{\Sigma}_R^{-1}$ can be written as
+	\begin{align*}
+		(\tilde{\Sigma}_R^{-1})_{ij} &= t_i^T\Sigma_R^{-1}t_j = \tr{\widehat{Ve_i}^TM^TKM\widehat{Ve_j}} = \tr{S\hat{e}_j\hat{e}_i^T},
+	\end{align*}
+	which implies $\tilde{\Sigma}_R^{-1} = \tr{S}I_{3 \times 3}-S$.
+	Besides, the second part of $\mu_c$ is
+	\begin{equation*}
+		P_R\Sigma_R^{-1}(x_R-{\mu}_R) = {P}[{t}_1,{t}_2,{t}_3]^T\Sigma_R^{-1}\mathrm{vec}(R^T-M^T),
+	\end{equation*}
+	and
+	\begin{align*}
+		&t_i^T\Sigma_R^{-1} \mathrm{vec}(R-M)
+		= \tr{\widehat{Ve_i}^TM^TK(R-M)} \\
+		= &\ \tr{\hat{e}_i^TS(Q-I)} = -e_i^T(Q^TS-SQ)^\vee, 
+	\end{align*}
+	where ${Q} = U^TRV$.
+	Thus $\mu_c = \mu+P\nu_R$.
+\end{proof}
+
+\begin{remark}
+	The following equation is repeatedly used in the above proof:
+	\begin{equation}
+		\mathrm{vec}(A)^T(I_{3\times 3} \otimes K)\mathrm{vec}(B) = \tr{A^TKB},
+	\end{equation}
+	where $A,B,K\in\real{3\times 3}$.
+\end{remark}
+
+\section{Interpretation of Correlations}
+
+With this conditioning construction, it is easier to interpret the correlation terms.
+For simplicity, assume $x\in\real{1}$, so $\Sigma = \sigma^2 \in \real{1}$.
+We want to study \textbf{how the conditional mean of $x_R$ moves as $x$ is changed}.
+For the original distribution, we have
+\begin{equation}
+	\expect{x_R \lvert x} = \mu_R + P_R^T \sigma^{-2}(x-\mu) = \mu_R + \sum_{i=1}^3 \frac{P_i}{\sigma^2}(x-\mu)t_i,
+\end{equation}
+where $P = [P_1, P_2, P_3] \in \real{1\times 3}$.
+Denote $P_i(x-\mu)/\sigma^2 = \lambda_i(x)$, then
+\begin{align} \label{eqn:conditionalMean}
+	\mathrm{vec}^{-1}(\expect{x_R \lvert x}) &= M^T + \sum_{i=1}^3 \lambda_i(x)(M\widehat{Ve_i})^T \nonumber \\
+	&= \left( M\left( I_{3\times 3} + \sum_{i=1}^3 \lambda_i(x)\widehat{Ve_i} \right) \right)^T \nonumber \\
+	&= \left( \left( I_{3\times 3} + \sum_{i=1}^3\lambda_i(x)\widehat{Ue_i} \right)M \right)^T.
+\end{align}
+Note that $I_{3\times 3} + \sum_{i=1}^3 \lambda_i(x)\widehat{Ve_i} \approx \exp\left(\sum_{i=1}^3 \lambda_i(x)\widehat{Ve_i}\right)$, which means the \textbf{conditional mean attitude} is approximately $M\exp\left(\sum_{i=1}^3 \lambda_i(x)\widehat{Ve_i}\right)$, or equivalently $\exp\left(\sum_{i=1}^3\lambda_i(x)\widehat{Ue_i}\right)M$.
+
+Similarly, if $\nu_R$ is defined using $Q^T$, the conditional mean of $x_R$ becomes
+\begin{align}
+	\mathrm{vec}^{-1}(\expect{x_R \lvert x}) &= \mathrm{vec}^{-1}\left(\mu_c + \sum_{i=1}^3\lambda_i(x)t_i\right) \nonumber \\
+	&= M + \sum_{i=1}^3 \lambda_i(x)(M\widehat{Ve_i}),
+\end{align}
+which is equivalent to \eqref{eqn:conditionalMean} except for the transpose.
+This means the two definitions are similar under usual conditions.
+
+\begin{remark}
+	\begin{align}
+		(QS-SQ^T)^\vee &= \begin{bmatrix} s_2Q_{32}-s_3Q_{23} \\ s_3Q_{13}-s_1Q_{31} \\ s_1Q_{21}-s_2Q_{12} \end{bmatrix}, \\
+		(SQ-Q^TS)^\vee &= \begin{bmatrix} s_3Q_{32}-s_2Q_{23} \\ s_1Q_{13}-s_3Q_{31} \\ s_2Q_{21}-s_1Q_{12} \end{bmatrix}.
+	\end{align}
+\end{remark}
+
+\section{When $s_2=s_3=0$}
+
+By the uniqueness theorem, if $s_2=s_3=0$ and $s_1>0$, then $\mathcal{MG}(\mu,\Sigma,P,U,S,V)$ and $\mathcal{MG}(\mu,\Sigma,P,U,S,V\exp(\theta\hat{e}_1))$ are equivalent for any $\theta$ for the original definition.
+On the other hand, if $Q^T$ is used in $\nu_R$, this becomes
+\begin{theorem}
+	$\mathcal{MG}(\mu,\Sigma,P,U,S,V)$ and $\mathcal{MG}(\mu,\Sigma,P,U\exp(\theta\hat{e}_1),S,V)$ are equivalent for any $\theta$.
+\end{theorem}
+\begin{proof}
+	Let $(F,\mu_c,\Sigma_c)$ and $(F',\mu'_c,\Sigma'_c)$ be the intermediate parameters.
+	Then
+	\begin{gather*}
+		F' = U\exp(\theta\hat{e}_1)SV^T = USV^T = F,
+	\end{gather*}
+	and $\Sigma_c = \Sigma'_c$ because they only depend on $S$, $\Sigma$ and $P$.
+	Finally, for all $R\in\SO$
+	\begin{align*}
+		\nu'_R &= (S\exp(\theta\hat{e}_1)^TU^TRV - V^TRU\exp(\theta\hat{e}_1)S)^\vee \\
+		&= (SQ-Q^TS)^\vee = \nu_R,
+	\end{align*}
+	so $\mu'_c = \mu_c$ for all $R\in\SO$.
+\end{proof}
+
+Together with the conditioning theorem, we may find the difference between the two definitions under this degenerative condition.
+First, we discuss the original definition.
+For simplicity, we assume $x\in\real{1}$ and only $P_2 \neq 0$ as in the previous section.
+Define $V'=V\exp(\theta\hat{e}_1)$, $M'=UV'^T$.
+If we think of the Gaussian distribution before conditioning is constructed from $(\mu,\Sigma,P,U,S,V')$, then the conditional mean is
+\begin{align} \label{eqn:conditionalMean1}
+	\mathrm{vec}^{-1}(\expect{x'_R \lvert R}) &= \left( \left( I_{3\times 3} + \lambda_2\widehat{Ue_2} \right)M' \right)^T \nonumber \\
+	&= \left( \left( I_{3\times 3} + \lambda_2\widehat{Ue_2} \right) \exp(\theta\widehat{Ue_1})M \right)^T \nonumber \\
+	&\approx \left( \exp(\lambda_2\widehat{Ue_2})\exp(\theta\widehat{Ue_1})M \right)^T.
+\end{align}
+
+Next, we discuss the new definition of $\nu_R$ with $Q^T$.
+This time, define $U' = U\exp(\theta\hat{e}_1)$ and $M'=U'V^T$.
+If we think of the Gaussian distribution before conditioning is constructed from $(\mu,\Sigma,P,U',S,V)$, then the conditional mean is
+\begin{align} \label{eqn:conditionalMean2}
+	\mathrm{vec}^{-1}(\expect{x'_R \lvert R}) &= M'\left( I_{3\time 3} + \lambda_2\widehat{Ve_2} \right) \nonumber \\
+	&= M\exp(\theta\widehat{Ve_1})\left( I_{3\time 3} + \lambda_2\widehat{Ve_2} \right) \nonumber \\
+	&\approx M\exp(\theta\widehat{Ve_1})\exp(\lambda_2\widehat{Ve_2}).
+\end{align}
+
+Compare \eqref{eqn:conditionalMean1} and \eqref{eqn:conditionalMean2}.
+Using the original definition, the conditional mean attitude is rotated from one of the mean attitudes $M'$ about the $Ue_2$ axis in the \textbf{global} coordinate;
+whereas using the $Q^T$ definition, the conditional mean attitude if rotated from $M'$ about the $Ue_2$ axis in the $M'$ coordinate.
+This is the reason why the new definition using $Q^T$ is more suitable for the gyroscope model.
+
+\end{document}
+
