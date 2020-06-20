@@ -26,24 +26,15 @@ end
 Miu = -parameters.xInit;
 Sigma = parameters.initXNoise;
 P = zeros(3);
-U = parameters.RInit;
-V = eye(3);
 if parameters.GaussMea
     S = Gau2MF(parameters.initRNoise);
 else
     S = parameters.initRNoise;
 end
+U = parameters.RInit;
+V = eye(3);
 S(2,2) = S(2,2)+2e-5;
 S(3,3) = S(3,3)+1e-5;
-
-for i = 1:3
-    k = setdiff([1,2,3],i);
-    if S(k(1),k(1))+S(k(2),k(2))==0
-        P(i,i) = 0;
-    else
-        P(i,i) = 0.1*sqrt(Sigma(i,i))/sqrt(S(k(1),k(1))+S(k(2),k(2)));
-    end
-end
 
 % data containers
 MFG.Miu = zeros(3,N); MFG.Miu(:,1) = Miu;

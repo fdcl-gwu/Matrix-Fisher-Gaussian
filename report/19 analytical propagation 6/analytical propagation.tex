@@ -1,0 +1,127 @@
+\documentclass[10pt]{article}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage[letterpaper, top=1in, left=1in, right=1in, bottom=1in]{geometry}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Analytical Uncertainty Propagation of Matrix Fisher-Gaussian Distribution with $Q^T$\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+
+\begin{document}
+
+\maketitle
+
+Suppose at time $t$, $(R(t),x(t))$ follows Matrix Fisher-Gaussian distribution with parameters $(\mu,\Sigma,P,U,S,V)$, consider the following discrete stochastic process
+\begin{align*}
+	R_{k+1} &= R_k\exp\left(h(\hat{x}_k-\mu_k) + \widehat{H\Delta W}\right) \exp\left(h(\hat{\Omega}_k + \mu_k)\right) \\
+	x_{k+1} &= x_k.
+\end{align*}
+
+\section{Calculating $\expect{R_{k+1}}$}
+Let $\delta R_k = \exp\left(h(\hat{\Omega}_k + \mu_k)\right)$.
+First, try to calculate $\expect{R_{k+1}}$:
+
+\begin{align*}
+	\expect{R_{k+1}} &= \expect{R_k\sum_{i=0}^{\infty}\frac{\left(h(\hat{x}_k-\hat{\mu}_k) + \widehat{H\Delta W}\right)^i}{i!}} \delta R_k \\
+	&= \left(\expect{R_k} + h\expect{R_k(\hat{x}_k-\hat{\mu}_k)} + \frac{1}{2}\expect{R_k\widehat{H\Delta W}^2}\right) \delta R_k \\
+	&= \left(\expect{R_k} + hU_k\expect{Q_kV_k^T\widehat{P_k\nu_{R_k}}} + \frac{h}{2}\expect{R_k(G_u-\tr{G_u}I)}\right) \delta R_k
+\end{align*}
+
+\section{Calculating $\expect{x_{k+1}\nu_{R_{k+1}}}$}
+Let $\Lambda(A) = (S_{k+1}U_{k+1}^TAV_{k+1}-V_{k+1}^TA^TU_{k+1}S_{k+1})^\vee$.
+
+\begin{align*}
+	\expect{x_{k+1}\nu_{R_{k+1}}^T} &= \expect{x_k \sum_{i=0}^\infty \Lambda\left(R_k \frac{\left(h(\hat{x}_k-\hat{\mu}_k) + \widehat{H\Delta W}\right)^i}{i!}\delta R_k\right)^T} \\
+	&= \expect{x_k\Lambda(R_k\delta R_k)^T} + h\expect{x_k\Lambda(R_k(\hat{x}_k-\hat{\mu}_k)\delta R_k)^T} + \frac{1}{2}\expect{x_k\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)^T}.
+\end{align*}
+
+\noindent Let $\tilde{U} = U_{k+1}^TU_k$, $\tilde{V} = V_{k+1}^T\delta R_k^TV_k$, $\tilde{S} = \tilde{U}^TS_{k+1}\tilde{V}$, and $\tilde{\nu}_R = (\tilde{S}^TQ_k - Q_k^T\tilde{S})^\vee$.
+Then
+\begin{align*}
+	\Lambda(R_k\delta R_k) &= (S_{k+1}U_{k+1}^TU_kQ_kV_k^T\delta R_kV_{k+1} - V_{k+1}^T\delta R_k^TV_kQ_k^TU_k^TU_{k+1}S_{k+1}) \\
+	&= (S_{k+1}\tilde{U}Q_k\tilde{V}^T - \tilde{V}Q_k^T\tilde{U}^TS_{k+1})^\vee \\
+	&= \tilde{V} (\tilde{V}^TS_{k+1}\tilde{U}Q_k - Q_k^T\tilde{U}^TS_{k+1}\tilde{V})^\vee \\
+	&= \tilde{V}(\tilde{S}^TQ_k - Q_k^T\tilde{S})^\vee \\
+	&= \tilde{V}\tilde{\nu}_R.
+\end{align*}
+
+\noindent Let $\Gamma_Q = \tr{Q_k^T\tilde{S}}I-Q_k^T\tilde{S}$.
+Then
+\begin{align*}
+	\Lambda(R_k(\hat{x}_k-\hat{\mu}_k)\delta R_k) &= (S_{k+1}\tilde{U}Q_kV_k^T(\hat{x}_k-\hat{\mu}_k)\delta R_kV_{k+1} - V_{k+1}^T\delta R_k^T(\hat{x}_k-\hat{\mu}_k)^TV_kQ_k^T\tilde{U}^TS_{k+1})^\vee \\
+	&= \left( S_{k+1}\tilde{U}Q_k(V_k^T(x_k-\mu_k))^\wedge\tilde{V}^T - \tilde{V}((V_k^T(x_k-\mu_k))^\wedge)^TQ_k^T\tilde{U}^TS_{k+1} \right)^\vee \\
+	&= \tilde{V}\left( \tilde{S}^TQ_k(V_k^T(x_k-\mu_k))^\wedge - ((V_k^T(x_k-\mu_k))^\wedge)^TQ_k^T\tilde{S} \right)^\vee \\
+	&= \tilde{V}\left( \tr{Q_k^T\tilde{S}}I - Q_k^T\tilde{S} \right)V_k^T(x_k-\mu_k) \\
+	&= \tilde{V}\Gamma_QV_k^T(x_k-\mu_k).
+\end{align*}
+
+\noindent Therefore, the first term on the right hand side is
+\begin{align*}
+	\expect{x_k\Lambda(R_k\delta R_k)^T} = \expect{x_k\tilde{\nu}_R^T} = \mu_k\expect{\tilde{\nu}_R}^T\tilde{V}^T + P_k\expect{\nu_{R_k}\tilde{\nu}_R^T}\tilde{V}^T.
+\end{align*}
+
+\noindent The second term on the right hand side is
+\begin{align*}
+	\expect{x_k\Lambda(R_k(\hat{x}_k-\hat{\mu}_k)\delta R_k)^T} &= \expect{x_k(x_k-\mu_k)^TV_k\Gamma_Q^T}\tilde{V}^T \\
+	&= \expect{(\Sigma_{c_k} + \mu\nu_{R_k}^TP_k^T + P_k\nu_{R_k}\nu_{R_k}^TP_k^T)V_k\Gamma_Q^T}\tilde{V}^T \\
+	&= \Sigma_{c_k}V_k\expect{\Gamma_Q^T}\tilde{V}^T + \mu_k\expect{\nu_{R_k}^TP_k^TV_k\Gamma_Q^T}\tilde{V}^T + P_k\expect{\nu_{R_k}\nu_{R_k}^TP_k^TV_k\Gamma_Q^T}\tilde{V}^T.
+\end{align*}
+
+\noindent Let $\tilde{\tilde{V}} = V_{k+1}^T\delta R_k^TG_u^TV_k$, $\tilde{\tilde{S}} = \tilde{U}^TS_{k+1}\tilde{\tilde{V}}$ and $\tilde{\tilde{\nu}}_R = (\tilde{\tilde{S}}^TQ_k-Q_k\tilde{\tilde{S}}^T)^\vee$.
+Then the third term on the right hand side is
+\begin{align*}
+	\expect{x_k\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)^T} &= h\expect{x_k\Lambda(R_k(G_u-\tr{G_u}I)\delta R_k)^T} \\
+	&= h\expect{x_k\tilde{\tilde{\nu}}_R^T}\tilde{\tilde{V}}^T - \tr{G_u}h\expect{x_k\Lambda(R_k\delta R_k)^T} \\
+	&= h\left(\mu_k\expect{\tilde{\tilde{\nu}}_R}^T + P_k\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}\right)\tilde{\tilde{V}}^T - \tr{G_u}h\left(\mu_k\expect{\tilde{\nu}_R}^T + P_k\expect{\nu_{R_k}\tilde{\nu}_R^T}\right)\tilde{V}^T.
+\end{align*}
+
+\section{Calculating $\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T}$}
+
+\begin{align*}
+	\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T} &= \expect{\sum_{i=0}^\infty \Lambda\left(R_k \frac{\left(h(\hat{x}_k-\hat{\mu}_k) + \widehat{H\Delta W}\right)^i}{i!}\delta R_k\right) \cdot \sum_{i=0}^\infty \Lambda\left(R_k \frac{\left(h(\hat{x}_k-\hat{\mu}_k) + \widehat{H\Delta W}\right)^i}{i!}\delta R_k\right)^T} \\
+	&= \expect{\Lambda(R_k\delta R_k)\Lambda(R_k\delta R_k)^T} + h\expect{\Lambda(R_k(\hat{x}_k-\hat{\mu}_k)\delta R_k)\Lambda(R_k\delta R_k)^T} \\
+	&\qquad + h\expect{\Lambda(R_k\delta R_k)\Lambda(R_k(\hat{x}_k-\hat{\mu}_k)\delta R_k)^T} + \frac{1}{2}\expect{\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)\Lambda(R_k\delta R_k)^T} \\
+	&\qquad + \frac{1}{2}\expect{\Lambda(R_k\delta R_k)\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)^T} + \expect{\Lambda(R_k\widehat{H\Delta W}\delta R_k)\Lambda(R_k\widehat{H\Delta W}\delta R_k)^T}.
+\end{align*}
+
+\noindent The first term on the right hand side is
+\begin{align*}
+	\expect{\Lambda(R_k\delta R_k)\Lambda(R_k\delta R_k)^T} = \tilde{V}\expect{\tilde{\nu}_R\tilde{\nu}_R^T}\tilde{V}^T.
+\end{align*}
+
+\noindent The second, third term on the right hand side is
+\begin{align*}
+	\expect{\Lambda(R_k(\hat{x}_k-\hat{\mu}_k)\delta R_k)\Lambda(R_k\delta R_k)^T} &= \tilde{V}\expect{\Gamma_QV_k^T(x_k-\mu_k)\tilde{\nu}_R^T}\tilde{V}^T \\
+	&= \tilde{V}\expect{\Gamma_QV_k^TP_k\nu_R\tilde{\nu}_R^T}\tilde{V}^T
+\end{align*}
+
+\noindent The fourth, fifth term on the right hand side is
+\begin{align*}
+	\expect{\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)\Lambda(R_k\delta R_k)^T} &= h\expect{\Lambda(R_k(G_u-\tr{G_u}I)\delta R_k)\Lambda(R_k\delta R_k)^T} \\
+	&= h\tilde{\tilde{V}}\expect{\tilde{\tilde{\nu}}\tilde{\nu}^T}\tilde{V} - \tr{G_u}h\tilde{V}^T\expect{\tilde{\nu}_R\tilde{\nu}_R^T}\tilde{V}^T.
+\end{align*}
+
+\noindent The last term on the right hand side is
+\begin{align*}
+	\expect{\Lambda(R_k\widehat{H\Delta W}\delta R_k)\Lambda(R_k\widehat{H\Delta W}\delta R_k)^T} &= \tilde{V}\expect{\Gamma_QV_k^TH\Delta W\Delta W^TH^TV_k\Gamma_Q^T}\tilde{V}^T \\
+	&= h\tilde{V}\expect{\Gamma_QV_k^TG_uV_k\Gamma_Q^T}\tilde{V}^T.
+\end{align*}
+
+\end{document}
+
