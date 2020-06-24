@@ -16,30 +16,24 @@ end
     
 parfor n = 1:N
     parameters = [];
-    parameters.t = 60;
-    parameters.dt = 1/sf;
-    parameters.randomWalk = 10*pi/180;
-    parameters.biasInstability = 500/3600*pi/180;
-    parameters.GaussMea = false;
-    parameters.meaIsVec = false;
-    parameters.attMeaLocal = true;
-    parameters.rotMeaNoise = diag([200,200,200]);
-    parameters.initRNoise = diag([200,200,200]);
-    parameters.initXNoise = 0.1^2*eye(3);
-    parameters.RInit = eye(3);
-    parameters.xInit = [0;0;0];
+    parameters.setting.omegaLocal = true;
+    parameters.setting.GaussMea = false;
+    parameters.setting.meaIsVec = false;
+    parameters.setting.attMeaLocal = true;
+    parameters.meaNoise = diag([200,200,200]);
+    parameters.initValue.RNoise = diag([200,200,200]);
+    parameters.initValue.xNoise = 0.1^2*eye(3);
+    parameters.initValue.U = eye(3);
+    parameters.initValue.V = eye(3);
+    parameters.initValue.Miu = [0;0;0];
 
-    [gyro,RMea,RTrue,xTrue] = genTrig_attMea(t,sf,parameters);
+    [gyro,RMea,RTrue,xTrue] = genTrig(t,sf,parameters);
 
-    % stachastic settings
-    parameters.RInit = eye(3);
-    parameters.xInit = [0;0;0];
+    [RMEKF,xMEKF,SigmaMEKF,TMEKF] = MEKF(gyro,RMea,sf,parameters);
+    [RMFGA,MFGA,TMFGA] = MFGAnalytic(gyro,RMea,sf,true,parameters);
+    [RMFGU,MFGU,TMFGU] = MFGUnscented(gyro,RMea,sf,true,parameters);
 
-    [RMEKF,xMEKF,G,TMEKF] = MEKF(gyro,RMea,parameters);
-    [RMFGA,MFGA,TMFGA] = MFGAnalytic(gyro,RMea,parameters);
-    [RMFGU,MFGU,TMFGU] = MFGUnscented(gyro,RMea,parameters);
-
-    parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,G,TMEKF,...
+    parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,SigmaMEKF,TMEKF,...
         RMFGA,MFGA,TMFGA,RMFGU,MFGU,TMFGU);
 
 end
@@ -52,10 +46,10 @@ rmpath('..\..\rotation3d');
 end
 
 
-function [] = parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,G,TMEKF,...
+function [] = parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,SigmaMEKF,TMEKF,...
     RMFGA,MFGA,TMFGA,RMFGU,MFGU,TMFGU)
 
-save(strcat('D:\result-SO3Euclid\6-21-2020\',num2str(n)),'gyro','RMea','RTrue','xTrue','parameters','RMEKF','xMEKF','G','TMEKF',...
+save(strcat('D:\result-SO3Euclid\6-23-2020\',num2str(n)),'gyro','RMea','RTrue','xTrue','parameters','RMEKF','xMEKF','SigmaMEKF','TMEKF',...
         'RMFGA','MFGA','TMFGA','RMFGU','MFGU','TMFGU');
 
 end

@@ -56,17 +56,18 @@ for n = 2:N
     
     % unscented update
     if rem(n,5)==0
-        [xs,Rs] = MFGSampling(Miu,Sigma,P,U,S,V,10000);
-        w = ones(1,10000)/10000;
-
-        for i = 1:10000
-            dR = Rs(:,:,i)'*RMea(:,:,n);
-            dx = xs(4:6,i)-pMea(:,n);
-            w(i) = w(i)*exp(trace(SM*dR))*exp(-0.5*dx'*posMeaNoise^-1*dx);
-        end
+%         [xs,Rs] = MFGSampling(Miu,Sigma,P,U,S,V,10000);
+%         w = ones(1,10000)/10000;
+% 
+%         for i = 1:10000
+%             dR = Rs(:,:,i)'*RMea(:,:,n);
+%             dx = xs(4:6,i)-pMea(:,n);
+%             w(i) = w(i)*exp(trace(SM*dR))*exp(-0.5*dx'*posMeaNoise^-1*dx);
+%         end
+%         
+%         w = w/sum(w);
+%         [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xs,Rs,w);
         
-        w = w/sum(w);
-        [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xs,Rs,w);
     end
     
     % record results
