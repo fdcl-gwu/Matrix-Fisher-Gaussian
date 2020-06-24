@@ -1,4 +1,4 @@
-function [ x, R, w ] = MFGGetSigmaPoints( Miu, Sigma, P, U, S, V, wM, w0 )
+function [ x, R, w ] = MFGGetSigmaPoints( Miu, Sigma, P, U, S, V, defQS, wM, w0 )
 
 % default values
 n = size(Miu,1);
@@ -49,15 +49,20 @@ end
 
 % calculate sigma points and weights
 Q = @(R)U'*R*V;
-fR = @(R)vee(Q(R)*S-S*Q(R)');
+if defQS
+    vR = @(R)vee(Q(R)*S-S*Q(R)');
+else
+    vR = @(R)vee(S*Q(R)-Q(R)'*S);
+end
+
 for i = 1:3
     theta = acos(cost{i}(sigma));
     e = zeros(3,1);
     e(i) = 1;
     R(:,:,2*n+2*i-1) = U*expRot(theta*e)*V';
     R(:,:,2*n+2*i) = U*expRot(-theta*e)*V';
-    x(:,2*n+2*i-1) = Miu+P*fR(R(:,:,2*n+2*i-1));
-    x(:,2*n+2*i) = Miu+P*fR(R(:,:,2*n+2*i));
+    x(:,2*n+2*i-1) = Miu+P*vR(R(:,:,2*n+2*i-1));
+    x(:,2*n+2*i) = Miu+P*vR(R(:,:,2*n+2*i));
     w([2*n+2*i-1,2*n+2*i]) = wm{i}(sigma);
 end
 

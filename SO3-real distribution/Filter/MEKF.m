@@ -1,89 +1,149 @@
-function [ R, x, G, stepT ] = MEKF( gyro, mea, parameters )
+function [ R, x, Sigma, stepT ] = MEKF( gyro, Mea, sf, parameters )
 
 N = size(gyro,2);
-dt = parameters.dt;
+dt = 1/sf;
 
-% noise parameters
-randomWalk = parameters.randomWalk;
-biasInstability = parameters.biasInstability;
-if parameters.meaIsVec
-    vecMeaNoise = parameters.meaNoise;
+%% settings
+% angular velocity noise parameters
+if exist('parameters','var') && isfield(parameters,'omegaNoise')
+    randomWalk = parameters.omegaNoise.randomWalk;
+    biasInstability = parameters.omegaNoise.biasInstability;
 else
-    if parameters.GaussMea
-        rotMeaNoise = parameters.rotMeaNoise;
+    randomWalk = 10*pi/180;
+    biasInstability = 500/3600*pi/180;
+end
+
+% measurement noise parameters
+if exist('parameters','var') && isfield(parameters,'meaNoise')
+    meaNoise = parameters.meaNoise;
+else
+    meaNoise = 0.2^2*eye(3);
+end
+
+% other settings
+if exist('parameters','var') && isfield(parameters,'setting')
+    omegaLocal = parameters.setting.omegaLocal;
+    GaussMea = parameters.setting.GaussMea;
+    meaIsVec = parameters.setting.meaIsVec;
+else
+    omegaLocal = true;
+    GaussMea = true;
+    meaIsVec = false;
+end
+
+if meaIsVec
+    if exist('parameters','var') && isfield(parameters,'setting')
+        vecRefInertial = parameters.setting.vecRefInertial;
+        nVecRef = parameters.setting.nVecRef;
+        vRef = parameters.setting.vRef;
     else
-        rotMeaNoise = MF2Gau(parameters.rotMeaNoise);
+        vecRefInertial = true;
+        nVecRef = 1;
+        vRef = [0;0;1];
+    end
+else
+    if exist('parameters','var') && isfield(parameters,'setting')
+        attMeaLocal = parameters.setting.attMeaLocal;
+    else
+        attMeaLocal = true;
     end
 end
 
-% measurement
-if parameters.meaIsVec
-    vMea = mea{1};
-    vRef = mea{2};
-end
-
-% initialize distribution
-if parameters.GaussMea
-    Sigma = [parameters.initRNoise,zeros(3)
-        zeros(3),parameters.initXNoise];
+% convert noise distributions
+if meaIsVec
+    if ~GaussMea
+        for nv = 1:nVecRef
+            meaNoise(nv) = VM2Gau(meaNoise(nv));
+        end
+    end
 else
-    Sigma = [MF2Gau(parameters.initRNoise),zeros(3)
-        zeros(3),parameters.initXNoise];
+    if ~GaussMea
+        meaNoise = MF2Gau(meaNoise);
+    end
 end
 
+%% initialization
 % data containers
-G.Sigma = zeros(6,6,N); G.Sigma(:,:,1) = Sigma;
-R = zeros(3,3,N); R(:,:,1) = parameters.RInit;
-x = zeros(3,N); x(:,1) = parameters.xInit;
+R = zeros(3,3,N);
+x = zeros(3,N);
+Sigma = zeros(6,6,N);
 stepT = zeros(N-1,1);
 
-% filter iteration
+% initialize
+if exist('parameters','var') && isfield(parameters,'initValue')
+    R(:,:,1) = parameters.initValue.U*parameters.initValue.V';
+    x(:,1) = parameters.initValue.Miu;
+    if GaussMea
+        Sigma(:,:,1) = [parameters.initValue.RNoise,zeros(3);
+            zeros(3),parameters.initValue.xNoise];
+    else
+        Sigma(:,:,1) = [MF2Gau(parameters.initValue.RNoise),zeros(3);
+            zeros(3),parameters.initValue.xNoise];
+    end
+else
+    R(:,:,1) = eye(3);
+    x(:,1) = [0;0;0];
+    Sigma(:,:,1) = [0.2^2*eye(3),zeros(3);zeros(3),0.05^2*eye(3)];
+end
+
+%% filter iteration
 for n = 2:N
     tic;
     
     % propagate
     av = (gyro(:,n-1)+gyro(:,n))/2-x(:,n-1);
-    Rp = R(:,:,n-1)*expRot(av*dt);
-    F = [expRot(av*dt)',-eye(3)*dt;zeros(3),eye(3)];
-    Sigma = F*Sigma*F'+[eye(3)*randomWalk^2*dt,zeros(3);
-        zeros(3),eye(3)*biasInstability^2*dt];
+    if omegaLocal
+        R(:,:,n) = R(:,:,n-1)*expRot(av*dt);
+        F = [expRot(av*dt)',-eye(3)*dt;zeros(3),eye(3)];
+        Sigma(:,:,n) = F*Sigma(:,:,n-1)*F'+[eye(3)*randomWalk^2*dt,zeros(3);
+            zeros(3),eye(3)*biasInstability^2*dt];
+    else
+        R(:,:,n) = expRot(av*dt)*R(:,:,n-1);
+        F = [eye(3),-R(:,:,n)'*dt;zeros(3),eye(3)];
+        Sigma(:,:,n) = F*Sigma(:,:,n-1)*F'+[eye(3)*randomWalk^2*dt,zeros(3);
+            zeros(3),eye(3)*biasInstability^2*dt];
+    end
+    x(:,n) = x(:,n-1);
     
     % update
     if rem(n,5)==0
-        if parameters.meaIsVec
-            if size(vRef,1)==3
-                H = [hat(Rp'*vRef(:,n)),zeros(3)];
-                K = Sigma*H'*(H*Sigma*H'+eye(3)/vecMeaNoise)^-1;
-                dx = K*(vMea(:,n)-Rp'*vRef(:,n));
-            else
-                H = [hat(Rp'*vRef(1:3,n)),zeros(3);hat(Rp'*vRef(4:6,n)),zeros(3)];
-                K = Sigma*H'*(H*Sigma*H'+eye(6)/vecMeaNoise)^-1;
-                dx = K*[vMea(1:3,n)-Rp'*vRef(1:3,n);vMea(4:6,n)-Rp'*vRef(4:6,n)];
+        if meaIsVec
+            % vector measurement
+            vPredict = zeros(3*nVecRef,1);
+            H = zeros(3*nVecRef,6);
+            vMeaNoise = zeros(3*nVecRef,3*nVecRef);
+            for nv = 1:nVecRef
+                if vecRefInertial
+                    vPredict(3*(nv-1)+1:3*nv) = R(:,:,n)'*vRef(3*(nv-1)+1:3*nv);
+                    H(3*(nv-1)+1:3*nv,1:3) = hat(R(:,:,n)'*vRef(3*(nv-1)+1:3*nv));
+                else
+                    vPredict(3*(nv-1)+1:3*nv) = R(:,:,n)*vRef(3*(nv-1)+1:3*nv);
+                    H(3*(nv-1)+1:3*nv,1:3) = -R(:,:,n)*hat(vRef(3*(nv-1)+1:3*nv));
+                end
+                vMeaNoise(3*(nv-1)+1:3*nv,3*(nv-1)+1:3*nv) = eye(3)*meaNoise(nv);
             end
-            Sigma = (eye(6)-K*H)*Sigma;
             
-            R(:,:,n) = Rp*expRot(dx(1:3));
-            x(:,n) = x(:,n-1)+dx(4:6);
+            K = Sigma(:,:,n)*H'*(H*Sigma(:,:,n)*H'+vMeaNoise)^-1;
+            dx = K*(Mea(:,n)-vPredict);
+            
+            R(:,:,n) = R(:,:,n)*expRot(dx(1:3));
+            x(:,n) = x(:,n)+dx(4:6);
+            Sigma(:,:,n) = (eye(6)-K*H)*Sigma(:,:,n);
         else
-            if parameters.attMeaLocal
-                H = [eye(3),zeros(3)];
+            % attitude measurement
+            H = [eye(3),zeros(3)];
+            if attMeaLocal
+                K = Sigma(:,:,n)*H'*(H*Sigma(:,:,n)*H'+meaNoise)^-1;
             else
-                H = [Rp,zeros(3)];
+                K = Sigma(:,:,n)*H'*(H*Sigma(:,:,n)*H'+R(:,:,n)'*meaNoise*R(:,:,n))^-1;
             end
-            K = Sigma*H'*(H*Sigma*H'+rotMeaNoise)^-1;
-            dx = K*logRot(Rp'*mea(:,:,n),'v');
-            Sigma = (eye(6)-K*H)*Sigma;
-
-            R(:,:,n) = Rp*expRot(dx(1:3));
-            x(:,n) = x(:,n-1)+dx(4:6);
+            dx = K*logRot(R(:,:,n)'*Mea(:,:,n),'v');
+            
+            R(:,:,n) = R(:,:,n)*expRot(dx(1:3));
+            x(:,n) = x(:,n)+dx(4:6);
+            Sigma(:,:,n) = (eye(6)-K*H)*Sigma(:,:,n);
         end
-    else
-        R(:,:,n) = Rp;
-        x(:,n) = x(:,n-1);
     end
-    
-    % record covariance
-    G.Sigma(:,:,n) = Sigma;
     
     stepT(n-1) = toc;
 end
@@ -91,6 +151,7 @@ end
 end
 
 
+%% convert distributions: Monte Carlo
 function [ Sigma ] = MF2Gau( S )
 
 N = 100000;
@@ -99,5 +160,44 @@ R = pdf_MF_sampling(S,N);
 v = logRot(R,'v');
 Sigma = cov(v');
 
+end
+
+
+function [ sigma ] = VM2Gau( kappa )
+
+N = 100000;
+v = pdf_VM_sampling(kappa,[0;0;1],N);
+
+sigma = mean([std(v(1,:),1),std(v(2,:),1)]);
+
+end
+
+
+%% sampling from von Mises-Fisher distribution
+function x=pdf_VM_sampling(kappa,mu,N)
+% simulate von Mises-Fisher distribution on \Sph^2
+% K. Mardia and P. Jupp, Directional Statistics, 2000, pp. 172
+
+%assert(abs(norm(mu)-1)<1e-5,'keyboard');
+
+R=[mu null(mu') ];
+if det(R) < 0
+    R=R(:,[1 3 2]);
+end
+
+x=zeros(3,N);
+for k=1:N
+   theta=inv_cdf_VMF_theta(rand,kappa);
+   phi=rand*2*pi;
+   
+   x0=[cos(theta); sin(theta)*cos(phi); sin(theta)*sin(phi)];
+   x(:,k)=R*x0;    
+end
+
+end
+
+
+function theta=inv_cdf_VMF_theta(C,kappa)
+theta=acos(log(exp(kappa)-2*sinh(kappa)*C)/kappa);
 end
 

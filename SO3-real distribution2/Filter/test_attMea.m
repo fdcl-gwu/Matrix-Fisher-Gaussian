@@ -1,43 +1,62 @@
 function [] = test_attMea()
 
-addpath('..\Generate-Path');
+addpath('..\..\SO3-real distribution\Generate-Path');
 addpath('..');
-addpath('..\Matrix-Fisher-Distribution');
+addpath('..\..\SO3-real distribution\Matrix-Fisher-Distribution');
 addpath('..\..\rotation3d');
 
 t = 600;
 sf = 150;
+N = 100;
 
-parameters = [];
-parameters.t = 60;
-parameters.dt = 1/sf;
-parameters.randomWalk = 10*pi/180;
-parameters.biasInstability = 500/3600*pi/180;
-parameters.GaussMea = false;
-parameters.meaIsVec = false;
-parameters.attMeaLocal = true;
-parameters.rotMeaNoise = diag([200,0,0]);
-parameters.initRNoise = diag([200,200,200]);
-parameters.initXNoise = 0.1^2*eye(3);
-parameters.RInit = eye(3);
-parameters.xInit = [0;0;0];
+% random seeds
+parfor n = 1:20
+    rng(n);
+end
+    
+parfor n = 1:N
+    parameters = [];
+    parameters.t = 60;
+    parameters.dt = 1/sf;
+    parameters.randomWalk = 10*pi/180;
+    parameters.biasInstability = 500/3600*pi/180;
+    parameters.GaussMea = false;
+    parameters.meaIsVec = false;
+    parameters.attMeaLocal = true;
+    parameters.rotMeaNoise = diag([2.4,2.4,2.4]);
+    parameters.initRNoise = diag([2.4,2.4,2.4]);
+    parameters.initXNoise = 0.1^2*eye(3);
+    parameters.RInit = eye(3);
+    parameters.xInit = [0;0;0];
 
-[gyro,RMea,RTrue,xTrue] = genTrig_attMea(t,sf,parameters);
+    [gyro,RMea,RTrue,xTrue] = genTrig_attMea(t,sf,parameters);
 
-% stachastic settings
-parameters.RInit = eye(3);
-parameters.xInit = [0;0;0];
+    % stachastic settings
+    parameters.RInit = RMea(:,:,1);
+    parameters.xInit = [0;0;0];
 
-[RMEKF,xMEKF,G,TMEKF] = MEKF(gyro,RMea,parameters);
-[RMFGA,MFGA,TMFGA] = MFGAnalytic(gyro,RMea,parameters);
-[RMFGU,MFGU,TMFGU] = MFGUnscented(gyro,RMea,parameters);
+    [RMEKF,xMEKF,G,TMEKF] = MEKF(gyro,RMea,parameters);
+    [RMFGA,MFGA,TMFGA] = MFGAnalytic(gyro,RMea,parameters);
+    [RMFGU,MFGU,TMFGU] = MFGUnscented(gyro,RMea,parameters);
 
-save('D:\result-SO3Euclid\5-15-2020','gyro','RMea','RTrue','xTrue','parameters','RMEKF','xMEKF','G','TMEKF','RMFGA','MFGA','TMFGA','RMFGU','MFGU','TMFGU');
+    parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,G,TMEKF,...
+        RMFGA,MFGA,TMFGA,RMFGU,MFGU,TMFGU);
 
-rmpath('..\Generate-Path');
+end
+
+rmpath('..\..\SO3-real distribution\Generate-Path');
 rmpath('..');
-rmpath('..\Matrix-Fisher-Distribution');
+rmpath('..\..\SO3-real distribution\Matrix-Fisher-Distribution');
 rmpath('..\..\rotation3d');
+
+end
+
+
+function [] = parsave(n,gyro,RMea,RTrue,xTrue,parameters,RMEKF,xMEKF,G,TMEKF,...
+    RMFGA,MFGA,TMFGA,RMFGU,MFGU,TMFGU)
+
+save(strcat('D:\result-SO3Euclid\6-21-2020\',num2str(n)),'gyro','RMea','RTrue','xTrue','parameters','RMEKF','xMEKF','G','TMEKF',...
+        'RMFGA','MFGA','TMFGA','RMFGU','MFGU','TMFGU');
 
 end
 

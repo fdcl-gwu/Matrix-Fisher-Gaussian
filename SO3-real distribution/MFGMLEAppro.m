@@ -1,10 +1,5 @@
-function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, convention, s0 )
+function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, defQS, s0 )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
-
-% default SVD convention is psvd
-if ~exist('convention','var') || isempty(convention)
-    convention = 1;
-end
 
 N = size(x,1);
 Ns = size(R,3);
@@ -29,16 +24,14 @@ if ~exist('s0','var') || isempty(s0)
 else
     S = diag(pdf_MF_M2S(diag(D),s0));
 end
-if convention==2
-    if S(3,3)<0
-        S(:,1:2) = -S(:,1:2);
-        U(:,1:2) = -U(:,1:2);
-    end
-end
 
 % vR
 Q = mulRot(mulRot(U',R,0),V,0);
-vR = vee(mulRot(Q,S,0)-mulRot(S,permute(Q,[2,1,3]),0));
+if defQS
+    vR = vee(mulRot(Q,S,0)-mulRot(S,permute(Q,[2,1,3]),0));
+else
+    vR = vee(mulRot(S,Q,0)-mulRot(permute(Q,[2,1,3]),S,0));
+end
 
 % other empirical moments
 EvR = sum(vR.*w,2);
