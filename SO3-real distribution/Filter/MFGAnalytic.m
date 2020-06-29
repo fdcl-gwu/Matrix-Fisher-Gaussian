@@ -109,11 +109,11 @@ for n = 2:N
         FMea = zeros(3,3);
         if meaIsVec
             if vecRefInertial
-                for nv = 1:nRefVec
+                for nv = 1:nVecRef
                     FMea = FMea + meaNoise(nv)*vRef(3*(nv-1)+1:3*nv)*Mea(3*(nv-1)+1:3*nv,n)';
                 end
             else
-                for nv = 1:nRefVec
+                for nv = 1:nVecRef
                     FMea = FMea + meaNoise(nv)*Mea(3*(nv-1)+1:3*nv,n)*vRef(3*(nv-1)+1:3*nv)';
                 end
             end
@@ -161,6 +161,7 @@ function [ kappa ] = Gau2VM( sigmaSqr )
 
 N = 100000;
 v = randn(3,N)*sqrt(sigmaSqr)+[0;0;1];
+v = v./sqrt(sum(v.^2));
 
 rho = sqrt(sum(mean(v,2).^2));
 

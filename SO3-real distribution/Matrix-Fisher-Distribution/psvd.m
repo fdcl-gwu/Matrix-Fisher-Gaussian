@@ -8,13 +8,6 @@ function [ U, S, V ]=psvd( F )
 %   Distribution on SO(3)", 2017, http://arxiv.org/abs/1710.03746
 
 [U,S,V]=svd(F);
-for i = 1:3
-    temp = nonzeros(U(:,i));
-    if temp(1) < 0
-        U(:,i) = -U(:,i);
-        V(:,i) = -V(:,i);
-    end
-end
 
 S=S*diag([1 1 det(U*V)]);
 U=U*diag([1 1 det(U)]);

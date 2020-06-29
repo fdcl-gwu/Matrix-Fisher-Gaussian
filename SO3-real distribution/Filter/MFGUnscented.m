@@ -65,7 +65,7 @@ end
 %% initialization
 % initialize
 if exist('parameters','var') && isfield(parameters,'initValue')
-    Miu = -parameters.initValue.Miu;
+    Miu = parameters.initValue.Miu;
     Sigma = parameters.initValue.xNoise;
     P = zeros(3);
     U = parameters.initValue.U;
@@ -75,8 +75,6 @@ if exist('parameters','var') && isfield(parameters,'initValue')
     else
         S = parameters.initValue.RNoise;
     end
-    S(1,1) = S(1,1)+2e-5;
-    S(2,2) = S(2,2)+1e-5;
 else
     Miu = [0;0;0];
     Sigma = 0.05^2*eye(3);
@@ -137,11 +135,11 @@ for n = 2:N
         FMea = zeros(3,3);
         if meaIsVec
             if vecRefInertial
-                for nv = 1:nRefVec
+                for nv = 1:nVecRef
                     FMea = FMea + meaNoise(nv)*vRef(3*(nv-1)+1:3*nv)*Mea(3*(nv-1)+1:3*nv,n)';
                 end
             else
-                for nv = 1:nRefVec
+                for nv = 1:nVecRef
                     FMea = FMea + meaNoise(nv)*Mea(3*(nv-1)+1:3*nv,n)*vRef(3*(nv-1)+1:3*nv)';
                 end
             end
@@ -181,6 +179,21 @@ ER = mean(R,3);
 [~,D,~] = psvd(ER);
 
 S = diag(pdf_MF_M2S(diag(D)));
+
+end
+
+
+function [ kappa ] = Gau2VM( sigmaSqr )
+
+N = 100000;
+v = randn(3,N)*sqrt(sigmaSqr)+[0;0;1];
+v = v./sqrt(sum(v.^2));
+
+rho = sqrt(sum(mean(v,2).^2));
+
+options = optimoptions('fsolve','Algorithm','levenberg-marquardt',...
+    'FunctionTolerance',1e-15,'Display','off');
+kappa = fsolve(@(k) coth(k)-1/k-rho,1,options);
 
 end
 

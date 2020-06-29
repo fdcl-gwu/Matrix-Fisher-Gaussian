@@ -163,12 +163,12 @@ Sigma = cov(v');
 end
 
 
-function [ sigma ] = VM2Gau( kappa )
+function [ sigmaSqr ] = VM2Gau( kappa )
 
 N = 100000;
 v = pdf_VM_sampling(kappa,[0;0;1],N);
 
-sigma = mean([std(v(1,:),1),std(v(2,:),1)]);
+sigmaSqr = mean([var(v(1,:),1),var(v(2,:),1)]);
 
 end
 
