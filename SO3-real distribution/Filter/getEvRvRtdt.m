@@ -821,7 +821,12 @@ G = H*H';
 if omegaLocal
     VTT = Vtdt'*expRot((omega+Miu)*dt)'*G'*V;
     STT = UT'*Stdt*VTT;
-    
+else
+    UTT = Utdt'*expRot((omega+Miu)*dt)*G*U;
+    STT = UTT'*Stdt*VT;
+end
+
+if defQS
     vRTvRGp(1,1) = (ST(3,2)*STT(3,2))*EQQ(5,5)+(-ST(2,3)*STT(3,2)-ST(3,2)*STT(2,3))*EQQ(5,9)+(ST(2,3)*STT(2,3))*EQQ(9,9)...
         +(ST(3,1)*STT(3,1))*EQQ(2,2)+(ST(2,1)*STT(2,1))*EQQ(3,3)+(ST(2,2)*STT(2,2)+ST(3,3)*STT(3,3))*EQQ(6,6)+(-ST(2,2)*STT(3,3)-ST(3,3)*STT(2,2))*EQQ(6,8);
     vRTvRGp(1,2) = (-ST(3,2)*STT(3,1))*EQQ(1,5)+(ST(2,3)*STT(3,1))*EQQ(1,9)+(ST(3,2)*STT(1,3))*EQQ(5,9)+(-ST(2,3)*STT(1,3))*EQQ(9,9)...
@@ -841,15 +846,12 @@ if omegaLocal
     vRTvRGp(3,3) = (ST(2,1)*STT(2,1))*EQQ(1,1)+(-ST(1,2)*STT(2,1)-ST(2,1)*STT(1,2))*EQQ(1,5)+(ST(1,2)*STT(1,2))*EQQ(5,5)...
         +(ST(1,1)*STT(1,1)+ST(2,2)*STT(2,2))*EQQ(2,2)+(-ST(1,1)*STT(2,2)-ST(2,2)*STT(1,1))*EQQ(2,4)+(ST(2,3)*STT(2,3))*EQQ(3,3)+(ST(1,3)*STT(1,3))*EQQ(6,6);
     
-    if defQS
+    if omegaLocal
         EvRTvRTTt = UT*vRTvRGp*UT';
     else
-        EvRTvRTTt = VT*vRTvRGp*VTT';
+        EvRTvRTTt = UT*vRTvRGp*UTT';
     end
 else
-    UTT = Utdt'*expRot((omega+Miu)*dt)*G*U;
-    STT = UTT'*Stdt*VT;
-    
     vRTvRGp(1,1) = (ST(2,3)*STT(2,3))*EQQ(5,5) +(-ST(2,3)*STT(3,2)-ST(3,2)*STT(2,3))*EQQ(5,9) +(ST(3,2)*STT(3,2))*EQQ(9,9)...
         + (ST(1,3)*STT(1,3))*EQQ(2,2) +(ST(1,2)*STT(1,2))*EQQ(3,3) +(ST(2,2)*STT(2,2)+ST(3,3)*STT(3,3))*EQQ(6,6) +(-ST(2,2)*STT(3,3)-ST(3,3)*STT(2,2))*EQQ(6,8);
     vRTvRGp(1,2) = (-ST(2,3)*STT(1,3))*EQQ(1,5) +(ST(3,2)*STT(1,3))*EQQ(1,9) +(ST(2,3)*STT(3,1))*EQQ(5,9) +(-ST(3,2)*STT(3,1))*EQQ(9,9)...
@@ -869,8 +871,8 @@ else
     vRTvRGp(3,3) = (ST(1,2)*STT(1,2))*EQQ(1,1) +(-ST(1,2)*STT(2,1)-ST(2,1)*STT(1,2))*EQQ(1,5) +(ST(2,1)*STT(2,1))*EQQ(5,5)...
         + (ST(1,1)*STT(1,1)+ST(2,2)*STT(2,2))*EQQ(2,2) +(-ST(1,1)*STT(2,2)-ST(2,2)*STT(1,1))*EQQ(2,4) +(ST(3,2)*STT(3,2))*EQQ(3,3) +(ST(3,1)*STT(3,1))*EQQ(6,6);
     
-    if defQS
-        EvRTvRTTt = UT*vRTvRGp*UTT';
+    if omegaLocal
+        EvRTvRTTt = VT*vRTvRGp*VTT';
     else
         EvRTvRTTt = VT*vRTvRGp*VT';
     end

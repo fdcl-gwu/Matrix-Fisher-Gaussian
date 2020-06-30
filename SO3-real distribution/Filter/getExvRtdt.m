@@ -454,10 +454,10 @@ else
         -STT(1,2)*EQ(1,1), STT(1,1)*EQ(1,1)+STT(3,3)*EQ(3,3), -STT(3,2)*EQ(3,3)
         -STT(1,3)*EQ(1,1), -STT(2,3)*EQ(2,2), STT(1,1)*EQ(1,1)+STT(2,2)*EQ(2,2)];
     if omegaLocal
-        EvRTTt = VTT*vee(EQ*STT'-STT*EQ');
+        EvRTTt = VTT*vee(STT'*EQ-EQ'*STT);
         EvRvRTTt = EvRvRTTt*VTT';
     else
-        EvRTTt = VT*vee(EQ*STT'-STT*EQ');
+        EvRTTt = VT*vee(STT'*EQ-EQ'*STT);
         EvRvRTTt = EvRvRTTt*VT';
     end
 end
