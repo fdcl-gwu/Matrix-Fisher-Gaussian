@@ -53,6 +53,12 @@ else
     end
 end
 
+if exist('parameters','var') && isfield(parameters,'setting')
+    gyroFail = parameters.setting.gyroFail;
+else
+    gyroFail = false;
+end
+
 %% true attitude
 roll = @(t)E.magr*sin(E.fr*2*pi*t);
 pitch = @(t)E.magp*sin(E.fp*2*pi*t);
@@ -90,6 +96,11 @@ biasTrue = cumsum(biasNoise/sf,2);
 
 gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
 gyroMea = gyro+gyroNoise+biasTrue;
+
+%% gyroscope failure
+if gyroFail
+    gyroMea(:,20*sf+1:22*sf) = zeros(3,2*sf);
+end
 
 %% measurement
 if meaIsVec

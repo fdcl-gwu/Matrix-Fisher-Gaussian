@@ -1,4 +1,8 @@
-function [  ] = MFGPlotDensity(  )
+function [  ] = MFGPlotDensity( defQS )
+
+if ~exist('defQS','var') || isempty(defQS)
+    defQS = true;
+end
 
 % parameters
 n1 = 1;
@@ -6,9 +10,9 @@ n1 = 1;
 Miu = 0;
 Sigma = 1;
 U = expRot([0,0,0]);
-V = expRot([pi/3,0,0]);
-S = diag([25,0,0]);
-P = [0,0.7,0]/5;
+V = expRot([0,0,0]);
+S = diag([150,10,0]);
+P = [0,0,0.7]/sqrt(160);
 
 % intermediate parameters
 F = U*S*V';
@@ -16,7 +20,11 @@ Sigma2Inv = trace(S)*eye(3)-S;
 
 % other intermediate parameters
 Q = @(R)U'*R*V;
-Miuc = @(R)Miu+P*vee(Q(R)*S-S*Q(R)');
+if defQS
+    Miuc = @(R)Miu+P*vee(Q(R)*S-S*Q(R)');
+else
+    Miuc = @(R)Miu+P*vee(S*Q(R)-Q(R)'*S);
+end
 Sigmac = Sigma-P*Sigma2Inv*P';
 
 % Normalizing constant
@@ -38,7 +46,7 @@ s3 = repmat(cos(theta2),Nt1,1);
 
 % linear grid
 Nx1 = 11;
-x1 = linspace(-1,1,Nx1);
+x1 = linspace(-10,10,Nx1);
 
 % color map
 c = zeros(Nt1,Nt2,Nx1);
@@ -58,7 +66,6 @@ for nx1 = 1:Nx1
     
     axis equal;
     view([1,1,1]);
-    caxis([0,cmax]);
 end
 
 % linear grid

@@ -187,5 +187,30 @@ Using the original definition, the conditional mean attitude is rotated from one
 whereas using the $Q^T$ definition, the conditional mean attitude if rotated from $M'$ about the $Ue_2$ axis in the $M'$ coordinate.
 This is the reason why the new definition using $Q^T$ is more suitable for the gyroscope model.
 
+\section{Approximations for $p(R|x)$}
+
+To examine the difference of the two definitions in details, the conditional distribution $p(R|x)$ close to the mean attitude is approximated.
+First, for the original definition
+\begin{align*}
+	p(R|x) &= \frac{1}{c}\etr{SQ^T}\exp\left\{ - \frac{(x-\mu-P\nu_R)^2}{2\sigma_c^2} \right\} \\
+	&\propto \frac{1}{c}\etr{SQ^T} \exp\left\{ \frac{x-\mu}{\sigma_c^2}P\nu_R - \frac{(P\nu_R)^2}{2\sigma_c^2} \right\}.
+\end{align*}
+Since $\nu_R$ only involves off-diagonal terms of $Q$, which are small near identity, the second order $(P\nu_R)^2$ is omitted.
+Therefore, let $\lambda_i(x) = P_i(x-\mu)/\sigma_c^2$, then
+\begin{align*}
+	p(R|x) &\propto \etr{SQ^T} \exp\left\{ \frac{x-\mu}{\sigma_c^2} P\nu_R \right\} \\
+	&= \etr{SQ^T} \etr{\frac{x-\mu}{\sigma_c^2} \widehat{P^T}SQ^T} \\
+	&= \etr{\left(I_{3\times 3}+\sum_{i=1}^3\lambda_i\hat{e}_i\right) SQ^T} \\
+	&\approx \etr{U\exp\left\{ \sum_{i=1}^3\lambda_i\hat{e}_i \right\}SV^TR^T}.
+\end{align*}
+
+Similarly, for the definition $\nu_R = (SQ-Q^TS)^\vee$, it becomes
+\begin{align*}
+	p(R|x) &\propto \etr{SQ^T} \exp\left\{ \frac{x-\mu}{\sigma_c^2} P\nu_R \right\} \\
+	&= \etr{SQ^T} \etr{\frac{x-\mu}{\sigma_c^2} \widehat{P^T}Q^TS} \\
+	&= \etr{\left(I_{3\times 3}+\sum_{i=1}^3\lambda_i\hat{e}_i\right) Q^TS} \\
+	&= \etr{US\exp\left\{ \sum_{i=1}^3\lambda_i\hat{e}_i \right\}V^TR^T}.
+\end{align*}
+
 \end{document}
 
