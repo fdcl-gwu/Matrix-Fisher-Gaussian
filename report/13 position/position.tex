@@ -33,10 +33,10 @@
 
 Consider the following kinematics model:
 \begin{align}
-	R\diff{R} &= (\hat{\omega}+\hat{b}_g)\diff{t} + H_{gu}\diff{W_{gu}}, \\
+	R^T\diff{R} &= (\hat{\omega}+\hat{b}_g)\diff{t} + H_{gu}\diff{W_{gu}}, \\
 	\diff{b_g} &= H_{gv}\diff{W_{gv}}, \\
 	\diff{p} &= v\diff{t}, \\
-	\diff{v} &= (R(a+ba)-g)\diff{t} + RH_{au}\diff{W_{au}}, \\
+	\diff{v} &= (R(a+b_a)-g)\diff{t} + RH_{au}\diff{W_{au}}, \\
 	\diff{b_a} &= H_{av}\diff{W_{av}},
 \end{align}
 where $(R,bg,p,v,ba)$ are attitude, gyroscope bias, position, velocity, and accelerometer bias of the IMU.
@@ -163,6 +163,12 @@ We give some example calculations:
 \end{align}
 
 \section{Measurement Update}
+
+Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigma,P,U,S,V)$.
+Write $x = (x_1,x_2)$, suppose also a measurement of $x_1$ follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$, then the conditional posterior distribution of $x$ is
+\begin{align*}
+	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x_1-\mu_m)^T\Sigma_m^{-1}(x_1-\mu_m)} \nonumber
+\end{align*}
 
 Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigma,P,U,S,V)$, and a measurement of $x$ follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$, then the conditional posterior distribution of $x$ is
 \begin{align}
