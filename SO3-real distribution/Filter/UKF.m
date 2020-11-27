@@ -92,7 +92,7 @@ for n = 2:N
     
     % propagate
     av = (gyro(:,n-1)+gyro(:,n))/2-x(:,n-1);
-    [x1,w1] = GGetSigmaPoints([zeros(3,1);x(:,n-1)],Sigma(:,:,n-1),0.5);
+    [x1,w1] = GGetSigmaPoints([zeros(3,1);x(:,n-1)],Sigma(:,:,n-1));
     
     R_sigma = zeros(3,3,13);
     for ns = 13:-1:1
@@ -112,7 +112,7 @@ for n = 2:N
         [eye(3)*randomWalk^2*dt,zeros(3);zeros(3),eye(3)*biasInstability^2*dt];
     
     % update
-    if rem(n,5)==0
+    if rem(n,5)==2
         if meaIsVec
             % vector measurement
             vPredict = zeros(3*nVecRef,13);

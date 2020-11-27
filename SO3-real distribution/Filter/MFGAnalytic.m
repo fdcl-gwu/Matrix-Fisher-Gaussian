@@ -105,7 +105,7 @@ for n = 2:N
     [Miu,Sigma,P,U,S,V] = MFGGyroProp(omega,Miu,Sigma,P,U,S,V,randomWalk*eye(3),biasInstability*eye(3),omegaLocal,defQS,dt);
     
     % update
-    if rem(n,5)==0
+    if rem(n,5)==2
         FMea = zeros(3,3);
         if meaIsVec
             if vecRefInertial

@@ -106,7 +106,7 @@ for n = 2:N
     x(:,n) = x(:,n-1);
     
     % update
-    if rem(n,5)==0
+    if rem(n,5)==2
         if meaIsVec
             % vector measurement
             vPredict = zeros(3*nVecRef,1);

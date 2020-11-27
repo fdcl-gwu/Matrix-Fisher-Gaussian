@@ -73,7 +73,7 @@ for n1 = 1:N1
         subQ = cell(N,1);
         termStr = cell(N,1);
         for n = 1:N
-            termStr{n} = char(terms(n));
+            termStr{n} = char(terms{n});
             indQ = strfind(termStr{n},'Q');
             
             indN = length(indQ);

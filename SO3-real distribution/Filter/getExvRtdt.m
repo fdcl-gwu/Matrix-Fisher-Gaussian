@@ -432,32 +432,54 @@ G = H*H';
 
 if omegaLocal
     VTT = Vtdt'*expRot((omega+Miu)*dt)'*G'*V;
-    STT = UT'*Stdt*VTT;
 else
     UTT = Utdt'*expRot((omega+Miu)*dt)*G*U;
-    STT = UTT'*Stdt*VT;
 end
 
 if defQS
-    EvRvRTTt = [STT(2,2)*EQ(2,2)+STT(3,3)*EQ(3,3), -STT(1,2)*EQ(2,2), -STT(1,3)*EQ(3,3)
-        -STT(2,1)*EQ(1,1), STT(1,1)*EQ(1,1)+STT(3,3)*EQ(3,3), -STT(2,3)*EQ(3,3)
-        -STT(3,1)*EQ(1,1), -STT(3,2)*EQ(2,2), STT(1,1)*EQ(1,1)+STT(2,2)*EQ(2,2)];
     if omegaLocal
+        STT = UT'*Stdt*VTT;
         EvRTTt = UT*vee(EQ*STT'-STT*EQ');
+        
+        EvRvRTTt = [STT(2,2)*EQ(2,2)+STT(3,3)*EQ(3,3), -STT(1,2)*EQ(2,2), -STT(1,3)*EQ(3,3)
+            -STT(2,1)*EQ(1,1), STT(1,1)*EQ(1,1)+STT(3,3)*EQ(3,3), -STT(2,3)*EQ(3,3)
+            -STT(3,1)*EQ(1,1), -STT(3,2)*EQ(2,2), STT(1,1)*EQ(1,1)+STT(2,2)*EQ(2,2)];
         EvRvRTTt = EvRvRTTt*UT';
     else
-        EvRTTt = UTT*vee(EQ*STT'-STT*EQ');
-        EvRvRTTt = EvRvRTTt*UTT';
+        SV = Stdt*VT;
+        EvRTTt = vee(UTT*EQ*SV'-SV*EQ'*UTT');
+        
+        EvRvRTTt(1,1) = (SV(2,2)*UTT(3,3)-SV(3,2)*UTT(2,3))*EQ(2,2) + (SV(3,3)*UTT(2,2)-SV(2,3)*UTT(3,2))*EQ(3,3);
+        EvRvRTTt(1,2) = (SV(3,2)*UTT(1,3)-SV(1,2)*UTT(3,3))*EQ(2,2) + (SV(1,3)*UTT(3,2)-SV(3,3)*UTT(1,2))*EQ(3,3);
+        EvRvRTTt(1,3) = (SV(1,2)*UTT(2,3)-SV(2,2)*UTT(1,3))*EQ(2,2) + (SV(2,3)*UTT(1,2)-SV(1,3)*UTT(2,2))*EQ(3,3);
+        EvRvRTTt(2,1) = (SV(3,1)*UTT(2,3)-SV(2,1)*UTT(3,3))*EQ(1,1) + (SV(2,3)*UTT(3,1)-SV(3,3)*UTT(2,1))*EQ(3,3);
+        EvRvRTTt(2,2) = (SV(1,1)*UTT(3,3)-SV(3,1)*UTT(1,3))*EQ(1,1) + (SV(3,3)*UTT(1,1)-SV(1,3)*UTT(3,1))*EQ(3,3);
+        EvRvRTTt(2,3) = (SV(2,1)*UTT(1,3)-SV(1,1)*UTT(2,3))*EQ(1,1) + (SV(1,3)*UTT(2,1)-SV(2,3)*UTT(1,1))*EQ(3,3);
+        EvRvRTTt(3,1) = (SV(2,1)*UTT(3,2)-SV(3,1)*UTT(2,2))*EQ(1,1) + (SV(3,2)*UTT(2,1)-SV(2,2)*UTT(3,1))*EQ(2,2);
+        EvRvRTTt(3,2) = (SV(3,1)*UTT(1,2)-SV(1,1)*UTT(3,2))*EQ(1,1) + (SV(1,2)*UTT(3,1)-SV(3,2)*UTT(1,1))*EQ(2,2);
+        EvRvRTTt(3,3) = (SV(1,1)*UTT(2,2)-SV(2,1)*UTT(1,2))*EQ(1,1) + (SV(2,2)*UTT(1,1)-SV(1,2)*UTT(2,1))*EQ(2,2);
     end
 else
-    EvRvRTTt = [STT(2,2)*EQ(2,2)+STT(3,3)*EQ(3,3), -STT(2,1)*EQ(2,2), -STT(3,1)*EQ(3,3)
-        -STT(1,2)*EQ(1,1), STT(1,1)*EQ(1,1)+STT(3,3)*EQ(3,3), -STT(3,2)*EQ(3,3)
-        -STT(1,3)*EQ(1,1), -STT(2,3)*EQ(2,2), STT(1,1)*EQ(1,1)+STT(2,2)*EQ(2,2)];
     if omegaLocal
-        EvRTTt = VTT*vee(STT'*EQ-EQ'*STT);
-        EvRvRTTt = EvRvRTTt*VTT';
+        SU = Stdt*UT;
+        EvRTTt = vee(SU*EQ*VTT'-VTT*EQ'*SU');
+        
+        EvRvRTTt(1,1) = (SU(2,2)*VTT(3,3)-SU(3,2)*VTT(2,3))*EQ(2,2) + (SU(3,3)*VTT(2,2)-SU(2,3)*VTT(3,2))*EQ(3,3);
+        EvRvRTTt(1,2) = (SU(3,2)*VTT(1,3)-SU(1,2)*VTT(3,3))*EQ(2,2) + (SU(1,3)*VTT(3,2)-SU(3,3)*VTT(1,2))*EQ(3,3);
+        EvRvRTTt(1,3) = (SU(1,2)*VTT(2,3)-SU(2,2)*VTT(1,3))*EQ(2,2) + (SU(2,3)*VTT(1,2)-SU(1,3)*VTT(2,2))*EQ(3,3);
+        EvRvRTTt(2,1) = (SU(3,1)*VTT(2,3)-SU(2,1)*VTT(3,3))*EQ(1,1) + (SU(2,3)*VTT(3,1)-SU(3,3)*VTT(2,1))*EQ(3,3);
+        EvRvRTTt(2,2) = (SU(1,1)*VTT(3,3)-SU(3,1)*VTT(1,3))*EQ(1,1) + (SU(3,3)*VTT(1,1)-SU(1,3)*VTT(3,1))*EQ(3,3);
+        EvRvRTTt(2,3) = (SU(2,1)*VTT(1,3)-SU(1,1)*VTT(2,3))*EQ(1,1) + (SU(1,3)*VTT(2,1)-SU(2,3)*VTT(1,1))*EQ(3,3);
+        EvRvRTTt(3,1) = (SU(2,1)*VTT(3,2)-SU(3,1)*VTT(2,2))*EQ(1,1) + (SU(3,2)*VTT(2,1)-SU(2,2)*VTT(3,1))*EQ(2,2);
+        EvRvRTTt(3,2) = (SU(3,1)*VTT(1,2)-SU(1,1)*VTT(3,2))*EQ(1,1) + (SU(1,2)*VTT(3,1)-SU(3,2)*VTT(1,1))*EQ(2,2);
+        EvRvRTTt(3,3) = (SU(1,1)*VTT(2,2)-SU(2,1)*VTT(1,2))*EQ(1,1) + (SU(2,2)*VTT(1,1)-SU(1,2)*VTT(2,1))*EQ(2,2);
     else
+        STT = UTT'*Stdt*VT;
         EvRTTt = VT*vee(STT'*EQ-EQ'*STT);
+        
+        EvRvRTTt = [STT(2,2)*EQ(2,2)+STT(3,3)*EQ(3,3), -STT(2,1)*EQ(2,2), -STT(3,1)*EQ(3,3)
+            -STT(1,2)*EQ(1,1), STT(1,1)*EQ(1,1)+STT(3,3)*EQ(3,3), -STT(3,2)*EQ(3,3)
+            -STT(1,3)*EQ(1,1), -STT(2,3)*EQ(2,2), STT(1,1)*EQ(1,1)+STT(2,2)*EQ(2,2)];
         EvRvRTTt = EvRvRTTt*VT';
     end
 end

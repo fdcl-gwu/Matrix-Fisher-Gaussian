@@ -83,12 +83,26 @@ Then
 	&= \Sigma_{c_k}V_k\expect{\Gamma_Q^T}\tilde{V}^T + \mu_k\expect{\nu_{R_k}^TP_k^TV_k\Gamma_Q^T}\tilde{V}^T + P_k\expect{\nu_{R_k}\nu_{R_k}^TP_k^TV_k\Gamma_Q^T}\tilde{V}^T.
 \end{align*}
 
-\noindent Let $\tilde{\tilde{V}} = V_{k+1}^T\delta R_k^TG_u^TV_k$, $\tilde{\tilde{S}} = \tilde{U}^TS_{k+1}\tilde{\tilde{V}}$ and $\tilde{\tilde{\nu}}_R = (\tilde{\tilde{S}}^TQ_k-Q_k\tilde{\tilde{S}}^T)^\vee$.
+\noindent Let $\tilde{\tilde{V}} = V_{k+1}^T\delta R_k^TG_u^TV_k$, $\tilde{\tilde{S}} = \tilde{U}^TS_{k+1}\tilde{\tilde{V}}$ and $\tilde{\tilde{\nu}}_R = (S_{k+1}\tilde{U}Q_k\tilde{\tilde{V}}^T - \tilde{\tilde{V}}Q_k^T\tilde{U}^TS_{k+1})^\vee$.
 Then the third term on the right hand side is
 \begin{align*}
 	\expect{x_k\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)^T} &= h\expect{x_k\Lambda(R_k(G_u-\tr{G_u}I)\delta R_k)^T} \\
-	&= h\expect{x_k\tilde{\tilde{\nu}}_R^T}\tilde{\tilde{V}}^T - \tr{G_u}h\expect{x_k\Lambda(R_k\delta R_k)^T} \\
-	&= h\left(\mu_k\expect{\tilde{\tilde{\nu}}_R}^T + P_k\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}\right)\tilde{\tilde{V}}^T - \tr{G_u}h\left(\mu_k\expect{\tilde{\nu}_R}^T + P_k\expect{\nu_{R_k}\tilde{\nu}_R^T}\right)\tilde{V}^T.
+	&= h\expect{x_k\tilde{\tilde{\nu}}_R^T} - \tr{G_u}h\expect{x_k\Lambda(R_k\delta R_k)^T} \\
+	&= h\left(\mu_k\expect{\tilde{\tilde{\nu}}_R}^T + P_k\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}\right) - \tr{G_u}h\left(\mu_k\expect{\tilde{\nu}_R}^T + P_k\expect{\nu_{R_k}\tilde{\nu}_R^T}\right)\tilde{V}^T.
+\end{align*}
+
+The term $\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}$ can be simplified as
+\begin{align*}
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{11} &= 
+	((S\tilde{U})_{22}\tilde{\tilde{V}}_{33} - (S\tilde{U})_{32}\tilde{\tilde{V}}_{23})\expect{Q_{22}} + ((S\tilde{U})_{33}\tilde{\tilde{V}}_{22} - (S\tilde{U})_{23}\tilde{\tilde{V}}_{32})\expect{Q_{33}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{12} &= 				  ((S\tilde{U})_{32}\tilde{\tilde{V}}_{13} -   (S\tilde{U})_{12}\tilde{\tilde{V}}_{33})\expect{Q_{22}} + ((S\tilde{U})_{13}\tilde{\tilde{V}}_{32} - (S\tilde{U})_{33}\tilde{\tilde{V}}_{12})\expect{Q_{33}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{13} &= ((S\tilde{U})_{12}\tilde{\tilde{V}}_{23} - (S\tilde{U})_{22}\tilde{\tilde{V}}_{13})\expect{Q_{22}} + ((S\tilde{U})_{23}\tilde{\tilde{V}}_{12} - (S\tilde{U})_{13}\tilde{\tilde{V}}_{22})\expect{Q_{33}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{21} &= ((S\tilde{U})_{31}\tilde{\tilde{V}}_{23} - (S\tilde{U})_{21}\tilde{\tilde{V}}_{33})\expect{Q_{11}} + ((S\tilde{U})_{23}\tilde{\tilde{V}}_{31} - (S\tilde{U})_{33}\tilde{\tilde{V}}_{21})\expect{Q_{33}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{22} &= ((S\tilde{U})_{11}\tilde{\tilde{V}}_{33} - (S\tilde{U})_{31}\tilde{\tilde{V}}_{13})\expect{Q_{11}} + ((S\tilde{U})_{33}\tilde{\tilde{V}}_{11} - (S\tilde{U})_{13}\tilde{\tilde{V}}_{31})\expect{Q_{33}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{23} &= ((S\tilde{U})_{21}\tilde{\tilde{V}}_{13} - (S\tilde{U})_{11}\tilde{\tilde{V}}_{23})\expect{Q_{11}} + ((S\tilde{U})_{13}\tilde{\tilde{V}}_{21} - (S\tilde{U})_{23}\tilde{\tilde{V}}_{11})\expect{Q_{33}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{31} &= ((S\tilde{U})_{21}\tilde{\tilde{V}}_{32} - (S\tilde{U})_{31}\tilde{\tilde{V}}_{22})\expect{Q_{11}} + ((S\tilde{U})_{32}\tilde{\tilde{V}}_{21} - (S\tilde{U})_{22}\tilde{\tilde{V}}_{31})\expect{Q_{22}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{32} &= ((S\tilde{U})_{31}\tilde{\tilde{V}}_{12} - (S\tilde{U})_{11}\tilde{\tilde{V}}_{32})\expect{Q_{11}} + ((S\tilde{U})_{12}\tilde{\tilde{V}}_{31} - (S\tilde{U})_{32}\tilde{\tilde{V}}_{11})\expect{Q_{22}} \\
+	\expect{\nu_{R_k}\tilde{\tilde{\nu}}_R^T}_{33} &= ((S\tilde{U})_{11}\tilde{\tilde{V}}_{22} - (S\tilde{U})_{21}\tilde{\tilde{V}}_{12})\expect{Q_{11}} + ((S\tilde{U})_{22}\tilde{\tilde{V}}_{11} - (S\tilde{U})_{12}\tilde{\tilde{V}}_{21})\expect{Q_{22}}
 \end{align*}
 
 \section{Calculating $\expect{\nu_{R_{k+1}}\nu_{R_{k+1}}^T}$}
@@ -114,7 +128,7 @@ Then the third term on the right hand side is
 \noindent The fourth, fifth term on the right hand side is
 \begin{align*}
 	\expect{\Lambda(R_k\widehat{H\Delta W}^2\delta R_k)\Lambda(R_k\delta R_k)^T} &= h\expect{\Lambda(R_k(G_u-\tr{G_u}I)\delta R_k)\Lambda(R_k\delta R_k)^T} \\
-	&= h\tilde{\tilde{V}}\expect{\tilde{\tilde{\nu}}\tilde{\nu}^T}\tilde{V} - \tr{G_u}h\tilde{V}^T\expect{\tilde{\nu}_R\tilde{\nu}_R^T}\tilde{V}^T.
+	&= h\expect{\tilde{\tilde{\nu}}\tilde{\nu}^T}\tilde{V}^T - \tr{G_u}h\tilde{V}\expect{\tilde{\nu}_R\tilde{\nu}_R^T}\tilde{V}^T.
 \end{align*}
 
 \noindent The last term on the right hand side is
