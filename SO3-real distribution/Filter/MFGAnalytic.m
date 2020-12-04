@@ -98,6 +98,7 @@ stepT = zeros(N-1,1);
 
 %% filter iteration
 for n = 2:N
+    try
     tic;
     
     % uncertainty propagation
@@ -138,6 +139,9 @@ for n = 2:N
     R(:,:,n) = U*V';
     
     stepT(n-1) = toc;
+    catch
+        break;
+    end
 end
 
 end

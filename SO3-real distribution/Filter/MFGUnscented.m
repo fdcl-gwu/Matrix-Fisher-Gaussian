@@ -96,6 +96,7 @@ stepT = zeros(N-1,1);
 
 %% filter iteration
 for n = 2:N
+    try
     tic;
     
     % unscented transform for last step
@@ -127,7 +128,7 @@ for n = 2:N
     end
     
     % recover prior distribution
-    [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp,defQS,diag(S));
+    [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xp,Rp,wp,defQS,diag(S),true);
     Sigma = Sigma+eye(3)*biasInstability^2*dt;
     
     % update
@@ -164,6 +165,9 @@ for n = 2:N
     R(:,:,n) = U*V';
     
     stepT(n-1) = toc;
+    catch
+        break;
+    end
 end
 
 end

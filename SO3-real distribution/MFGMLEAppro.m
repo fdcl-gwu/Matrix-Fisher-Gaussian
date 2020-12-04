@@ -1,4 +1,4 @@
-function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, defQS, s0 )
+function [ Miu, Sigma, P, U, S, V ] = MFGMLEAppro( x, R, w, defQS, s0, approx )
 % let x be N-by-Ns, R be 3-by-3-by-Ns
 
 N = size(x,1);
@@ -6,6 +6,10 @@ Ns = size(R,3);
 
 if ~exist('w','var') || isempty(w)
     w = ones(1,Ns)/Ns;
+end
+
+if ~exist('approx','var') || isempty(approx)
+    approx = false;
 end
 
 % empirical moments
@@ -45,6 +49,13 @@ end
 
 % correlation part
 P = covxvR*covvRvR^-1;
+
+if approx
+    if S(2,2)+S(3,3) < 1
+        P(:,1) = 0;
+        covxvR(:,1) = 0;
+    end
+end
 
 % Gaussian part
 SigmaTilde2Inv = diag([S(2,2)+S(3,3),S(1,1)+S(3,3),S(1,1)+S(2,2)]);
