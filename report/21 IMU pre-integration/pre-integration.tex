@@ -1,0 +1,275 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage{xcolor}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{IMU Pre-integration\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\begin{document}
+
+\maketitle
+
+Let the continuous kinematics model of an IMU be
+\begin{align}
+	R^T\diff{R} &= \hat{\Omega}\diff{t} + H_g\diff{W}_t^g, \\
+	\diff{v} &= (Ra + g)\diff{t} + R(H_a\diff{W}_t^a), \\
+	\diff{p} &= v\diff{t}.
+\end{align}
+The corresponding discrete time kinematics is
+\begin{align}
+	R_{i+1} &= R_i\exp\left( h\hat{\Omega}_i + (H_g\Delta W_t^g)^\wedge \right), \\
+	v_{i+1} &= v_i + hg + R_i(ha_i + H_a\Delta W_t^a), \\
+	p_{i+1} &= p_i + hv_i + \tfrac{1}{2}h^2g + \tfrac{1}{2}R_i\left(h^2a_i + H_a\int_0^h W_t^a\diff{t}\right).
+\end{align}
+Let $i$, $j$ be the indices of two key frames, between which there are $(j-i)$ IMU.
+Define the following increments for all $k=i+1,\ldots,j$:
+\begin{gather}
+	\Delta R_{ik} = R_i^TR_k = \prod_{l=i}^{k-1} \exp\left( h\hat{\Omega}_l + (H_g\Delta W_t^g)^\wedge \right), \label{eqn:Delta R} \\
+	\Delta v_{ik} = R_i^T(v_k-v_i-(k-i)hg) = \sum_{l=i}^{k-1} \Delta R_{il}(ha_l + H_a\Delta W_t^a). \label{eqn:Delta v}
+\end{gather}
+The expressions for $\Delta p_{ik}$ is trickier, as we want it to be independent of $R_i$, $v_i$ and $p_i$.
+\begin{align*}
+	p_k &= p_i + \sum_{l=i}^{k-1} \left[ hv_l + \tfrac{1}{2}h^2g + \tfrac{1}{2}R_l \left( h^2a_l + H_a\int_0^h W_t^a\diff{t} \right) \right] \\
+	&= p_i + \tfrac{1}{2}(k-i)h^2g + \sum_{l=i}^{k-1} \left[ h(v_l-v_i-(l-i)hg) + \tfrac{1}{2}R_l \left( h^2a_l + H_a\int_0^h W_t^a\diff{t} \right) \right] + \sum_{l=i}^{k-1} \left[ h(v_i+(l-i)hg) \right] \\
+	&= p_i + (k-i)hv_i + \tfrac{1}{2}(k-i)^2h^2g + \sum_{l=i}^{k-1} \left[ h(v_l-v_i-(l-i)hg) + \tfrac{1}{2}R_l \left( h^2a_l + H_a\int_0^h W_t^a\diff{t} \right) \right].
+\end{align*}
+This indicates
+\begin{align} \label{eqn: Delta p}
+	\Delta p_{ik} = R_i^T\left( p_k - p_i - (k-i)hv_i - \tfrac{1}{2}(k-i)^2h^2g \right) = \sum_{l=i}^{k-1} \left[ h\Delta v_{il} + \tfrac{1}{2}\Delta R_{il}\left( h^2a_l + H_a\int_0^h W_t^a\diff{t} \right) \right]
+\end{align}
+
+\section{Uncertainty Propagation}
+Suppose for any $i < k \leq j$, $(\Delta R_{ik}, \Delta v_{ik}, \Delta p_{ik}) \sim \mathcal{MG}(U_k,S_k,V_k,\mu_k,\Sigma_k,P_k)$, we want to match the distribution of $(\Delta R_{ik+1}, \Delta v_{ik+1}, \Delta p_{ik+1})$ to a new MFG.
+The parameters $\mu_k\in\real{6}$, $P_k\in\real{6\times 3}$, and $\Sigma_k\in\real{6\times 6}$ are factorized into the velocity and position components, as follows:
+\begin{gather}
+	\mu_k = \begin{bmatrix} \mu_{v_k}^T & \mu_{p_k}^T \end{bmatrix}^T, \qquad
+	P_k = \begin{bmatrix} P_{v_k} \\ P_{p_k} \end{bmatrix}, \qquad 
+	\Sigma_k = \begin{bmatrix} \Sigma_{vv_k} & \Sigma_{vp_k} \\ \Sigma_{pv_k} & \Sigma_{pp_k} \end{bmatrix}.
+\end{gather}
+
+\subsection{Moments for $\Delta R_{ik+1}$}
+Decompose $\Delta R_{ik+1}$ as
+\begin{align*}
+	\Delta R_{ik+1} = \Delta R_{ik} \exp(h\hat{\Omega}_k + (H_g\Delta W_t^g)^\wedge) = \Delta R_{ik} \exp((H_g\Delta t^g)^\wedge + C(h,\Delta W_t^g)) \exp(h\hat{\Omega}_k),
+\end{align*}
+where $C(h,\Delta W_t^g) = -\frac{1}{2}[h\hat{\Omega}_k+(H_g\Delta W_t^g)^\wedge, h\hat{\Omega}_k] + \cdots \sim o(h)$.
+First
+\color{blue}
+\begin{align}
+	\expect{\Delta R_{ik+1}} &= \expect{\Delta R_{ik}} \expect{\exp\left( (H_g\Delta W_t^g)^\wedge + C(h,\Delta W_t^g) \right)} \exp(h\hat{\Omega}_k) \nonumber \\
+	&= \expect{\Delta R_{ik}} \expect{ \sum_{n=1}^\infty \tfrac{1}{n!} \left( (H_g\Delta W_t^g)^\wedge + C(h,\Delta W_t^g)^n \right) } \exp(h\hat{\Omega}_k) \nonumber \\
+	&= \expect{\Delta R_{ik}} \left( I_{3\times 3} + \tfrac{h}{2}(G_g-\tr{G_g}I_{3\times 3}) \right) \exp(h\hat{\Omega}_k) + O(h^2),
+\end{align}
+\color{black}
+where $G_g = H_gH_g^T$.
+Then $U_{k+1}$, $V_{k+1}$ are given by $U_{k+1}D_{k+1}V_{k+1}^T = \expect{\Delta R_{ik+1}}$, and $S_{k+1}$ can be solved from $D_{k+1}$.
+Let $\nu_{\Delta R_{ik+1}} = (Q_{k+1}S_{k+1} - S_{k+1}Q_{k+1}^T)^\vee$, where $Q_{k+1} = U_{k+1}^T \Delta R_{ik+1} V_{k+1}$, then
+\color{blue}
+\begin{align}
+	\expect{\nu_{\Delta R_{ik+1}}} = 0.
+\end{align}
+\color{black}
+
+For any $A\in\real{3\times 3}$, let $\Lambda(A) = (U_{k+1}^TAV_{k+1}S_{k+1} - S_{k+1}V_{k+1}^TA^TU_{k+1})^\vee$.
+Also, denote $\delta R_k = \exp(h\hat{\Omega}_k)$, and $\xi = (H_g\Delta W_t^g)^\wedge + C(h,\Delta W_t^g)$, then
+\color{blue}
+\begin{align} \label{eqn:EvR(k+1)vR(k+1)}
+	\expect{\nu_{\Delta R_{ik+1}} \nu_{\Delta R_{ik+1}}^T} &= \sum_{m,n=1}^{\infty} \tfrac{1}{m!n!} \expect{\Lambda\left( \Delta R_{ik} \xi^m \delta R_k \right) \Lambda\left( \Delta R_{ik} \xi^n \delta R_k \right)^T} \nonumber \\
+	&= \expect{\Lambda\left( \Delta R_{ik} \delta R_k \right) \Lambda\left( \Delta R_{ik} \delta R_k \right)^T} + \expect{\Lambda\left( \Delta R_{ik} (H_g\Delta W_t^g)^\wedge \delta R_k \right) \Lambda\left( \Delta R_{ik} (H_g\Delta W_t^g)^\wedge \delta R_k \right)^T} \nonumber \\
+	&\quad + \tfrac{1}{2}\expect{\Lambda\left( \Delta R_{ik} \delta R_k \right) \Lambda\left( \Delta R_{ik} ((H_g\Delta W_t^g)^\wedge)^2 \delta R_k \right)^T} \nonumber \\
+	&\quad + \tfrac{1}{2}\expect{\Lambda\left( \Delta R_{ik} ((H_g\Delta W_t^g)^\wedge)^2 \delta R_k \right) \Lambda\left( \Delta R_{ik} \delta R_k \right)^T} + O(h^2).
+\end{align}
+\color{black}
+Let $\tilde{U} = U_{k+1}^TU_k$, $\tilde{V} = V_{k+1}^T\exp(-h\hat{\Omega}_k)V_k$, and $\tilde{S} = \tilde{U}^TS_{k+1}\tilde{V}$.
+Also, let $Q_k = U_k^T\Delta R_{ik}V_k$, and $\tilde{\nu}_{\Delta R_{ik}} = (Q_k\tilde{S}^T - \tilde{S}Q_k^T)^\vee$, then we have
+\begin{align*}
+	\Lambda(\Delta R_{ik} \delta R_k) &= (U_{k+1}^TU_kQ_kV_k^T\delta R_kV_{k+1}S_{k+1} - S_{k+1}V_{k+1}^T\delta R_k^TV_kQ_k^TU_k^TU_{k+1})^\vee \\
+	&= (\tilde{U}Q_k\tilde{V}^TS_{k+1} - S_{k+1}\tilde{V}Q_k^T\tilde{U}^T)^\vee \\
+	&= \tilde{U} (Q_k\tilde{V}^TS_{k+1}\tilde{U} - \tilde{U}^TS_{k+1}\tilde{V}Q_k^T)^\vee \\
+	&= \tilde{U} (Q_k\tilde{S}^T - \tilde{S}Q_k^T)^\vee \\
+	&= \tilde{U} \tilde{\nu}_{\Delta R_{ik}}.
+\end{align*}
+Thus the first term on the right hand side of \eqref{eqn:EvR(k+1)vR(k+1)} can be written as
+\begin{align}
+	\expect{\Lambda\left( \Delta R_{ik} \delta R_k \right) \Lambda\left( \Delta R_{ik} \delta R_k \right)^T} = \tilde{U} \expect{\tilde{\nu}_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T.
+\end{align}
+Next, let $\Gamma_k = \left( \tr{Q_k\tilde{S}^T}I_{3\times 3} - Q_k\tilde{S}^T \right) Q_k$, then we have
+\begin{align*}
+	\Lambda\left( \Delta R_{ik} (H_g\Delta W_t^g)^\wedge \delta R_k \right) &= (U_{k+1}^T \Delta R_{ik} (H_g\Delta W_t^g)^\wedge \delta R_kV_{k+1}S_{k+1} + S_{k+1}V_{k+1}^T\delta R_k^T (H_g\Delta W_t^g)^\wedge \Delta R_{ik}^TU_{k+1})^\vee \\
+	&= (\tilde{U}Q_kV_k^T(H_g\Delta W_t^g)^\wedge \delta R_kV_{k+1}S_{k+1} + S_{k+1}V_{k+1}^T\delta R_k^T (H_g\Delta W_t^g)^\wedge V_kQ_k^T\tilde{U}^T)^\vee \\
+	&= (\tilde{U}Q_k(V_k^TH_g\Delta W_t^g)^\wedge \tilde{V}^TS_{k+1} + S_{k+1}\tilde{V}(V_k^TH_g\Delta W_t^g)^\wedge Q_k^T\tilde{U}^T)^\vee \\
+	&= \tilde{U}(Q_k(V_k^TH_g\Delta W_t^g)^\wedge \tilde{S}^T + \tilde{S}(V_k^TH_g\Delta W_t^g)^\wedge Q_k^T)^\vee \\
+	&= \tilde{U}((Q_kV_k^TH_g\Delta W_t^g)^\wedge Q_k\tilde{S}^T + \tilde{S}Q_k^T(Q_kV_k^TH_g\Delta W_t^g)^\wedge)^\vee \\
+	&= \tilde{U}\left( \tr{Q_k\tilde{S}^T}I_{3\times 3} - Q_k\tilde{S}^T \right) Q_kV_k^TH_g\Delta W_t^g \\
+	&= \tilde{U}\Gamma_kV_k^TH_g\Delta W_t^g.
+\end{align*}
+Thus, the second term on the right hand side of \eqref{eqn:EvR(k+1)vR(k+1)} can be written as
+\begin{align}
+	\expect{\Lambda\left( \Delta R_{ik} (H_g\Delta W_t^g)^\wedge \delta R_k \right) \Lambda\left( \Delta R_{ik} (H_g\Delta W_t^g)^\wedge \delta R_k \right)^T} &= \tilde{U} \expect{\Gamma_kV_k^TH_g\Delta W_t^g (H_g\Delta W_t^g)^TV_k\Gamma_k^T} \tilde{U}^T \nonumber \\
+	&= h\tilde{U} \expect{\Gamma_kV_k^TG_gV_k\Gamma_k^T} \tilde{U}^T.
+\end{align}
+Lastly, let $\tilde{\tilde{V}} = V_{k+1}^T\exp(-h\hat{\Omega}_k)G_g^TV_k$, $\tilde{\tilde{S}} = \tilde{U}^TS_{k+1}\tilde{\tilde{V}}$ and $\tilde{\tilde{\nu}}_{\Delta R_{ik}} = (Q_k\tilde{\tilde{S}}^T - \tilde{\tilde{S}}Q_k^T)^\vee$, then we have
+\begin{align*}
+	\Lambda\left( \Delta R_{ik}G_u\delta R_k \right) &= (U_{k+1}^T \Delta R_{ik} G_g \delta R_kV_{k+1}S_{k+1} + S_{k+1}V_{k+1}^T\delta R_k^T G_g^T \Delta R_{ik}^TU_{k+1})^\vee \\
+	&= (\tilde{U}Q_k\tilde{\tilde{V}}^TS_{k+1} - S_{k+1}\tilde{\tilde{V}}Q_k^T\tilde{U}^T)^\vee \\
+	&= \tilde{U}(Q_k\tilde{\tilde{S}}^T - \tilde{\tilde{S}}Q_k^T)^\vee \\
+	&= \tilde{U}\tilde{\tilde{\nu}}_{\Delta R_{ik}}.
+\end{align*}
+Thus, the third term on the right hand side of \eqref{eqn:EvR(k+1)vR(k+1)} can be written as
+\begin{align}
+	&\expect{\Lambda\left( \Delta R_{ik} \delta R_k \right) \Lambda\left( \Delta R_{ik} ((H_g\Delta W_t^g)^\wedge)^2 \delta R_k \right)^T} = h\tilde{U} \expect{\tilde{\nu}_{\Delta R_{ik}} \Lambda\left( \Delta R_{ik} (G_g-\tr{G_g}I_{3\times 3}) \delta R_k \right)^T} \nonumber \\
+	&\qquad \qquad = h\tilde{U} \expect{\tilde{\nu}_{\Delta R_{ik}} \Lambda\left( \Delta R_{ik}G_g\delta R_k \right)^T} - h\tr{G_g}\tilde{U} \expect{\tilde{\nu}_{\Delta R_{ik}} \Lambda\left( \Delta R_{ik}\delta R_k \right)^T} \nonumber \\
+	&\qquad \qquad = h\tilde{U}\expect{ \tilde{\nu}_{\Delta R_{ik}} \tilde{\tilde{\nu}}_{\Delta R_{ik}}^T }\tilde{U}^T - h\tr{G_g}\tilde{U} \expect{\tilde{\nu}_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T.
+\end{align}
+
+\subsection{Moments for $\Delta v_{ik+1}$ and $\Delta p_{ik+1}$}
+Next, we consider moments involved with $\Delta v_{ik+1}$ and $\Delta p_{ik+1}$.
+First, we have
+\color{blue}
+\begin{gather}
+	\expect{\Delta v_{ik+1}} = \expect{\Delta v_{ik}} + \expect{\Delta R_{ik}(ha_k + H_a\Delta W_t^a)} = \expect{\Delta v_{ik}} + h\expect{\Delta R_{ik}}a_k, \\
+	\expect{\Delta p_{ik+1}} = \expect{\Delta p_{ik}} + h\expect{\Delta v_{ik}} + \tfrac{1}{2}h^2\expect{\Delta R_{ik}}a_k.
+\end{gather}
+\color{black}
+
+Let $G_a = H_aH_a^T$, then for the second order moments, we have
+\color{blue}
+\begin{align}
+	\expect{\Delta v_{ik+1} \Delta v_{ik+1}^T} &= \expect{\Delta v_{ik} \Delta v_{ik}^T} + \expect{\Delta R_{ik}(ha_k+H_a\Delta W_t^a)(ha_k+H_a\Delta W_t^a)^T\Delta R_{ik}^T} \nonumber \\
+	&\qquad + h\expect{\Delta v_{ik}a_k^T\Delta R_{ik}^T} + h\expect{\Delta R_{ik}a_k\Delta v_{ik}^T},
+\end{align}
+\color{black}
+where the second term on the right hand side can be written as
+\begin{align}
+	\expect{\Delta R_{ik}(ha_k+H_a\Delta W_t^a)(ha_k+H_a\Delta W_t^a)^T\Delta R_{ik}^T} = \expect{\Delta R_{ik} (h^2a_ka_k^T + hG_a)\Delta R_{ik}^T},
+\end{align}
+and the third term on the right hand side can be written as
+\begin{align}
+	\expect{\Delta v_{ik}a_k^T\Delta R_{ik}^T} = \mu_{v_k}a_k^T\expect{\Delta R_{ik}^T} + P_{v_k}\expect{\nu_{\Delta R_{ik}} a_k^T \Delta R_{ik}^T}.
+\end{align}
+Similarly, we have
+\color{blue}
+\begin{align}
+	\expect{\Delta p_{ik+1} \Delta p_{ik+1}^T} &= \expect{\Delta p_{ik} \Delta p_{ik}^T} + h\expect{\Delta p_{ik} \Delta v_{ik}^T} + h\expect{\Delta v_{ik} \Delta p_{ik}^T} + h^2\expect{\Delta v_{ik} \Delta v_{ik}} \nonumber \\
+	&\quad + \tfrac{1}{2}h^2\expect{\Delta p_{ik}a_k^T\Delta R_{ik}^T} + \tfrac{1}{2}h^2\expect{\Delta R_{ik}a_k\Delta p_{ik}^T} + \tfrac{1}{2}h^3\expect{\Delta v_{ik}a_k^T\Delta R_{ik}^T} \nonumber \\
+	&\quad + \tfrac{1}{2}h^3\expect{\Delta R_{ik}a_k\Delta v_{ik}^T} + \tfrac{1}{4}\expect{\Delta R_{ik} \left(h^2a_k + H_a\int_0^h W_t^a\diff{t}\right) \left(h^2a_k + H_a\int_0^h W_t^a\diff{t}\right)^T \Delta R_{ik}^T}.
+\end{align}
+\color{black}
+The fifth term on the right hand side can be written as
+\begin{align}
+	\expect{\Delta p_{ik}a_k^T\Delta R_{ik}^T} = \mu_{p_k}a_k^T\expect{\Delta R_{ik}^T} + P_{p_k}\expect{\nu_{\Delta R_{ik}}a_k^T\Delta R_{ik}^T}.
+\end{align}
+Note that $\int_0^h W_t^a\diff{t} \sim \mathcal{N}(0,\tfrac{1}{3}h^3I_{3\times 3})$, so the last term on the right hand side can be written as
+\begin{align}
+	\expect{\Delta R_{ik} \left(h^2a_k + H_a\int_0^h W_t^a\diff{t}\right) \left(h^2a_k + H_a\int_0^h W_t^a\diff{t}\right)^T \Delta R_{ik}^T} = \expect{\Delta R_{ik} \left(h^4a_ka_k^T + \tfrac{1}{3}h^3G_a\right) \Delta R_{ik}}.
+\end{align}
+Lastly, we have
+\color{blue}
+\begin{align} \label{eqn:Ev(k+1)p(k+1)}
+	\expect{\Delta v_{ik+1} \Delta p_{ik+1}^T} &= \expect{\Delta v_{ik} \Delta p_{ik}^T} + h\expect{\Delta v_{ik} \Delta v_{ik}^T} + h\expect{\Delta R_{ik}a_k\Delta P_{ik}^T} + \tfrac{1}{2}h^2\expect{\Delta v_{ik}a_k^T\Delta R_{ik}^T} \nonumber \\
+	&\quad + \tfrac{1}{2} \expect{\Delta R_{ik}(ha_k + H_a\Delta W_t^a) \left(h^2a_k + H_a\int_0^t W_t^a\diff{t}\right)^T \Delta R_{ik}^T}
+\end{align}
+\color{black}
+By Ito's isometry, we have
+\begin{align*}
+	\expect{\int_0^h \diff{W_t^a} \left( \int_0^h W_t^a \diff{t} \right)^T} = \expect{\int_0^h \diff{W_t^a} \left( \int_0^h (h-t) \diff{W_t^a} \right)^T} 
+	=\expect{\int_0^h (h-t) \diff{t}} I_{3\times 3} = \tfrac{1}{2}h^2I_{3\times 3}.
+\end{align*}
+Thus the last term on the right hand side of \eqref{eqn:Ev(k+1)p(k+1)} can be written as
+\begin{align}
+	\expect{\Delta R_{ik}(ha_k + H_a\Delta W_t^a) \left(h^2a_k + H_a\int_0^t W_t^a\diff{t}\right)^T \Delta R_{ik}^T} = \expect{\Delta R_{ik} \left(h^3a_ka_k^T + \tfrac{1}{2}h^2G_a\right) \Delta R_{ik}^T}.
+\end{align}
+
+Next, we consider the correlation between $\Delta v_{ik+1}$, $\Delta p_{ik+1}$, and $\nu_{\Delta R_{ik+1}}$.
+First, we have
+\color{blue}
+\begin{align}
+	\expect{\Delta v_{ik+1} \nu_{\Delta R_{ik+1}}^T} = \expect{\Delta v_{ik} \nu_{\Delta R_{ik+1}}^T} + h\expect{\Delta R_{ik}a_k\nu_{\Delta R_{ik+1}}^T}.
+\end{align}
+\color{black}
+The first term on the right hand side can be calculated as
+\begin{align}
+	\expect{\Delta v_{ik} \nu_{\Delta R_{ik+1}}^T} &= \mu_{v_k} \expect{\nu_{\Delta R_{ik+1}}^T} + P_{v_k} \expect{\nu_{\Delta R_{ik}} \nu_{\Delta R_{ik+1}}^T} \nonumber \\
+	&= P_{v_k}\sum_{n=1}^\infty \tfrac{1}{n!} \expect{\nu_{\Delta R_{ik}} \Lambda\left( \Delta R_{ik}\xi^n\delta R_k \right)^T} \nonumber \\
+	&= P_{v_k}\expect{\nu_{\Delta R_{ik}} \Lambda\left( \Delta R_{ik}\delta R_k \right)^T} + \tfrac{1}{2} P_{v_k} \expect{\nu_{\Delta R_{ik}} \Lambda\left( \Delta R_{ik} ((H_g\Delta W_t^g)^\wedge)^2 \delta R_k \right)^T} + O(h^2) \nonumber \\
+	&= P_{v_k}\expect{\nu_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T}\tilde{U}^T + \tfrac{1}{2} hP_{v_k}\expect{\nu_{\Delta R_{ik}} \tilde{\tilde{\nu}}_{\Delta R_{ik}}^T} \tilde{U}^T - \tfrac{1}{2}h\tr{G_g} P_{v_k}\expect{\nu_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T + O(h^2) \nonumber \\
+	&= \tfrac{1}{2} hP_{v_k}\expect{\nu_{\Delta R_{ik}} \tilde{\tilde{\nu}}_{\Delta R_{ik}}^T} \tilde{U}^T + \left( 1- \tfrac{1}{2}h\tr{G_g} \right) P_{v_k}\expect{\nu_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T + O(h^2).
+\end{align}
+Similarly, the second term on the right hand side can be calculated as
+\begin{align}
+	\expect{\Delta R_{ik}a_k\nu_{\Delta R_{ik+1}}^T} &= \expect{\Delta R_{ik}a_k\Lambda(\Delta R_{ik}\delta R_k)^T} + \tfrac{1}{2}h\expect{\Delta R_{ik}a_k\Lambda\left( \Delta R_{ik} ((H_g\Delta W_t^g)^\wedge)^2 \delta R_k \right)^T} + O(h^2) \nonumber \\
+	&= \tfrac{1}{2}h U_k\expect{Q_kV_k^Ta_k\tilde{\tilde{\nu}}_{\Delta R_{ik}}^T} \tilde{U}^T + \left( 1- \tfrac{1}{2}h\tr{G_g} \right) U_k\expect{Q_kV_k^Ta_k\tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T + O(h^2).
+\end{align}
+Finally,
+\color{blue}
+\begin{align}
+	\expect{\Delta p_{ik+1} \nu_{\Delta R_{ik+1}}^T} = \expect{\Delta p_{ik} \nu_{\Delta R_{ik+1}}^T} + h\expect{\Delta v_{ik}\nu_{\Delta R_{ik+1}}^T} + \tfrac{1}{2}h^2\expect{\Delta R_{ik}a_k\nu_{\Delta R_{ik+1}}^T},
+\end{align}
+\color{black}
+where the first term on the right hand side can be written as
+\begin{align}
+	\expect{\Delta p_{ik} \nu_{\Delta R_{ik+1}}^T} = \tfrac{1}{2}hP_{p_k}\expect{\nu_{\Delta R_{ik}} \tilde{\tilde{\nu}}_{\Delta R_{ik}}^T} \tilde{U}^T + \left( 1- \tfrac{1}{2}h\tr{G_g} \right) P_{p_k}\expect{\nu_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T + O(h^2).
+\end{align}
+
+\subsection{Pre-integration}
+
+From the highlighted formulae, we can recover match $(\Delta R_{ik+1}, \Delta v_{ik+1}, \Delta p_{ik+1})$ to a new MFG, by assuming $(\Delta R_{ik}, \Delta v_{ik}, \Delta p_{ik})$ follows an MFG.
+To find the MFG for $(\Delta R_{ij}, \Delta v_{ij}, \Delta p_{ij})$, we start from $(\Delta R_{ii+1}, \Delta v_{ii+1}, \Delta p_{ii+1})$:
+\begin{align}
+	\Delta R_{ii+1} &= \exp\left( h\hat{\Omega}_i + (H_g\Delta W_t^g)^\wedge \right), \\
+	\Delta v_{ii+1} &= ha_i + H_a\Delta W_t^a, \\
+	\Delta p_{ii+1} &= \tfrac{1}{2} \left( h^2a_i + H_a\int_0^h W_t^a\diff{t}\right).
+\end{align}
+So $(\Delta R_{ii+1}, \Delta v_{ii+1}, \Delta p_{ii+1})$ are independent, and
+\begin{gather}
+	\expect{\Delta R_{ii+1}} = \left( I_{3\times 3} + \tfrac{h}{2}(G_g-\tr{G_g}I_{3\times 3}) \right) \exp(h\hat{\Omega}_k) + O(h^2), \\
+	\Delta v_{ii+1} \sim \mathcal{N}(ha_i, hG_a), \\
+	\Delta p_{ii+1} \sim \mathcal{N}(\tfrac{1}{2}h^2a_i, \tfrac{1}{3}h^3G_a).
+\end{gather}
+Let $x = (R,v,p)$, and $\Delta x_{ij} = (\Delta R_{ij}, \Delta v_{ij}, \Delta p_{ij})$, then $\Delta x_{ij} (x_i,x_j)$ is a function of $x_i$ and $x_j$ according to \eqref{eqn:Delta R}, \eqref{eqn:Delta v} and \eqref{eqn: Delta p}.
+The propagated MFG at time $t_j$ gives the density for $p(\Delta x_{ij} | \mathcal{I}_{ij})$, where $\mathcal{I}_{ij}$ denotes all IMU measurements at time $t_k$, $k=i,\ldots,j-1$.
+Suppose the prior $p(\Delta x_{ij})$ is uniform, then
+\begin{align}
+	p(\mathcal{I}_{ij} | \Delta x_{ij}) = \frac{p(\Delta x_{ij} | \mathcal{I}_{ij}) p(\mathcal{I}_{ij})}{p(\Delta x_{ij})} \propto p(\Delta x_{ij}|\mathcal{I}_{ij}).
+\end{align}
+
+From another point of view, using the notations in \cite{forster2016manifold}, let $\mathcal{K}_k = \{i_0,\ldots,i_n\}$ be all keyframes, $\mathcal{I}_k = \{\mathcal{I}_{i_j i_{j+1}}\}_{i_j\in\mathcal{K}_k}$, $\mathcal{C}_k = \{\mathcal{C}_i\}_{i\in\mathcal{K}}$, and $\mathcal{X}_k = \{x_i\}_{i\in\mathcal{K}_k}$.
+Then the posterior density can be factorized into
+\begin{align}
+	p(\mathcal{X}_k | \mathcal{C}_k, \mathcal{I}_k) &= \frac{p(\mathcal{C}_k | \mathcal{X}_k, \mathcal{I}_k) p(\mathcal{X}_k | \mathcal{I}_k)}{p(\mathcal{C}_k | \mathcal{I}_k)} \propto p(\mathcal{C}_k | \mathcal{X}_k) p(\mathcal{X}_k | \mathcal{I}_k).
+\end{align}
+The density $p(\mathcal{X}_k | \mathcal{I}_k)$ can further be decomposed into
+\begin{align}
+	p(\mathcal{X}_k | \mathcal{I}_k) &= p(x_{i_0}) p(x_{i_1},\ldots,x_{i_n} | \mathcal{I}_k, x_{i_0}) \nonumber \\
+	&= p(x_{i_0}) p(x_{i_2},\ldots,x_{i_n} | \mathcal{I}_k, x_{i_0}, x_{i_1}) p(x_{i_1} | \mathcal{I}_k, x_{i_0}) \nonumber \\
+	&= p(x_{i_0}) p(x_{i_2},\ldots,x_{i_n} | \mathcal{I}_{i_1i_2}, \ldots, \mathcal{I}_{i_{n-1}i_n}, x_{i_1}) p(x_{i_1} | \mathcal{I}_{0i_1}, x_{i_0}) \nonumber \\
+	&= p(x_{i_0}) \prod_{j=0}^{n-1} p(x_{i_j} | \mathcal{I}_{i_{j-1}i_j}, x_{i_{j-1}}) \nonumber \\
+	&= p(x_{i_0}) \prod_{j=0}^{n-1} p(\Delta x_{i_{j-1}i_j} | \mathcal{I}_{i_{j-1}i_j})
+\end{align}
+
+\bibliographystyle{IEEEtran}
+\bibliography{ref}
+
+\end{document}
+
