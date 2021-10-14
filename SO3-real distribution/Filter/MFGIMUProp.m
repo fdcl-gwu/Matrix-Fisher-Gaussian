@@ -44,7 +44,7 @@ EHW2 = (Ggu-trace(Ggu)*eye(3))*dt;
 ERtdt = (ERt*(eye(3)+EHW2/2) + dt*ERHatPvRt)*expRot((omega+Miubg)*dt);
 
 [Utdt,D,Vtdt] = psvd(ERtdt);
-Stdt = diag(pdf_MF_M2S(diag(D)));
+Stdt = diag(pdf_MF_M2S(diag(D),s));
 
 %% E[x(t+dt)]
 Ebgtdt = Miubg;

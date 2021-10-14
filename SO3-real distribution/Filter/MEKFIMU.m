@@ -15,6 +15,8 @@ else
 end
 posMeaNoise = parameters.posMeaNoise;
 
+hasRMea = ~isempty(RMea);
+
 % initialize distribution
 if parameters.GaussMea
     initRNoise = parameters.initRNoise;
@@ -30,10 +32,20 @@ Q = [eye(3)*randomWalk^2*dt,zeros(3,12);
     zeros(3,15);
     zeros(3,9),eye(3)*acceRandomWalk^2*dt,zeros(3);
     zeros(3,12),eye(3)*acceBiasInstability^2*dt];
-meaNoise = [rotMeaNoise,zeros(3);
-    zeros(3),posMeaNoise];
-H = [eye(3),zeros(3,12);
-    zeros(3,6),eye(3),zeros(3,6)];
+
+if hasRMea
+    meaNoise = [rotMeaNoise,zeros(3);
+        zeros(3),posMeaNoise];
+else
+    meaNoise = posMeaNoise;
+end
+
+if hasRMea
+    H = [eye(3),zeros(3,12);
+        zeros(3,6),eye(3),zeros(3,6)];
+else
+    H = [zeros(3,6),eye(3),zeros(3,6)];
+end
 
 % data containers
 G.Sigma = zeros(15,15,N); G.Sigma(:,:,1) = Sigma;
@@ -63,7 +75,11 @@ for n = 2:N
     % update
     if rem(n,5)==0
         K = Sigma*H'*(H*Sigma*H'+meaNoise)^-1;
-        y = [logRot(Rp'*RMea(:,:,n),'v');pMea(:,n)-xp(4:6)];
+        if hasRMea
+            y = [logRot(Rp'*RMea(:,:,n),'v');pMea(:,n)-xp(4:6)];
+        else
+            y = pMea(:,n)-xp(4:6);
+        end
         dx = K*y;
         Sigma = (eye(15)-K*H)*Sigma;
 

@@ -1,4 +1,4 @@
-function [ R, x, MFG, stepT ] = MFGAnalyticIMU( gyro, acce, RMea, pMea, parameters, RTrue, xTrue )
+function [ R, x, MFG, stepT ] = MFGAnalyticIMU( gyro, acce, RMea, pMea, parameters )
 
 N = size(gyro,2);
 dt = parameters.dt;
@@ -19,6 +19,9 @@ H.Hgu = randomWalk*eye(3);
 H.Hgv = biasInstability*eye(3);
 H.Hau = acceRandomWalk*eye(3);
 H.Hav = acceBiasInstability*eye(3);
+
+hasRMea = ~isempty(RMea);
+bool_prog = parameters.bool_prog;
 
 % initialize distribution
 Miu = parameters.xInit;
@@ -56,18 +59,12 @@ for n = 2:N
     
     % unscented update
     if rem(n,5)==0
-%         [xs,Rs] = MFGSampling(Miu,Sigma,P,U,S,V,10000);
-%         w = ones(1,10000)/10000;
-% 
-%         for i = 1:10000
-%             dR = Rs(:,:,i)'*RMea(:,:,n);
-%             dx = xs(4:6,i)-pMea(:,n);
-%             w(i) = w(i)*exp(trace(SM*dR))*exp(-0.5*dx'*posMeaNoise^-1*dx);
-%         end
-%         
-%         w = w/sum(w);
-%         [Miu,Sigma,P,U,S,V] = MFGMLEAppro(xs,Rs,w);
-        
+        if hasRMea
+            FMea = RMea(:,:,n)*SM;
+            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,bool_prog);
+        else
+            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,zeros(3),pMea(:,n),posMeaNoise,bool_prog);
+        end
     end
     
     % record results

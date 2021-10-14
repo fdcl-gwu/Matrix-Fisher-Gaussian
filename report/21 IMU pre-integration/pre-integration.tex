@@ -188,7 +188,7 @@ Lastly, we have
 \color{blue}
 \begin{align} \label{eqn:Ev(k+1)p(k+1)}
 	\expect{\Delta v_{ik+1} \Delta p_{ik+1}^T} &= \expect{\Delta v_{ik} \Delta p_{ik}^T} + h\expect{\Delta v_{ik} \Delta v_{ik}^T} + h\expect{\Delta R_{ik}a_k\Delta P_{ik}^T} + \tfrac{1}{2}h^2\expect{\Delta v_{ik}a_k^T\Delta R_{ik}^T} \nonumber \\
-	&\quad + \tfrac{1}{2} \expect{\Delta R_{ik}(ha_k + H_a\Delta W_t^a) \left(h^2a_k + H_a\int_0^t W_t^a\diff{t}\right)^T \Delta R_{ik}^T}
+	&\quad + h^2\expect{\Delta R_{ik}a_k\Delta v_{ik}^T} + \tfrac{1}{2} \expect{\Delta R_{ik}(ha_k + H_a\Delta W_t^a) \left(h^2a_k + H_a\int_0^t W_t^a\diff{t}\right)^T \Delta R_{ik}^T}
 \end{align}
 \color{black}
 By Ito's isometry, we have
@@ -230,6 +230,90 @@ Finally,
 where the first term on the right hand side can be written as
 \begin{align}
 	\expect{\Delta p_{ik} \nu_{\Delta R_{ik+1}}^T} = \tfrac{1}{2}hP_{p_k}\expect{\nu_{\Delta R_{ik}} \tilde{\tilde{\nu}}_{\Delta R_{ik}}^T} \tilde{U}^T + \left( 1- \tfrac{1}{2}h\tr{G_g} \right) P_{p_k}\expect{\nu_{\Delta R_{ik}} \tilde{\nu}_{\Delta R_{ik}}^T} \tilde{U}^T + O(h^2).
+\end{align}
+
+\subsection{Gradient}
+
+Having the density function for $(\Delta R_{ij}, \Delta v_{ij}, \Delta p_{ij})$, we want to calculate its gradient with respect to $(\delta \phi_i, \delta \phi_j, \delta v_i, \delta v_j, \delta p_i, \delta p_j)$.
+First, $\Delta R_{ij}, \Delta v_{ij}, \Delta p_{ij}$ can be written as
+\begin{align}
+	\Delta R_{ij} &= [R_i\exp(\delta \hat{\phi}_i)]^T R_j\exp(\delta \hat{\phi}_j), \\
+	\Delta v_{ij} &= [R_i\exp(\delta \hat{\phi}_i)]^T (v_j+\delta v_j - (v_i+\delta v_i) - \Delta t_{ij}g), \\
+	\Delta p_{ij} &= [R_i\exp(\delta \hat{\phi}_i)]^T (p_j+\delta p_j - (p_i+\delta p_i) - \Delta t_{ij}(v_i+\delta v_i) - \tfrac{1}{2}\Delta t_{ij}^2g).
+\end{align}
+The negative log density function is
+\begin{align}
+	f = -\tr{QS} + \tfrac{1}{2}(\Delta x_{ij} - \mu_c)^T \Sigma_c^{-1} (\Delta x_{ij} - \mu_c),
+\end{align}
+where $x_{ij} = \begin{bmatrix} \Delta v_{ij}^T & \Delta p_{ij}^T \end{bmatrix}^T$.
+
+Then we have
+\color{blue}
+\begin{align}
+	\frac{\partial f}{\partial \delta \phi_i} = -\frac{\partial \tr{QS}}{\partial \delta \phi_i} + \frac{\partial (\Delta x_{ij} - \mu_c)^T}{\partial \delta \phi_i} \Sigma_c^{-1} (\Delta x_{ij} - \mu_c).
+\end{align}
+\color{black}
+The first term on the right hand side can be calculated as
+\begin{align}
+	\frac{\partial \tr{QS}}{\partial \delta \phi_i} &\approx \frac{\partial \tr{U^T[R_i(I_{3\times 3} + \delta \hat{\phi}_i)]^TR_jVS}}{\partial \phi_i}
+	= -\frac{\partial \tr{\delta\hat{\phi}_i R_i^TR_jF^T}}{\partial \delta\phi_i} \nonumber \\
+	&= \frac{\partial \delta\phi_i^T (R_i^TR_jF^T - FR_j^TR_i)^\vee}{\partial \phi_i} = (R_i^TR_jF^T - FR_j^TR_i)^\vee.
+\end{align}
+The second term can be calculated as
+\begin{align}
+	\frac{\partial \Delta v_{ij}}{\partial \delta\phi_i} &\approx \frac{\partial [R_i(I_{3\times 3} + \hat{\phi}_i)]^T (v_j-v_i-\Delta t_{ij}g)}{\partial \delta\phi_i} = \left[ R_i^T(v_j-v_i-\Delta t_{ij}g) \right]^\wedge, \\
+	\frac{\partial \Delta p_{ij}}{\partial \delta\phi_i} &\approx \frac{\partial [R_i(I_{3\times 3} + \hat{\phi}_i)]^T (p_j-p_i-\Delta t_{ij}v_i - \tfrac{1}{2}\Delta t_{ij}^2g)}{\partial \delta\phi_i} = \left[ R_i^T(p_j-p_i-\Delta t_{ij}v_i - \tfrac{1}{2}\Delta t_{ij}^2g) \right]^\wedge.
+\end{align}
+And
+\begin{align}
+	\frac{\partial \mu_c}{\partial \delta\phi_i} &= P \frac{\partial (QS-SQ^T)^\vee}{\partial \delta\phi_i} \approx P \frac{\partial \left(U^T[R_i(I_{3\times 3}+\delta\hat{\phi}_i)]^TR_jVS - SV^TR_j^TR_i(I_{3\times 3}+\delta\hat{\phi}_i)U\right)^\vee}{\partial \delta\phi_i} \nonumber \\
+	&= -PU^T \frac{\partial \left(\delta\hat{\phi}R_i^TR_jF^T + FR_j^TR_i\delta\hat{\phi}\right)^\vee}{\partial \delta\phi_i} = -PU^T \frac{\partial \left(\tr{R_i^TR_jF^T}I_{3\times 3} - R_i^TR_jF^T\right) \delta\phi_i}{\partial \delta\phi_i} \nonumber \\
+	&= PU^T\left(R_i^TR_jF^T - \tr{R_i^TR_jF^T}I_{3\times 3}\right).
+\end{align}
+Next, the gradient with respect to $\delta\phi_j$ is
+\color{blue}
+\begin{align}
+	\frac{\partial f}{\partial \delta\phi_j} = -\frac{\partial \tr{QS}}{\partial \delta \phi_j} - \frac{\partial \mu_c^T}{\partial \delta\phi_j} \Sigma_c^{-1} (\Delta x_{ij} - \mu_c).
+\end{align}
+\color{black}
+Similarly, the first term on the right hand side can be calculated as
+\begin{align}
+	\frac{\partial \tr{QS}}{\partial \delta\phi_j} \approx \frac{\partial \tr{U^TR_i^TR_j(I_{3\times 3}+\hat{\phi}_j)VS}}{\partial \delta\phi_j} = \frac{\partial \tr{\hat{\phi}_jF^TR_i^TR_j}}{\partial \delta\phi_j} = -(F^TR_i^TR_j - R_j^TR_iF)^\vee.
+\end{align}
+And the second term on the right hand side can be calculated as
+\begin{align}
+	\frac{\partial \mu_c}{\partial \delta\phi_j} &\approx P\frac{\partial \left(U^TR_i^TR_j(I_{3\times 3}+\hat{\phi}_j)VS - SV^T[R_j(I_{3\times 3}+\hat{\phi}_j)]^TR_iU\right)^\vee}{\partial \delta\phi_j} \nonumber \\
+	&= PU^TR_i^TR_j \frac{\partial \left(\hat{\phi}_jF^TR_i^TR_j + R_j^TR_iF\hat{\phi}_j\right)^\vee}{\partial \delta\phi_j} = PU^TR_i^TR_j \left(\tr{F^TR_i^TR_j}I_{3\times 3} - F^TR_i^TR_j\right).
+\end{align}
+
+In addition, the gradient with respect to $\delta v_i$ and $\delta v_j$ are
+\color{blue}
+\begin{align}
+	\frac{\partial f}{\partial \delta v_i} = \frac{\partial \Delta x_{ij}^T}{\partial \delta v_i} \Sigma_c^{-1} (\Delta x_{ij}-\mu_c), \qquad \frac{\partial f}{\partial \delta v_j} = \frac{\partial \Delta x_{ij}^T}{\partial \delta v_j} \Sigma_c^{-1} (\Delta x_{ij}-\mu_c).
+\end{align}
+\color{black}
+And for $\delta v_i$, we have
+\begin{align}
+	\frac{\partial \Delta v_{ij}}{\partial \delta v_i} = -R_i^T, \qquad \frac{\partial \Delta p_{ij}}{\partial \delta v_i} = -\Delta t_{ij} R_i^T.
+\end{align}
+Similarly, for $\delta v_j$, we have
+\begin{align}
+	\frac{\partial \Delta v_{ij}}{\partial \delta v_j} = R_i^T, \qquad \frac{\partial \Delta p_{ij}}{\partial \delta v_j} = 0.
+\end{align}
+
+Finally, the gradient with respect to $\delta p_i$ and $\delta p_j$ are
+\color{blue}
+\begin{align}
+	\frac{\partial f}{\partial \delta p_i} = \frac{\partial \Delta x_{ij}^T}{\partial \delta p_i} \Sigma_c^{-1} (\Delta x_{ij}-\mu_c), \qquad \frac{\partial f}{\partial \delta p_j} = \frac{\partial \Delta x_{ij}^T}{\partial \delta p_j} \Sigma_c^{-1} (\Delta x_{ij}-\mu_c).
+\end{align}
+\color{black}
+And for $\delta p_i$, we have
+\begin{align}
+	\frac{\partial \Delta v_{ij}}{\partial \delta p_i} = 0, \qquad \frac{\partial \Delta p_{ij}}{\partial \delta p_i} = -R_i^T.
+\end{align}
+Similarly, for $\delta p_j$, we have
+\begin{align}
+	\frac{\partial \Delta v_{ij}}{\partial \delta p_j} = 0, \qquad \frac{\partial \Delta p_{ij}}{\partial \delta p_j} = R_i^T.
 \end{align}
 
 \subsection{Pre-integration}

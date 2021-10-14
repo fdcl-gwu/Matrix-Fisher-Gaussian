@@ -1,14 +1,5 @@
 function [ gyroMea, acceMea, RMea, pMea, RTrue, xTrue ] = genTrigIMU( t, sf, parameters )
 
-filePath = mfilename('fullpath');
-pathCell = regexp(path, pathsep, 'split');
-if ~any(strcmp(pathCell,getAbsPath('..\..\rotation3d',filePath)))
-    addpath(getAbsPath('..\..\rotation3d',filePath));
-end
-if ~any(strcmp(pathCell,getAbsPath('..\Matrix-Fisher-Distribution',filePath)))
-    addpath(getAbsPath('..\Matrix-Fisher-Distribution',filePath));
-end
-
 time = (0:1/sf:t);
 N = length(time);
 
@@ -28,6 +19,7 @@ if exist('parameters','var')
     acceBiasInstability = parameters.acceBiasInstability;
     rotMeaNoise = parameters.rotMeaNoise;
     posMeaNoise = parameters.posMeaNoise;
+    GaussMea = parameters.GaussMea;
 else
     randomWalk = 10*pi/180;
     biasInstability = 500/3600*pi/180;
@@ -35,6 +27,7 @@ else
     acceBiasInstability = 200/3600;
     rotMeaNoise = 0.2^2*eye(3);
     posMeaNoise = 1*eye(3);
+    GaussMea = true;
 end
 
 %% rotation
@@ -79,7 +72,7 @@ biasTrue = cumsum(biasNoise/sf,2);
 gyroNoise = randn(3,N)*randomWalk*sqrt(sf);
 gyroMea = gyro+gyroNoise+biasTrue;
 
-if parameters.GaussMea
+if GaussMea
     RNoise = expRot(mvnrnd([0;0;0],rotMeaNoise,N));
 else
     RNoise = pdf_MF_sampling(rotMeaNoise,N);

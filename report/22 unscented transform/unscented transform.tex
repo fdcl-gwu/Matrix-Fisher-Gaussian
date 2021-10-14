@@ -1,0 +1,69 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage{xcolor}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Unscented Transform for Matrix Fisher Distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\begin{document}
+
+\maketitle
+
+Suppose $R\sim \mathcal{M}(S)$, we want to select sigma points and weights $(R_i,w_i)$ from the distribution, such that $\expect{R} = \sum w_iR_i$.
+Let $R_i = I_{3\times 3}$, $\exp(\pm\theta_1\hat{e}_1)$, $\exp(\pm\theta_2\hat{e}_2)$, $\exp(\pm\theta_3\hat{e}_3)$, and their weights be $w_0$, $w_1$, $w_2$, $w_3$.
+Then we have
+\begin{align}
+	\sum w_iR_i = \mathrm{diag} \begin{bmatrix}
+		w_0 + 2w_1 + 2w_2\cos\theta_2 + 2w_3\cos\theta_3 \\
+		w_0 + 2w_1\cos\theta_1 + 2w_2 + 2w_3\cos\theta_3 \\
+		w_0 + 2w_1\cos\theta_1 + 2w_2\cos\theta_2 + 2w_3
+	\end{bmatrix} = \mathrm{diag} \begin{bmatrix} d_1 \\ d_2 \\ d_3 \end{bmatrix}.
+\end{align}
+For $d_1+d_2-d_3$, $d_1+d_3-d_2$, and $d_2+d_3-d_1$, we have
+\begin{equation}
+	\begin{aligned}
+		1 + 4w_3(\cos\theta_3-1) &= d_1+d_2-d_3, \\
+		1 + 4w_2(\cos\theta_2-1) &= d_1+d_3-d_2, \\
+		1 + 4w_1(\cos\theta_1-1) &= d_2+d_3-d_1.
+	\end{aligned}
+\end{equation}
+Thus, $\theta_i$ can be solved as
+\begin{align} \label{eqn:theta}
+	\theta_i = \arccos\left( 1 - \frac{1+d_i-d_j-d_k}{4w_i} \right),
+\end{align}
+for $\{i,j,k\} = \{1,2,3\}$.
+In any case, we want $\theta_i < \frac{2\pi}{3}$, this indicates $w_i \geq \tfrac{1+d_i-d_j-d_k}{6}$, so
+\begin{align}
+	w_0 = 1-2(w_1+w_2+w_3) \leq \tfrac{1}{3}(d_1+d_2+d_3).
+\end{align}
+For a parameter $\lambda \in [0,1]$, we can design the weights to be
+\begin{equation}
+	\begin{aligned}
+		w_0 &= \tfrac{\lambda}{3}(d_1+d_2+d_3), \\
+		w_i &= \tfrac{1}{6}(1+d_i-d_j-d_k) + \tfrac{1-\lambda}{18}(d_1+d_2+d_3).
+	\end{aligned}
+\end{equation}
+
+\end{document}
+

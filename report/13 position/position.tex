@@ -25,6 +25,18 @@
 \newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
 \newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
 
+\def\app#1#2{%
+	\mathrel{%
+		\setbox0=\hbox{$#1\sim$}%
+		\setbox2=\hbox{%
+			\rlap{\hbox{$#1\propto$}}%
+			\lower1.1\ht0\box0%
+		}%
+		\raise0.25\ht2\box2%
+	}%
+}
+\def\approxprop{\mathpalette\app\relax}
+
 \begin{document}
 
 \maketitle
@@ -164,12 +176,6 @@ We give some example calculations:
 
 \section{Measurement Update}
 
-Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigma,P,U,S,V)$.
-Write $x = (x_1,x_2)$, suppose also a measurement of $x_1$ follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$, then the conditional posterior distribution of $x$ is
-\begin{align*}
-	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x_1-\mu_m)^T\Sigma_m^{-1}(x_1-\mu_m)} \nonumber
-\end{align*}
-
 Suppose $(R,x)$ follows a matrix Fisher distribution with parameters $(\mu,\Sigma,P,U,S,V)$, and a measurement of $x$ follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$, then the conditional posterior distribution of $x$ is
 \begin{align}
 	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(x-\mu_m)^T\Sigma_m^{-1}(x-\mu_m)} \nonumber \\
@@ -193,6 +199,68 @@ After omitting some constants, \eqref{eqn:postAttitude} can be simplified as
 	\expb{\tr{FR^T}+f(R)} \propto \expb{\tr{F^TR} - \nu_R^TP^T(\Sigma_c+\Sigma_m)^{-1}(\mu-\mu_m) - \frac{1}{2}\nu_R^TP^T(\Sigma_c+\Sigma_m)^{-1}P\nu_R}.
 \end{align}
 
-Let $x = [x_1,x_2]$, suppose only the measurement of $x_1$ is available, which follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$.
+Now suppose $Hx$ is measured, and the measurement follows a Gaussian distribution with parameters $(\mu_m,\Sigma_m)$.
+Then the conditional posterior distribution of $x$ is
+\begin{align}
+	&\expb{-\frac{1}{2}(x-\mu_c)^T\Sigma_c^{-1}(x-\mu_c)} \cdot \expb{-\frac{1}{2}(Hx-\mu_m)^T\Sigma_m^{-1}(Hx-\mu_m)} \nonumber \\
+	\propto &\expb{-\frac{1}{2}\left( x^T(\Sigma_c^{-1}+H^T\Sigma_m^{-1}H)x - 2x^T(\Sigma_c^{-1}\mu_c + H^T\Sigma_m^{-1}\mu_m) + \mu_c^T\Sigma_c^{-1}\mu_c \right)}.
+\end{align}
+Let $K = \Sigma_c H^T(\Sigma_m+H\Sigma_c H^T)^{-1}$, then according to Woodbury matrix identity, we have
+\begin{align}
+	(\Sigma_c^{-1}+H^T\Sigma_m^{-1}H)^{-1} = (I-KH)\Sigma_c.
+\end{align}
+Then the above conditional posterior distribution can be written as
+\begin{align}
+	&\expb{-\frac{1}{2}\left( x^T(\Sigma_c^{-1}+H^T\Sigma_m^{-1}H)x - 2x^T(\Sigma_c^{-1}\mu_c + H^T\Sigma_m^{-1}\mu_m) + \mu_c^T\Sigma_c^{-1}\mu_c \right)} \nonumber \\
+	= &\expb{-\frac{1}{2}\Big( x-\big(\mu_c+K(\mu_m-H\mu_c)\big) \Big)^T \big((I-KH)\Sigma_c\big)^{-1} \Big( x-\big(\mu_c+K(\mu_m-H\mu_c)\big) \Big)} \nonumber \\
+	\quad &\times \expb{\frac{1}{2}\left(\Sigma_c^{-1}\mu_c+H^T\Sigma_m^{-1}\mu_m\right)^T (I-KH)\Sigma_c \left(\Sigma_c^{-1}\mu_c+H^T\Sigma_m^{-1}\mu_m\right) - \frac{1}{2}\mu_c^T\Sigma_c^{-1}\mu_c} \nonumber \\
+	\propto &\expb{-\frac{1}{2}\Big( x-\big(\mu_c+K(\mu_m-H\mu_c)\big) \Big)^T \big((I-KH)\Sigma_c\big)^{-1} \Big( x-\big(\mu_c+K(\mu_m-H\mu_c)\big) \Big)} \nonumber \\
+	\quad &\times \expb{-\frac{1}{2}(H\mu_c-\mu_m)^T (\Sigma_m+H\Sigma_cH^T)^{-1} (H\mu_c-\mu_m)}
+\end{align}
+
+Now we want to calculate the moments of $R$ associated with the posterior marginal density \eqref{eqn:postAttitude}.
+One method is to approximate it by a matrix Fisher density.
+To do this, we regard $f(R) = p(\mu_m | R)$ as a likelihood function with the measurement $\mu_m$, and adopt the idea of ``progressive measurement update''.
+More specifically, the likelihood function is decomposed as
+\begin{align}
+	f(R) = f(R)^{\lambda_1} f(R)^{\lambda_2} \cdots f(R)^{\lambda_k},
+\end{align}
+with $\lambda_1 + \cdots + \lambda_k = 1$.
+First, we select sigma points $(R_i,w_i)$ from $\mathcal{M}(F)$, and reweigh the weights by
+\begin{align}
+	w_i^1 = w_i f(R_i)^{\lambda_1},
+\end{align}
+where $\lambda_1$ is chosen such that $\frac{\min\{f(R_i)^{\lambda_1}\}}{\max\{f(R_i)^{\lambda_1}\}} > \tau \in (0,1)$.
+The reweighed sigma points $(R_i,w_i^1)$ are then matched to a new matrix Fisher distribution $\mathcal{M}(F_1)$.
+These are repeated until the full likelihood is multiplied.
+Finally, the posterior marginal density \eqref{eqn:postAttitude} is matched to a matrix Fisher density $\mathcal{M}(F^+)$.
+
+Next, the posterior joint density can be written as
+\begin{align}
+	p(x,R|\mu_m) \approxprop \expb{\tr{F^+R^T}} \cdot \expb{-\frac{1}{2}\Big( x-\big(\mu_c+K(\mu_m-H\mu_c)\big) \Big)^T \big((I-KH)\Sigma_c\big)^{-1} \Big( x-\big(\mu_c+K(\mu_m-H\mu_c)\big) \Big)}.
+\end{align}
+However, $\mu_c$ is still defined with respect to the original $F$, so we still need to match this density to a MFG.
+To do this, we need to calculate the following moments
+\begin{align}
+	\expect{x|\mu_m} &= (I-KH)(\mu+P\expect{\nu_R|\mu_m}) + K\mu_m, \\
+	\expect{xx^T|\mu_m} &= (I-KH)\Sigma_c + (I-KH) \left( \mu\mu^T + \mu\expect{\nu_R|\mu_m}^TP^T + P\expect{\nu_R|\mu_m}\mu^T + P\expect{\nu_R\nu_R^T|\mu_m}P^T \right) (I-KH)^T \nonumber \\
+	&\qquad + (I-KH)\left( \mu + P\expect{\nu_R|\mu_m} \right)\mu_m^TK^T + K\mu_m\left(\mu^T + \expect{\nu_R^T|\mu_m}P^T\right)(I-KH)^T + K\mu_m\mu_m^TK^T, \\
+	\expect{x(\nu_R^+)^T|\mu_m} &= (I-KH)P\expect{\nu_R(\nu_R^+)^T|\mu_m}.
+\end{align}
+For MFGI, the intermediate results are
+\begin{align}
+	\expect{\nu_R|\mu_m} &= \tilde{U} \expect{\tilde{\nu}_R|\mu_m}, \\
+	\expect{\nu_R\nu_R^T|\mu_m} &= \tilde{U} \expect{\tilde{\nu}_R\tilde{\nu}_R^T|\mu_m} \tilde{U}^T, \\
+	\expect{\nu_R(\nu_R^+)^T|\mu_m} &= \tilde{U} \expect{\tilde{\nu}_R(\nu_R^+)^T|\mu_m},
+\end{align}
+where $\tilde{\nu}_R = \left( Q^+\tilde{S}^T - \tilde{S}(Q^+)^T \right)^\vee$, with $Q^+ = (U^+)^TRV^+$, $\tilde{U} = U^TU^+$, $\tilde{V} = V^TV^+$, and $\tilde{S} = \tilde{U}^TS\tilde{V}$.
+Similarly, for MFGB, the intermediate results are
+\begin{align}
+	\expect{\nu_R|\mu_m} &= \tilde{V} \expect{\tilde{\nu}_R|\mu_m}, \\
+	\expect{\nu_R\nu_R^T|\mu_m} &= \tilde{V} \expect{\tilde{\nu}_R\tilde{\nu}_R^T|\mu_m} \tilde{V}^T, \\
+	\expect{\nu_R(\nu_R^+)^T|\mu_m} &= \tilde{V} \expect{\tilde{\nu}_R(\nu_R^+)^T|\mu_m},
+\end{align}
+where $\tilde{\nu}_R = \left( \tilde{S}^TQ^+ - (Q^+)^T\tilde{S} \right)^\vee$.
+
 \end{document}
 
