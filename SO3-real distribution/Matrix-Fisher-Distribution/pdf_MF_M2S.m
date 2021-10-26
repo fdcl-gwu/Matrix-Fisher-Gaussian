@@ -31,7 +31,7 @@ if nargin < 2
 end
 
 s=s0;
-eps=1e-12;
+eps=1e-8;
 alpha=0.05;
 nf=2*eps;
 
@@ -48,8 +48,31 @@ while nf > eps && NITER < MAX_ITER
     f_stack=[];
     lambda_stack=[];
 
-    [f, df]=func(s,d,1,bool_scaled);        
-    s_dir=-df\f;    
+    if s(2)+s(3) > 1000   
+        [c,dc] = pdf_MF_normal(s,1,1);
+        EQ = dc/c+1;
+        f = EQ-d;
+        df = get_J1(s);
+    elseif s(1)+s(3) > 1000
+        [c,dc] = pdf_MF_normal(s,1,1);
+        EQ = dc/c+1;
+        f = EQ-d;
+        df = get_J2(s);
+    else
+        [c,dc,ddc] = pdf_MF_normal(s,1,1,1);
+        EQ = dc/c+1;
+        EQQ = zeros(3,3);
+        for i = 1:3
+            for j = 1:3
+                EQQ(i,j) = (c+dc(i)+dc(j)+ddc(i,j))/c;
+            end
+        end
+
+        df = EQQ-EQ*EQ';
+        f = EQ-d;
+    end
+    
+    s_dir=-df\f;
     f_stack=stack3(f_stack,f);
     lambda_stack=stack3(lambda_stack,0);
     
@@ -90,6 +113,7 @@ while nf > eps && NITER < MAX_ITER
    end
     
     s=s_trial;
+    s=sort(s,'descend');
     nf=max(abs(f_trial));    
 end
 
@@ -151,4 +175,50 @@ else
         varargout{2}=df;
     end
 end
+end
+
+
+function [ df ] = get_J1( s )
+
+df(1,1) = 0.5*(1/(s(1)+s(2))^2+1/(s(1)+s(3))^2);
+df(2,2) = 0.5*(1/(s(2)+s(1))^2+1/(s(2)+s(3))^2);
+df(3,3) = 0.5*(1/(s(3)+s(1))^2+1/(s(3)+s(2))^2);
+df(1,2) = 0.1/(s(1)+s(2))^2;
+df(1,3) = 0.1/(s(1)+s(3))^2;
+df(2,3) = 0.1/(s(2)+s(3))^2;
+df(2,1) = df(1,2);
+df(3,1) = df(1,3);
+df(3,2) = df(2,3);
+
+end
+
+
+function [ df ] = get_J2( s )
+
+I0 = besseli(0,s(2)+s(3));
+I1 = besseli(1,s(2)+s(3));
+I2 = besseli(2,s(2)+s(3));
+I1I0 = I1/I0;
+I2I0 = I2/I0;
+
+s12 = 1/(s(1)+s(2));
+s13 = 1/(s(1)+s(3));
+s12s = s12^2;
+s13s = s13^2;
+s1213 = s12*s13;
+
+df(1,1) = 0.5*(s12s+s13s);
+df(2,2) = 0.5*(1+I2I0-2*I1I0^2)*(1-s12+0.5*s12s+1/12*s1213) +...
+    1/4*(1+I2I0)*s12s + 1/8*(1-I2I0)*s1213;
+df(3,3) = 0.5*(1+I2I0-2*I1I0^2)*(1-s13+0.5*s13s+1/12*s1213) +...
+    1/4*(1+I2I0)*s13s + 1/8*(1-I2I0)*s1213;
+df(1,2) = 0.5*I1I0*s12s;
+df(1,3) = 0.5*I1I0*s13s;
+df(2,3) = 0.5*(1+I2I0-2*I1I0^2)*(1-0.5*(s12+s13)+1/24*(3*s12s+3*s13s+2*s1213)) +...
+    1/4*(1-I1I0^2)*s1213;
+
+df(2,1) = df(1,2);
+df(3,1) = df(1,3);
+df(3,2) = df(2,3);
+
 end

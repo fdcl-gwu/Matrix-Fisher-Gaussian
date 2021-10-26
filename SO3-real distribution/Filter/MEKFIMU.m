@@ -2,6 +2,7 @@ function [ R, x, G, stepT ] = MEKFIMU( gyro, acce, RMea, pMea, parameters)
 
 N = size(gyro,2);
 dt = parameters.dt;
+sf_GPS = parameters.sf_GPS;
 
 % noise parameters
 randomWalk = parameters.randomWalk;
@@ -73,7 +74,7 @@ for n = 2:N
     Sigma = F*Sigma*F'+Q;
     
     % update
-    if rem(n,5)==0
+    if rem(n,1/dt/sf_GPS)==0
         K = Sigma*H'*(H*Sigma*H'+meaNoise)^-1;
         if hasRMea
             y = [logRot(Rp'*RMea(:,:,n),'v');pMea(:,n)-xp(4:6)];

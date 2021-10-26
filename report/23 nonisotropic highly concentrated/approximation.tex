@@ -1,0 +1,170 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage{xcolor}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Gaussian Approximation for Matrix Fisher Distribution\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\makeatletter
+\newcommand\approxsim{\mathpalette\@approxsim\relax}
+\newcommand\@approxsim[2]{%
+	\mathrel{%
+		\ooalign{%
+			$\m@th#1\sim$\cr
+			\hidewidth$\m@th#1:$\hidewidth\cr
+		}%
+	}%
+}
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\section{Gaussian Approximations}
+
+\subsection{Case I}
+
+Let $s_1+s_2 \geq s_1+s_3 \geq s_2+s_3 \gg 0$, suppose $\exp(\hat{\eta}) = Q \sim \mathcal{M}(S)$, then $\eta \approxsim \mathcal{N}(0,(\tr{S}I_{3\times 3}-S)^{-1})$.
+
+\subsection{Case II}
+
+Let $s_1+s_2 \geq s_1+s_3 \gg s_2+s_3 \geq 0$, and $R \sim \mathcal{M}(S)$.
+Note that this equivalent to $s_1 \gg s_2 \geq |s_3|$.
+Write $Q = \exp(\hat{\eta}) \exp(\hat{\eta'})$, where $\eta = \begin{bmatrix} 0 & \eta_2 & \eta_3 \end{bmatrix}^T$, and $\eta' = \begin{bmatrix} \eta_1 & 0 & 0 \end{bmatrix}^T$.
+Also, let $\Sigma = \mathrm{diag}\left( 0, \tfrac{1}{s_1+s_3}, \tfrac{1}{s_1+s_2} \right)$, and $\eta = \sqrt{\Sigma} \xi$.
+Then the density function can be written as
+\begin{align}
+	\etr{SQ} &= \etr{S \exp(\hat{\eta}) \exp(\hat{\eta'})} \nonumber \\
+	&= \etr{S \left( I_{3\times 3} + (\sqrt{\Sigma}\xi)^\wedge + \tfrac{1}{2}((\sqrt{\Sigma}\xi)^\wedge)^2 + O(s_1^{-3/2}) \right) \begin{bmatrix} 1 & 0 & 0 \\ 0 & \cos\eta_1 & -\sin\eta_1 \\ 0 & \sin\eta_1 & \cos\eta_1 \end{bmatrix}} \nonumber \\
+	&= \etr{s_1 + (s_2+s_3)\cos\eta_1 - \tfrac{1}{2}\left( s_1(\eta_2^2+\eta_3^2) + (s_2\eta_3^2 + s_3\eta_2^2)\cos\eta_1 + (s_3-s_2)\eta_2\eta_3\sin\eta_1 \right) + O(s_1^{-1/2})}.
+\end{align}
+And note that
+\begin{align}
+	&s_1(\eta_2^2+\eta_3^2) + (s_2\eta_3^2 + s_3\eta_2^2)\cos\eta_1 + (s_3-s_2)\eta_2\eta_3\sin\eta_1 \nonumber \\
+	= &(s_1+s_3)\eta_2^2 + (s_1+s_2)\eta_3^2 + (s_2\eta_3^2 + s_3\eta_2^2)(\cos\eta_1-1) + (s_3-s_2)\eta_2\eta_3\sin\eta_1 \nonumber \\
+	= &\xi_2^2 + \xi_3^2 + \left( \tfrac{s_2}{s_1+s_2}\xi_3^2 + \tfrac{s_3}{s_1+s_3}\xi_2^2 \right)(\cos\eta_1-1) + \tfrac{s_3-s_2}{\sqrt{s_1+s_3} \sqrt{s_1+s_2}} \xi_2\xi_3 \sin\eta_1 \nonumber \\
+	= &\xi_2^2 + \xi_3^2 + O(s_1^{-1}).
+\end{align}
+Therefore, the density function can be approximated by
+\begin{align}
+	\etr{SQ} \propto \etr{(s_2+s_3)\cos\eta_1 - \tfrac{1}{2}(\xi_2^2 + \xi_3^2) + O(s_1^{-1/2})},
+\end{align}
+which indicates that $\eta_1 \approxsim \mathcal{VM}(0,s_2+s_3)$, $(\eta_2,\eta_3) \approxsim \mathcal{N}\left(0,\mathrm{diag}\left( \tfrac{1}{s_1+s_3}, \tfrac{1}{s_1+s_2} \right)\right)$, and they are approximately independent.
+
+\subsection{Case III}
+Let $s_1+s_2 \gg s_1+s_3 \geq s_2+s_3 \geq 0$, and $R \sim \mathcal{M}(S)$.
+Note that this is equivalent to $s_1 \geq s_2 \gg |s_3|$.
+Let $\mathbf{K}$ be a subgroup of $\SO$ defined as
+\begin{align}
+	\mathbf{K} = \left\{ R\in\SO \,:\, R = \exp(\hat{\eta}),\, \eta = \begin{bmatrix} \eta_1 & 0 & 0 \end{bmatrix}^T \right\},
+\end{align}
+and denote the left coset of $\mathbf{K}$ by $Q\mathbf{K}$ for $Q\in\SO$.
+The left coset $Q\mathbf{K}$ can be identified with $\mathbb{S}^2$ under
+\begin{align}
+	g\, :\, 
+\end{align}
+
+\section{Jacobian of Moments}
+
+For the maximum likelihood estimation of matrix Fisher distribution, the key step is to solve the following equation
+\begin{align}
+	f_i(S) = \frac{1}{c(S)} \frac{\partial c(S)}{\partial s_i} - d_i = 0, \qquad i = 1,2,3.
+\end{align}
+Using Newton's method, the search direction is given by
+\begin{align}
+	s^{n+1} = s^n - J_f(s^n)^{-1} f(s^n),
+\end{align}
+where $J_f$ is the Jacobian of $f$, and its $i,j$-th entry can be calculated as
+\begin{align}
+	(J_f)_{ij} = \frac{\partial}{\partial s_j} \left( \frac{1}{c(S)} \frac{\partial c(S)}{\partial s_i} \right) = \frac{\partial_{ij}c(S)\cdot c(S) - \partial_i c(S) \partial_j c(S)}{c(S)^2} = \expect{Q_{ii}Q_{jj}} - \expect{Q_{ii}}\expect{Q_{jj}}.
+\end{align}
+Therefore, the Jacobian $J_f$ can be calculated as
+\begin{align}
+	J_f = \expect{qq^T} - \expect{q}\expect{q}^T,
+\end{align}
+where $q = \begin{bmatrix} Q_{11} & Q_{22} & Q_{33} \end{bmatrix}^T$.
+And by Jansen's inequality, $J_f$ is always positive definite.
+However, when $S$ has large values, $J_f$ is not guaranteed to be positive definite due to numerical errors.
+And in this chapter, we use Gaussian approximations of the matrix Fisher distribution to approximate $J_f$.
+
+\subsection{Case I}
+
+In this case, we write $Q = \exp(\hat{\eta})$, and $q$ can be approximated by
+\begin{align}
+	q = \begin{bmatrix} 1-\tfrac{1}{2}(\eta_2^2+\eta_3^2) + \tfrac{1}{24}((\eta_2^2+\eta_3^2)^2 + \eta_1^2\eta_2^2 + \eta_1^2\eta_3^2) \\ 1 - \tfrac{1}{2}(\eta_1^2+\eta_3^2) + \tfrac{1}{24}((\eta_1^2+\eta_3^2)^2 + \eta_1^2\eta_2^2 + \eta_2^2\eta_3^2) \\ 1 - \tfrac{1}{2}(\eta_1^2+\eta_2^2) + \tfrac{1}{24}((\eta_1^2+\eta_2^2)^2 + \eta_1^2\eta_3^2 + \eta_2^2\eta_3^2) \end{bmatrix} + O(\hat{\eta}^6),
+\end{align}
+where $\eta \approxsim \mathcal{N}(0,(\tr{S}I_{3\times 3}-S)^{-1})$.
+Thus, using formulae for multivariate Gaussian distribution, we have
+\begin{align}
+	\expect{Q_{ii}} &\approx 1 - \tfrac{1}{2}\left( \tfrac{1}{s_i+s_j} + \tfrac{1}{s_i+s_k} \right) + \tfrac{1}{24} \left( \tfrac{3}{(s_i+s_j)^2} + \tfrac{3}{(s_i+s_k)^2} + \tfrac{2}{(s_i+s_j)(s_i+s_k)} + \tfrac{1}{(s_i+s_j)(s_j+s_k)} + \tfrac{1}{(s_i+s_k)(s_j+s_k)} \right),
+\end{align}
+and
+\begin{align}
+	\expect{Q_{ii}^2} &\approx 1 - \left( \tfrac{1}{s_i+s_j} + \tfrac{1}{s_i+s_k} \right) + \tfrac{1}{3}\left( \tfrac{3}{(s_i+s_j)^2} + \tfrac{3}{(s_i+s_k)^2} + \tfrac{2}{(s_i+s_j)(s_i+s_k)} \right) + \tfrac{1}{12}\left( \tfrac{1}{(s_i+s_j)(s_j+s_k)} + \tfrac{1}{(s_i+s_k)(s_j+s_k)} \right), \\
+	\expect{Q_{ii}Q_{jj}} &\approx 1 - \tfrac{1}{2}\left( \tfrac{2}{s_i+s_j} + \tfrac{1}{s_i+s_k} + \tfrac{1}{s_j+s_k} \right) + \tfrac{1}{(s_i+s_j)^2} + \tfrac{1}{8}\left( \tfrac{1}{(s_i+s_k)^2} + \tfrac{1}{(s_j+s_k)^2} \right) + \tfrac{1}{3}\tfrac{1}{(s_i+s_k)(s_j+s_k)} \nonumber \\
+	&\qquad\qquad\qquad + \tfrac{3}{8}\left( \tfrac{1}{(s_i+s_j)(s_i+s_k)} + \tfrac{1}{(s_i+s_j)(s_j+s_k)} \right).
+\end{align}
+And $J_f$ can be calculated as
+\begin{align}
+	\expect{Q_{ii}^2} - \expect{Q_{ii}}^2 &\approx \frac{1}{2}\left( \frac{1}{(s_i+s_j)^2} + \frac{1}{(s_i+s_k)^2} \right), \\
+	\expect{Q_{ii}Q_{jj}} - \expect{Q_{ii}}\expect{Q_{jj}} &\approx \frac{1}{2}\frac{1}{(s_i+s_j)^2}.
+\end{align}
+It is clearly seen that $J_f$ is positive definite under this approximation.
+
+\subsection{Case II}
+
+In this case, we write $Q = \exp(\hat{\eta}) \exp(\hat{\eta'})$, and $q$ can be approximated by
+\begin{align}
+	q = \begin{bmatrix} 1 - \tfrac{1}{2}(\eta_2^2+\eta_3^2) + \tfrac{1}{24}(\eta_2^2+\eta_3^2)^2 \\ \cos\eta_1 - \tfrac{1}{2}(\eta_3^2\cos\eta_1 - \eta_2\eta_3\sin\eta_1) + \tfrac{1}{24}\big( (\eta_2^2\eta_3^2+\eta_3^4)\cos\eta_1 - (\eta_2^3\eta_3+\eta_2\eta_3^3)\sin\eta_1 \big) \\ \cos\eta_1 - \tfrac{1}{2}(\eta_2^2\cos\eta_1 + \eta_2\eta_3\sin\eta_1) + \tfrac{1}{24}\big( (\eta_2^4+\eta_2^2\eta_3^2)\cos\eta_1 + (\eta_2^3\eta_3+\eta_2\eta_3^3)\sin\eta_1 \big) \end{bmatrix} + O(\hat{\eta}^6),
+\end{align}
+where $\eta_1 \approxsim \mathcal{VM}(0,s_2+s_3)$, $(\eta_2,\eta_3) \approxsim \mathcal{N}\left(0,\mathrm{diag}\left( \tfrac{1}{s_1+s_3}, \tfrac{1}{s_1+s_2} \right)\right)$, and they are approximately independent.
+Thus, using the moments for Gaussian distribution, and those for von Mises distribution, we have
+\begin{align}
+	\expect{Q_{11}} &\approx 1 - \tfrac{1}{2}\left( \tfrac{1}{s_1+s_3} + \tfrac{1}{s_1+s_2} \right) + \tfrac{1}{24}\left( \tfrac{3}{(s_1+s_2)^2} + \tfrac{3}{(s_1+s_3)^2} + \tfrac{2}{(s_1+s_2)(s_1+s_3)} \right), \\
+	\expect{Q_{jj}} &\approx \tfrac{I_1(s_2+s_3)}{I_0(s_2+s_3)} \left( 1 - \tfrac{1}{2} \tfrac{1}{s_1+s_j} + \tfrac{1}{24}\left( \tfrac{3}{(s_1+s_j)^2} + \tfrac{1}{(s_1+s_j)(s_1+s_k)} \right) \right),
+\end{align}
+for $(j,k) \in \{(2,3),(3,2)\}$.
+Also, we have
+\begin{align}
+	\expect{Q_{11}^2} &\approx 1 - \left( \tfrac{1}{s_1+s_2} + \tfrac{1}{s_1+s_3} \right) + \tfrac{1}{3}\left( \tfrac{3}{(s_1+s_2)^2} + \tfrac{3}{(s_1+s_3)^2} + \tfrac{2}{(s_1+s_2)(s_1+s_3)} \right), \\
+	\expect{Q_{jj}^2} &\approx \tfrac{1}{2} \left( 1 + \tfrac{I_2(s_2+s_3)}{I_0(s_2+s_3)} \right) \left( 1 - \tfrac{1}{s_1+s_j} + \tfrac{1}{(s_1+s_j)^2} + \tfrac{1}{12} \tfrac{1}{(s_1+s_j)(s_1+s_k)} \right) + \tfrac{1}{8} \left( 1 - \tfrac{I_2(s_2+s_3)}{I_0(s_2+s_3)} \right) \tfrac{1}{(s_1+s_j)(s_1+s_k)},
+\end{align}
+and
+\begin{align}
+	\expect{Q_{11}Q_{jj}} &\approx \tfrac{I_1(s_2+s_3)}{I_0(s_2+s_3)} \left( 1 - \tfrac{1}{s_1+s_j} - \tfrac{1}{2}\tfrac{1}{s_1+s_k} + \tfrac{1}{(s_1+s_j)^2} + \tfrac{1}{8}\tfrac{1}{(s_1+s_k)^2} + \tfrac{3}{8}\tfrac{1}{(s_1+s_j)(s_1+s_k)} \right), \\
+	\expect{Q_{22}Q_{33}} &\approx \tfrac{1}{2} \left( 1 + \tfrac{I_2(s_2+s_3)}{I_0(s_2+s_3)} \right) \left( 1 - \tfrac{1}{2}\left( \tfrac{1}{s_1+s_2} + \tfrac{1}{s_1+s_3} \right) + \tfrac{1}{24}\left( \tfrac{3}{(s_1+s_2)^2} + \tfrac{3}{(s_1+s_3)^2} + \tfrac{2}{(s_1+s_2)(s_1+s_3)} \right) \right) + \tfrac{1}{4} \tfrac{1}{(s_1+s_2)(s_1+s_3)}.
+\end{align}
+And $J_f$ can be calculated as
+\begin{align}
+	\expect{Q_{11}^2} - \expect{Q_{11}}^2 &\approx \frac{1}{2}\left( \frac{1}{(s_1+s_2)^2} + \frac{1}{(s_1+s_3)^2} \right), \\
+	\expect{Q_{jj}^2} - \expect{Q_{jj}}^2 &\approx \frac{1}{2}\left( 1 + \frac{I_2(s_2+s_3)}{I_0(s_2+s_3)} - \frac{2I_1^2(s_2+s_3)}{I_0^2(s_2+s_3)} \right) \left( 1 - \frac{1}{s_1+s_j} + \frac{1}{2} \frac{1}{(s_1+s_j)^2} + \frac{1}{12} \frac{1}{(s_1+s_j)(s_1+s_k)} \right) \nonumber \\
+	&\qquad\qquad + \frac{1}{4}\left( 1 + \frac{I_2(s_2+s_3)}{I_0(s_2+s_3)} \right) \frac{1}{(s_1+s_j)^2} + \frac{1}{8}\left( 1 - \frac{I_2(s_2+s_3)}{I_0(s_2+s_3)} \right) \frac{1}{(s_1+s_j)(s_1+s_k)} \\
+	\expect{Q_{11}Q_{jj}} - \expect{Q_{11}}\expect{Q_{jj}} &\approx \frac{1}{2} \frac{I_1(s_2+s_3)}{I_0(s_2+s_3)} \frac{1}{(s_1+s_j)^2}, \\
+	\expect{Q_{22}Q_{33}} - \expect{Q_{22}}\expect{Q_{33}} &\approx \frac{1}{2}\left( 1 + \frac{I_2(s_2+s_3)}{I_0(s_2+s_3)} - \frac{2I_1^2(s_2+s_3)}{I_0^2(s_2+s_3)} \right) \left( 1 - \frac{1}{2}\left( \frac{1}{s_1+s_2} + \frac{1}{s_1+s_3} \right) + \frac{1}{24}\left( \frac{3}{(s_1+s_2)^2} \right. \right. \nonumber \\
+	&\qquad\qquad \left. \left. + \frac{3}{(s_1+s_3)^2} + \frac{2}{(s_1+s_2)(s_1+s_3)} \right) \right) + \frac{1}{4}\left( 1 - \frac{I_1^2(s_2+s_3)}{I_0^2(s_2+s_3)} \right) \frac{1}{(s_1+s_2)(s_1+s_3)}.
+\end{align}
+
+\end{document}
+

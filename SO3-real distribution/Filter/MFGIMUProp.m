@@ -1,4 +1,4 @@
-function [ Miutdt, Sigmatdt, Ptdt, Utdt, Stdt, Vtdt ] = MFGIMUProp( omega, a, Miu, Sigma, P, U, S, V, H, dt )
+function [ Miutdt, Sigmatdt, Ptdt, Utdt, Stdt, Vtdt ] = MFGIMUProp( omega, a, Miu, Sigma, P, U, S, V, H, dt, options )
 % disassemble variables
 g = [0;0;9.8];
 
@@ -44,7 +44,7 @@ EHW2 = (Ggu-trace(Ggu)*eye(3))*dt;
 ERtdt = (ERt*(eye(3)+EHW2/2) + dt*ERHatPvRt)*expRot((omega+Miubg)*dt);
 
 [Utdt,D,Vtdt] = psvd(ERtdt);
-Stdt = diag(pdf_MF_M2S(diag(D),s));
+Stdt = diag(pdf_MF_M2S_TR(diag(D),s,options));
 
 %% E[x(t+dt)]
 Ebgtdt = Miubg;

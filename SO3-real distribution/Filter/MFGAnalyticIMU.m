@@ -2,6 +2,7 @@ function [ R, x, MFG, stepT ] = MFGAnalyticIMU( gyro, acce, RMea, pMea, paramete
 
 N = size(gyro,2);
 dt = parameters.dt;
+sf_GPS = parameters.sf_GPS;
 
 % noise parameters
 randomWalk = parameters.randomWalk;
@@ -23,16 +24,19 @@ H.Hav = acceBiasInstability*eye(3);
 hasRMea = ~isempty(RMea);
 bool_prog = parameters.bool_prog;
 
+% options for lsqlin
+options = optimoptions('lsqlin','display','off','algorithm','active-set');
+
 % initialize distribution
 Miu = parameters.xInit;
 Sigma = parameters.initXNoise;
 P = zeros(12,3);
-U = parameters.RInit;
-V = eye(3);
 if parameters.GaussMea
+    U = parameters.RInit;
+    V = eye(3);
     S = Gau2MF(parameters.initRNoise);
 else
-    S = parameters.initRNoise;
+    [U,S,V] = psvd(parameters.initRNoise);
 end
 S(2,2) = S(2,2)+1e-5;
 S(3,3) = S(3,3)+2e-5;
@@ -52,19 +56,24 @@ stepT = zeros(N-1,1);
 for n = 2:N
     tic;
     
+    try
     % uncertainty propagation
     omega = (gyro(:,n-1)+gyro(:,n))/2;
     a = (acce(:,n-1)+acce(:,n))/2;
-    [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,dt);
+    [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,dt,options);
     
     % unscented update
-    if rem(n,5)==0
+    if rem(n,1/dt/sf_GPS)==0
         if hasRMea
             FMea = RMea(:,:,n)*SM;
-            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,bool_prog);
+            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,bool_prog,options);
         else
-            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,zeros(3),pMea(:,n),posMeaNoise,bool_prog);
+            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,zeros(3),pMea(:,n),posMeaNoise,bool_prog,options);
         end
+    end
+    catch
+        save('workspace');
+        error("break");
     end
     
     % record results

@@ -1,4 +1,4 @@
-function [ Miu, Sigma, P, U, S, V ] = MFGIMUUpdate( Miu1, Sigma1, P1, U1, S1, V1, MF, z, Sigmaz, bool_prog )
+function [ Miu, Sigma, P, U, S, V ] = MFGIMUUpdate( Miu1, Sigma1, P1, U1, S1, V1, MF, z, Sigmaz, bool_prog, options )
 
 H = [zeros(3,3),eye(3),zeros(3,6)];
 
@@ -64,7 +64,7 @@ end
 
 % update U, S, V
 [U,EQ,V] = psvd(ER);
-S = diag(pdf_MF_M2S(diag(EQ),diag(S1)));
+S = diag(pdf_MF_M2S_TR(diag(EQ),diag(S1),options));
 s = diag(S);
 
 %% linear components
