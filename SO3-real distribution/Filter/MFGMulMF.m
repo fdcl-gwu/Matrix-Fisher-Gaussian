@@ -15,9 +15,9 @@ ST = UT'*S*VT;
 
 % EvR
 if defQS
-    EvR = UT*vee(EQC*ST'-ST*EQC');
+    EvR = UT*vee(EQC*ST'-ST*EQC',[],false);
 else
-    EvR = VT*vee(ST'*EQC-EQC'*ST);
+    EvR = VT*vee(ST'*EQC-EQC'*ST,[],false);
 end
 
 % EvRvR

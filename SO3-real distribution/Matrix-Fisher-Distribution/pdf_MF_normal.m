@@ -35,14 +35,25 @@ end
 % if s are approximately equal, average them to eliminate numerical errors
 % when calculating 1/(s(i)^2-s(j)^2)
 if bool_ddc
-    e12 = abs(s(1)-s(2)) <= 1e-12*max([1,abs(s(1)),abs(s(2))]);
-    e23 = abs(s(2)-s(3)) <= 1e-12*max([1,abs(s(2)),abs(s(3))]);
+    if s(3)<0
+        negs3 = true;
+        s(3) = -s(3);
+    else
+        negs3 = false;
+    end
+    
+    e12 = abs(s(1)-s(2)) <= 1e-8*max([1,abs(s(1)),abs(s(2))]);
+    e23 = abs(s(2)-s(3)) <= 1e-8*max([1,abs(s(2)),abs(s(3))]);
     if e12 && e23
         s(1:3) = mean(s);
     elseif e12
         s(1:2) = mean(s(1:2));
     elseif e23
         s(2:3) = mean(s(2:3));
+    end
+    
+    if negs3
+        s(3) = -s(3);
     end
 end
 

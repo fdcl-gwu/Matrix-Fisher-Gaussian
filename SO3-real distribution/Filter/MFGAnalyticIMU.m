@@ -16,6 +16,11 @@ else
 end
 posMeaNoise = parameters.posMeaNoise;
 
+useGrav = parameters.useGrav;
+if useGrav
+    gravMeaNoise = Gau2VM(parameters.gravMeaNoise);
+end
+
 H.Hgu = randomWalk*eye(3);
 H.Hgv = biasInstability*eye(3);
 H.Hau = acceRandomWalk*eye(3);
@@ -62,13 +67,36 @@ for n = 2:N
     a = (acce(:,n-1)+acce(:,n))/2;
     [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,dt,options);
     
-    % unscented update
+    % update
+    if useGrav
+        grav = acce(:,n)+Miu(10:12);
+        FMea = gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
+        [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,FMea,true);
+    end
+    
     if rem(n,1/dt/sf_GPS)==0
         if hasRMea
-            FMea = RMea(:,:,n)*SM;
-            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,bool_prog,options);
+            if useGrav
+                grav = acce(:,n)+Miu(10:12);
+                FMea = RMea(:,:,n)*SM + gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
+            else
+                FMea = RMea(:,:,n)*SM;
+            end
         else
-            [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,zeros(3),pMea(:,n),posMeaNoise,bool_prog,options);
+            if useGrav
+                grav = acce(:,n)+Miu(10:12);
+                FMea = gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
+            else
+                FMea = zeros(3,3);
+            end
+        end
+        
+        [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,bool_prog,options);
+    else
+        if useGrav
+            grav = acce(:,n)+Miu(10:12);
+            FMea = gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
+            [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,FMea,true);
         end
     end
     catch
@@ -104,3 +132,19 @@ ER = mean(R,3);
 S = diag(pdf_MF_M2S(diag(D)));
 
 end
+
+
+function [ kappa ] = Gau2VM( Sigma )
+
+N = 100000;
+v = sqrtm(Sigma)*randn(3,N)+[0;0;9.8];
+v = v./sqrt(sum(v.^2));
+
+rho = sqrt(sum(mean(v,2).^2));
+
+options = optimoptions('fsolve','Algorithm','levenberg-marquardt',...
+    'FunctionTolerance',1e-15,'Display','off');
+kappa = fsolve(@(k) coth(k)-1/k-rho,1,options);
+
+end
+

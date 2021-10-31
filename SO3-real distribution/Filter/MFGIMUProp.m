@@ -69,7 +69,7 @@ ST = UT'*Stdt*VT;
 VTT = Vtdt'*expRot((omega+Miubg)*dt)'*Ggu'*V;
 STT = UT'*Stdt*VTT;
 
-EvRdRpt = UT*vee(EQ*ST'-ST*EQ');
+EvRdRpt = UT*vee(EQ*ST'-ST*EQ',[],false);
 
 EvRvRdRpt = [ST(2,2)*EQ(2,2)+ST(3,3)*EQ(3,3), -ST(1,2)*EQ(2,2), -ST(1,3)*EQ(3,3)
     -ST(2,1)*EQ(1,1), ST(1,1)*EQ(1,1)+ST(3,3)*EQ(3,3), -ST(2,3)*EQ(3,3)
@@ -308,7 +308,7 @@ Sigmacxbg = Sigmac(:,1:3);
 ExvRhatbdRptdt = (Sigmacxbg*V*EGQt' + Miu*EvRPbgVGQt + P*EvRvRPbgVGQt)*UT';
 
 % ExvRhatWdRptdt
-EvRGdRpt = UT*vee(EQ*STT'-STT*EQ');
+EvRGdRpt = UT*vee(EQ*STT'-STT*EQ',[],false);
 EvRvRGdRpt = [STT(2,2)*EQ(2,2)+STT(3,3)*EQ(3,3), -STT(1,2)*EQ(2,2), -STT(1,3)*EQ(3,3)
     -STT(2,1)*EQ(1,1), STT(1,1)*EQ(1,1)+STT(3,3)*EQ(3,3), -STT(2,3)*EQ(3,3)
     -STT(3,1)*EQ(1,1), -STT(3,2)*EQ(2,2), STT(1,1)*EQ(1,1)+STT(2,2)*EQ(2,2)];

@@ -16,7 +16,7 @@ if ~bool_prog
 
     % reweight
     for i = 1:7
-        vR1 = vee(U1'*R1(:,:,i)*V1*S1-S1*V1'*R1(:,:,i)'*U1);
+        vR1 = vee(U1'*R1(:,:,i)*V1*S1-S1*V1'*R1(:,:,i)'*U1,[],false);
         Miuc = Miu1+P1*vR1;
         expfR1 = exp(-1/2*(H*Miuc-z)'*Sigma_R^-1*(H*Miuc-z));
         w1(i) = w1(i)*expfR1;
@@ -103,7 +103,7 @@ UT = U1'*U;
 VT = V1'*V;
 ST = UT'*S1*VT;
 
-EvR1 = UT*vee(EQ*ST'-ST*EQ');
+EvR1 = UT*vee(EQ*ST'-ST*EQ',[],false);
 
 EvRTvRT(1,1) = (ST(3,2)^2)*EQQ(5,5)+(-2*ST(2,3)*ST(3,2))*EQQ(5,9)+(ST(2,3)^2)*EQQ(9,9)...
     +(ST(3,1)^2)*EQQ(2,2)+(ST(2,1)^2)*EQQ(3,3)+(ST(2,2)^2+ST(3,3)^2)*EQQ(6,6)+(-2*ST(2,2)*ST(3,3))*EQQ(6,8);

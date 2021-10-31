@@ -139,7 +139,7 @@ function y=saturation(x,min_x,max_x)
 
 if x <= min_x
     y=min_x;
-elseif x >= max_x;
+elseif x >= max_x
     y=max_x;
 else
     y=x;
@@ -195,9 +195,9 @@ end
 
 function [ df ] = get_J2( s )
 
-I0 = besseli(0,s(2)+s(3));
-I1 = besseli(1,s(2)+s(3));
-I2 = besseli(2,s(2)+s(3));
+I0 = besseli(0,s(2)+s(3),1);
+I1 = besseli(1,s(2)+s(3),1);
+I2 = besseli(2,s(2)+s(3),1);
 I1I0 = I1/I0;
 I2I0 = I2/I0;
 
@@ -215,10 +215,11 @@ df(3,3) = 0.5*(1+I2I0-2*I1I0^2)*(1-s13+0.5*s13s+1/12*s1213) +...
 df(1,2) = 0.5*I1I0*s12s;
 df(1,3) = 0.5*I1I0*s13s;
 df(2,3) = 0.5*(1+I2I0-2*I1I0^2)*(1-0.5*(s12+s13)+1/24*(3*s12s+3*s13s+2*s1213)) +...
-    1/4*(1-I1I0^2)*s1213;
+    1/4*(I2I0-I1I0^2)*s1213;
 
 df(2,1) = df(1,2);
 df(3,1) = df(1,3);
 df(3,2) = df(2,3);
 
 end
+

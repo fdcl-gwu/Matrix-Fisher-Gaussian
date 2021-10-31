@@ -9,6 +9,8 @@ randomWalk = parameters.randomWalk;
 biasInstability = parameters.biasInstability;
 acceRandomWalk = parameters.acceRandomWalk;
 acceBiasInstability = parameters.acceBiasInstability;
+
+% measurement settings
 if parameters.GaussMea
     rotMeaNoise = parameters.rotMeaNoise;
 else
@@ -17,6 +19,7 @@ end
 posMeaNoise = parameters.posMeaNoise;
 
 hasRMea = ~isempty(RMea);
+useGrav = parameters.useGrav;
 
 % initialize distribution
 if parameters.GaussMea
@@ -35,17 +38,15 @@ Q = [eye(3)*randomWalk^2*dt,zeros(3,12);
     zeros(3,12),eye(3)*acceBiasInstability^2*dt];
 
 if hasRMea
-    meaNoise = [rotMeaNoise,zeros(3);
-        zeros(3),posMeaNoise];
+    HMea = [zeros(3,6),eye(3),zeros(3,6);eye(3),zeros(3,12)];
+    meaNoise = [posMeaNoise,zeros(3);zeros(3),rotMeaNoise];
 else
+    HMea = [zeros(3,6),eye(3),zeros(3,6)];
     meaNoise = posMeaNoise;
 end
 
-if hasRMea
-    H = [eye(3),zeros(3,12);
-        zeros(3,6),eye(3),zeros(3,6)];
-else
-    H = [zeros(3,6),eye(3),zeros(3,6)];
+if useGrav
+    gravMeaNoise = parameters.gravMeaNoise;
 end
 
 % data containers
@@ -75,20 +76,49 @@ for n = 2:N
     
     % update
     if rem(n,1/dt/sf_GPS)==0
-        K = Sigma*H'*(H*Sigma*H'+meaNoise)^-1;
         if hasRMea
-            y = [logRot(Rp'*RMea(:,:,n),'v');pMea(:,n)-xp(4:6)];
+            if useGrav
+                y = [pMea(:,n)-xp(4:6);logRot(Rp'*RMea(:,:,n),'v');...
+                    acce(:,n)-Rp'*[0;0;9.8]];
+                H = [HMea;hat(Rp'*[0;0;9.8]),zeros(3,12)];
+                SigmaMea = [meaNoise,zeros(3,3);zeros(3,3),gravMeaNoise];
+            else
+                y = [pMea(:,n)-xp(4:6);logRot(Rp'*RMea(:,:,n),'v')];
+                H = HMea;
+                SigmaMea = meaNoise;
+            end
         else
-            y = pMea(:,n)-xp(4:6);
+            if useGrav
+                y = [pMea(:,n)-xp(4:6);acce(:,n)-Rp'*[0;0;9.8]];
+                H = [HMea;hat(Rp'*[0;0;9.8]),zeros(3,12)];
+                SigmaMea = [meaNoise,zeros(3,3);zeros(3,3),gravMeaNoise];
+            else
+                y = pMea(:,n)-xp(4:6);
+                H = HMea;
+                SigmaMea = meaNoise;
+            end
         end
+        
+        K = Sigma*H'*(H*Sigma*H'+SigmaMea)^-1;
+        
         dx = K*y;
         Sigma = (eye(15)-K*H)*Sigma;
-
         R(:,:,n) = Rp*expRot(dx(1:3));
         x(:,n) = xp+dx(4:15);
     else
-        R(:,:,n) = Rp;
-        x(:,n) = xp;
+        if useGrav
+            H = [hat(Rp'*[0;0;9.8]),zeros(3,12)];
+            K = Sigma*H'*(H*Sigma*H'+gravMeaNoise)^-1;
+            y = acce(:,n)-Rp'*[0;0;9.8];
+
+            dx = K*y;
+            Sigma = (eye(15)-K*H)*Sigma;
+            R(:,:,n) = Rp*expRot(dx(1:3));
+            x(:,n) = xp+dx(4:15);
+        else
+            R(:,:,n) = Rp;
+            x(:,n) = xp;
+        end
     end
     
     % record covariance
