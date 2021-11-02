@@ -48,12 +48,12 @@ while nf > eps && NITER < MAX_ITER
     f_stack=[];
     lambda_stack=[];
 
-    if s(2)+s(3) > 1000   
+    if s(2)+s(3) > 1000
         [c,dc] = pdf_MF_normal(s,1,1);
         EQ = dc/c+1;
         f = EQ-d;
         df = get_J1(s);
-    elseif s(1)+s(3) > 1000
+    elseif s(1)+s(3) > 2000
         [c,dc] = pdf_MF_normal(s,1,1);
         EQ = dc/c+1;
         f = EQ-d;
@@ -76,8 +76,12 @@ while nf > eps && NITER < MAX_ITER
     f_stack=stack3(f_stack,f);
     lambda_stack=stack3(lambda_stack,0);
     
-    lambda=1;        
+    lambda=1;
     s_trial=s+lambda*s_dir;
+    while sum(s_trial<-1e-6) > 1
+        lambda = lambda/2;
+        s_trial=s+lambda*s_dir;
+    end
     f_trial=func(s_trial,d,0,bool_scaled);
     f_stack=stack3(f_stack,f_trial);
     lambda_stack=stack3(lambda_stack,lambda);

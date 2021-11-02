@@ -37,9 +37,9 @@ n_iter = 0;
 
 while f > eps
     % calculate jacobias
-    if s(2)+s(3) > 1000   
+    if s(2)+s(3) > 1000
         J = get_J1(s);
-    elseif s(1)+s(3) > 1000
+    elseif s(1)+s(3) > 2000
         J = get_J2(s);
     else
         EQQ = zeros(3,3);

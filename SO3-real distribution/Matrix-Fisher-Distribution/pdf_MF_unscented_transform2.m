@@ -8,7 +8,12 @@ end
 
 if nargin < 3 || isempty(d)
     s = diag(S);
-    d = pdf_MF_moment(s,false);
+    d = diag(pdf_MF_moment(s));
+end
+
+% at highly concentrated cases, d may not be accurate
+if d(1)+d(2)-d(3)>1
+    d = diag(pdf_MF_moment(s,false,true));
 end
 
 R = zeros(3,3,7);

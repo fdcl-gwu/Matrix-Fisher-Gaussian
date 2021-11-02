@@ -5,8 +5,7 @@ function [ MiuC, SigmaC, PC, UC, SC, VC ] = MFGMulMF( Miu, Sigma, P, U, S, V, FM
 [UC,SC,VC] = psvd(U*S*V'+FM);
 
 % moments
-EQC = diag(pdf_MF_moment(diag(SC)));
-EQQC = pdf_MF_moment2(diag(SC));
+[EQC,EQQC] = pdf_MF_moment(diag(SC),true);
 
 %% vR
 UT = U'*UC;

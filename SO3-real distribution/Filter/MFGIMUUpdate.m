@@ -33,12 +33,16 @@ else
     
     while lambda_rem > 0
         for i = 1:7
-            vR1 = vee(U1'*Rp(:,:,i)*V1*S1-S1*V1'*Rp(:,:,i)'*U1);
+            vR1 = vee(U1'*Rp(:,:,i)*V1*S1-S1*V1'*Rp(:,:,i)'*U1,[],false);
             Miuc = Miu1+P1*vR1;
             expfR1(i) = exp(-1/2*lambda_rem*(H*Miuc-z)'*Sigma_R^-1*(H*Miuc-z));
         end
         
         r = min(expfR1)/max(expfR1);
+        if r == 0
+            break;
+        end
+        
         if r < tau
             k = log(tau)/log(r);
             lambda = lambda_rem*log(tau)/log(r);
@@ -72,31 +76,14 @@ s = diag(S);
 Sigmac1 = Sigma1 - P1*(trace(S1)*eye(3)-S1)*P1';
 K = Sigmac1*H'*(Sigmaz+H*Sigmac1*H')^-1;
 
-% EQQ
-EQQ = zeros(3,3);
-for i = 1:3
-    for j = setdiff(1:3,i)
-        EQQ(3*(i-1)+j,3*(i-1)+j) = EQ(i,i)*s(i)/(s(i)^2-s(j)^2)-EQ(j,j)*s(j)/(s(i)^2-s(j)^2);
-        EQQ(3*(i-1)+j,3*(j-1)+i) = EQ(i,i)*s(j)/(s(i)^2-s(j)^2)-EQ(j,j)*s(i)/(s(i)^2-s(j)^2);
-    end
-end
-
-EQQ(1,1) = 1-EQQ(2,2)-EQQ(3,3);
-EQQ(5,5) = 1-EQQ(4,4)-EQQ(6,6);
-EQQ(9,9) = 1-EQQ(7,7)-EQQ(8,8);
-
-EQQ(1,5) = EQQ(2,4)+EQ(3,3);
-EQQ(1,9) = EQQ(3,7)+EQ(2,2);
-EQQ(5,9) = EQQ(6,8)+EQ(1,1);
-EQQ(5,1) = EQQ(1,5);
-EQQ(9,1) = EQQ(1,9);
-EQQ(9,5) = EQQ(5,9);
+% EQ, EQQ
+[EQ,EQQ] = pdf_MF_moment(s,true);
 
 % EvRvR
 EvRvR = zeros(3,3);
-EvRvR(1,1) = S(2,2)*EQ(2,2) + S(3,3)*EQ(3,3);
-EvRvR(2,2) = S(1,1)*EQ(1,1) + S(3,3)*EQ(3,3);
-EvRvR(3,3) = S(1,1)*EQ(1,1) + S(2,2)*EQ(2,2);
+EvRvR(1,1) = s(2)*EQ(2,2) + s(3)*EQ(3,3);
+EvRvR(2,2) = s(1)*EQ(1,1) + s(3)*EQ(3,3);
+EvRvR(3,3) = s(1)*EQ(1,1) + s(2)*EQ(2,2);
 
 % EvR1, EvR1vR1
 UT = U1'*U;
