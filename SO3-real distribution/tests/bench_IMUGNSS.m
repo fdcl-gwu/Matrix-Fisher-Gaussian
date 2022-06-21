@@ -13,9 +13,9 @@ if ~isempty(gcp('nocreate'))
     delete(gcp('nocreate'));
 end
 
-N_worker = 12;
+N_worker = 16;
 parpool(N_worker);
-parfor n = 1:12
+parfor n = 1:16
     rng(n);
 end
 
@@ -32,15 +32,15 @@ parameters_base.randomWalk = 1*pi/180;
 parameters_base.biasInstability = 50/3600*pi/180;
 parameters_base.acceRandomWalk = 0.01;
 parameters_base.acceBiasInstability = 20/3600;
-parameters_base.rotMeaNoise = 1^2*eye(3);
-parameters_base.posMeaNoise = 1^2*eye(3);
-parameters_base.gravMeaNoise = 10^2*eye(3);
+parameters_base.rotMeaNoise = 0.1^2*eye(3);
+parameters_base.posMeaNoise = 0.1^2*eye(3);
+parameters_base.gravMeaNoise = 6^2*eye(3);
 parameters_base.GaussMea = true;
 parameters_base.useGrav = false;
 parameters_base.bool_prog = false;
 
 % path
-path = 'D:\result-SO3Euclid\bench_IMUGNSS\10-30-2021-2';
+path = 'D:\result-SO3Euclid\bench_IMUGNSS\11-4-2021-3';
 if ~exist(path,'dir')
     mkdir(path);
 end

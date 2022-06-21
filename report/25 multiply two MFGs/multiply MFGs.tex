@@ -1,0 +1,100 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Multiplying Two MFGs\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\def\app#1#2{%
+	\mathrel{%
+		\setbox0=\hbox{$#1\sim$}%
+		\setbox2=\hbox{%
+			\rlap{\hbox{$#1\propto$}}%
+			\lower1.1\ht0\box0%
+		}%
+		\raise0.25\ht2\box2%
+	}%
+}
+\def\approxprop{\mathpalette\app\relax}
+
+\begin{document}
+
+\maketitle
+
+Suppose there are two MFG densities
+\begin{align}
+	f_1(R,x) &= \exp\left\{ -\frac{1}{2}(x-\mu_1-P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (x-\mu_1-P_1\nu_{R_1}) \right\} \etr{F_1R^T}, \\
+	f_2(R,x) &= \exp\left\{ -\frac{1}{2}(Hx-\mu_2-P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (Hx-\mu_2-P_2\nu_{R_2}) \right\} \etr{F_2R^T}.
+\end{align}
+We want to calculate $f(R,x) = f_1(R,x)f_2(R,x)$.
+First
+\begin{align}
+	&(x-\mu_1-P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (x-\mu_1-P_1\nu_{R_1}) + (Hx-\mu_2-P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (Hx-\mu_2-P_2\nu_{R_2}) \nonumber \\
+	= & x^T \Sigma_{c_1}^{-1} x - 2x^T \Sigma_{c_1}^{-1} (\mu_1+P_1\nu_{R_1}) + (\mu_1+P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (\mu_1+P_1\nu_{R_1}) + x^T H^T\Sigma_{c_2}^{-1}H x \nonumber \\
+	& \qquad \qquad - 2x^T H^T \Sigma_{c_2}^{-1} (\mu_2+P_2\nu_{R_2}) + (\mu_2+P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (\mu_2+P_2\nu_{R_2}) \nonumber \\
+	= & x^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) x - 2x^T \left( \Sigma_{c_1}^{-1}(\mu_1+P_1\nu_{R_1}) + H^T\Sigma_{c_2}^{-1}(\mu_2+P_2\nu_{R_2}) \right) \nonumber \\
+	& \qquad \qquad + (\mu_1+P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (\mu_1+P_1\nu_{R_1}) + (\mu_2+P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (\mu_2+P_2\nu_{R_2}) \nonumber \\
+	= & x^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) x - 2x^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H)^{-1} \left( \Sigma_{c_1}^{-1}(\mu_1+P_1\nu_{R_1}) + H^T\Sigma_{c_2}^{-1}(\mu_2+P_2\nu_{R_2}) \right) \nonumber \\
+	&\qquad \qquad + (\mu_1+P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (\mu_1+P_1\nu_{R_1}) + (\mu_2+P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (\mu_2+P_2\nu_{R_2}) \nonumber
+\end{align}
+Let $A_1 = (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)^{-1} \Sigma_{c_1}^{-1}$, and $A_2 = (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)^{-1} H^T\Sigma_{c_2}^{-1}$, then
+\begin{align}
+	&(x-\mu_1-P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (x-\mu_1-P_1\nu_{R_1}) + (Hx-\mu_2-P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (Hx-\mu_2-P_2\nu_{R_2}) \nonumber \\ 
+	=& x^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) x - 2x^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \nonumber \\
+	&\qquad \qquad + (\mu_1+P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (\mu_1+P_1\nu_{R_1}) + (\mu_2+P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (\mu_2+P_2\nu_{R_2}) \nonumber \\
+	= & \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right)^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right) \nonumber \\
+	&\qquad \qquad - \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right)^T (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H) \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \nonumber \\
+	&\qquad \qquad + (\mu_1+P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (\mu_1+P_1\nu_{R_1}) + (\mu_2+P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (\mu_2+P_2\nu_{R_2}) \nonumber \\
+	= & \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right)^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right) \nonumber \\
+	&\qquad \qquad + (\mu_1+P_1\nu_{R_1})^T \left(\Sigma_{c_1}^{-1} - A_1^T(\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)A_1\right) (\mu_1+P_1\nu_{R_1}) \nonumber \\
+	&\qquad \qquad + (\mu_2+P_2\nu_{R_2})^T \left(\Sigma_{c_2}^{-1} - A_2^T(\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)A_2\right) (\mu_2+P_2\nu_{R_2}) \nonumber \\
+	&\qquad \qquad - 2(\mu_1+P_1\nu_{R_1})^T \left( A_1^T (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H) A_2 \right) (\mu_2+P_2\nu_{R_2})
+\end{align}
+Note that
+\begin{align}
+	\Sigma_{c_1}^{-1} - A_1^T(\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) A_1 &= \Sigma_{c_1}^{-1} - \Sigma_{c_1}^{-1} (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)^{-1} \Sigma_{c_1}^{-1} = H^T(H\Sigma_{c_1}H^T+\Sigma_{c_2})^{-1}H, \\
+	\Sigma_{c_2}^{-1} - A_2^T(\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) A_2 &= \Sigma_{c_2}^{-1} - \Sigma_{c_2}^{-1}H (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)^{-1} H^T\Sigma_{c_2}^{-1} = (H\Sigma_{c_1}H^T+\Sigma_{c_2})^{-1}, \\
+	A_1^T (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H) A_2 &= \Sigma_{c_1}^{-1} (\Sigma_{c_1}^{-1}+H^T\Sigma_{c_2}^{-1}H)^{-1} H^T\Sigma_{c_2}^{-1} = H^T(H\Sigma_{c_1}H^T+\Sigma_{c_2})^{-1}.
+\end{align}
+Thus,
+\begin{align}
+	&(x-\mu_1-P_1\nu_{R_1})^T \Sigma_{c_1}^{-1} (x-\mu_1-P_1\nu_{R_1}) + (Hx-\mu_2-P_2\nu_{R_2})^T \Sigma_{c_2}^{-1} (Hx-\mu_2-P_2\nu_{R_2}) \nonumber \\
+	= & \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right)^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right) \nonumber \\
+	&\qquad \qquad + \left( H(\mu_1+P_1\nu_{R_1}) -\mu_2-P_2\nu_{R_2} \right)^T (H\Sigma_{c_1}H^T + \Sigma_{c_2})^{-1} \left( H(\mu_1+P_1\nu_{R_1}) -\mu_2-P_2\nu_{R_2} \right)
+\end{align}
+Also
+\begin{align}
+	\etr{F_1R^T} \etr{F_2R^T} = \etr{(F_1+F_2)R^T}.
+\end{align}
+Then $f(R,x)$ can be decomposed as
+\begin{align}
+	f(R,x) = f(R) f(x|R),
+\end{align}
+where
+\begin{gather}
+	f(R) = \etr{(F_1+F_2)R^T} \expb{ -\frac{1}{2} \left( H(\mu_1+P_1\nu_{R_1}) -\mu_2-P_2\nu_{R_2} \right)^T (H\Sigma_{c_1}H^T + \Sigma_{c_2})^{-1} \left( H(\mu_1+P_1\nu_{R_1}) -\mu_2-P_2\nu_{R_2} \right) } \\
+	f(x|R) = \expb{-\frac{1}{2} \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right)^T (\Sigma_{c_1}^{-1} + H^T\Sigma_{c_2}^{-1}H) \left( x- \left( A_1(\mu_1+P_1\nu_{R_1}) + A_2(\mu_2+P_2\nu_{R_2}) \right) \right) }
+\end{gather}
+
+\end{document}
+

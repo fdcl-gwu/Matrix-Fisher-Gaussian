@@ -68,7 +68,7 @@ for n = 2:N
     [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,dt,options);
     
     % update
-    if useGrav
+     if useGrav
         grav = acce(:,n)+Miu(10:12);
         FMea = gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
         [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,FMea,true);

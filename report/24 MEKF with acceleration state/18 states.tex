@@ -1,0 +1,85 @@
+\documentclass[10pt]{article}
+
+\usepackage[letterpaper,margin=0.5in]{geometry}
+
+\usepackage{amssymb,amsmath,amsthm}
+\usepackage{bm}
+\usepackage{graphicx,subcaption}
+\usepackage{xcolor}
+
+\newtheorem{definition}{Definition}
+\newtheorem{proposition}{Proposition}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
+\newtheorem{remark}{Remark}
+
+\title{\vspace{-4ex}\textbf{Eighteen State MEKF\vspace{-4ex}}}
+\date{}
+
+\newcommand{\norm}[1]{\ensuremath{\left\| #1 \right\|}}
+\newcommand{\fnorm}[1]{\ensuremath{\left\| #1 \right\|_\mathrm{F}}}
+\newcommand{\tr}[1]{\ensuremath{\mathrm{tr}\left( #1 \right)}}
+\newcommand{\etr}[1]{\ensuremath{\mathrm{etr}\left\{ #1 \right\}}}
+\newcommand{\expect}[1]{\ensuremath{\mathrm{E}\left[ #1 \right]}}
+\newcommand{\SO}{\ensuremath{\mathrm{SO(3)}}}
+\newcommand{\real}[1]{\ensuremath{\mathbb{R}^{ #1 }}}
+\newcommand{\diff}[1]{\ensuremath{\mathrm{d} #1}}
+\newcommand{\expb}[1]{\ensuremath{\mathrm{exp}\left\{#1\right\}}}
+
+\makeatletter
+\newcommand\approxsim{\mathpalette\@approxsim\relax}
+\newcommand\@approxsim[2]{%
+	\mathrel{%
+		\ooalign{%
+			$\m@th#1\sim$\cr
+			\hidewidth$\m@th#1:$\hidewidth\cr
+		}%
+	}%
+}
+\makeatother
+
+\begin{document}
+
+\maketitle
+
+\section{Acceleration in inertial frame}
+
+The states are
+\begin{align}
+	\begin{bmatrix}
+		\delta\theta_n^T & {b_g}_n^T & p_n^T & v_n^T & a_n^T & {b_a}_n^T
+	\end{bmatrix}^T,
+\end{align}
+where $b_g$, $b_a$ are the bias for gyroscope and accelerometer, and $p_n$, $v_n$, $a_n$ are in the inertial frame.
+
+The state transition equations are
+\begin{align}
+	R_{n+1} &= R_n \expb{h (\omega_n-{b_g}_n)^\wedge + \Delta W_{gu}^\wedge}, \\
+	{b_g}_{n+1} &= {b_g}_n + \Delta W_{gv}, \\
+	p_{n+1} &= p_n + h v_n, \\
+	v_{n+1} &= v_n + h a_n, \\
+	a_{n+1} &= a_n + \Delta W_{ad}, \\
+	{b_a}_{n+1} &= {b_a}_n + \Delta W_{av}.
+\end{align}
+
+The linearized state transition equations are
+\begin{align}
+	\begin{bmatrix} \delta\theta_{n+1} \\ {b_g}_{n+1} \\ p_{n+1} \\ v_{n+1} \\ a_{n+1} \\ {b_a}_{n+1} \end{bmatrix} = &\begin{bmatrix} \expb{h(\omega_n-{b_g}_n)^\wedge}^T & -hI_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & I_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} & hI_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} & hI_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} \end{bmatrix} \begin{bmatrix} \delta\theta_n \\ {b_g}_n \\ p_n \\ v_n \\ a_n \\ {b_a}_n \end{bmatrix} \nonumber \\
+	&+ \begin{bmatrix} I_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & I_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} & 0_{3\times 3} \\ 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} \end{bmatrix} \begin{bmatrix} \Delta W_{gu} \\ \Delta W_{gv} \\ \Delta W_{ad} \\ \Delta W_{av} \end{bmatrix}
+\end{align}
+
+The measurement functions are
+\begin{align}
+	p_n^m &= p_n + N_p \\
+	a_n^m &= R_n^T(a_n+g) + {b_a}_n + N_{au}.
+\end{align}
+
+The linearized measurement functions are
+\begin{align}
+	\begin{bmatrix} p_n^m \\ a_n^m \end{bmatrix} = \begin{bmatrix} 0_{3\times 3} & 0_{3\times 3} & I_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} \\ \{R_n^T(a_n+g)\}^\wedge & 0_{3\times 3} & 0_{3\times 3} & 0_{3\times 3} & R_n^T & I_{3\times 3} \end{bmatrix} \begin{bmatrix} \delta\theta_n \\ {b_g}_n \\ p_n \\ v_n \\ a_n \\ {b_a}_n \end{bmatrix} + \begin{bmatrix} N_p \\ N_{au} \end{bmatrix}
+\end{align}
+
+\section{Acceleration in body-fixed frame}
+
+\end{document}
+

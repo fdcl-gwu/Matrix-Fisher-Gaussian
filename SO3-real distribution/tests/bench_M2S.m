@@ -36,10 +36,14 @@ time_TR = zeros(Ns,Ns,2*Ns);
 
 options = optimoptions('lsqlin','display','off');
 
-for i = 1:Ns
+for i = 15:Ns
     for j = 1:Ns
         for k = 1:2*Ns
             d = pdf_MF_moment(s(:,i,j,k));
+            
+            if i==3 && j==19 && k==1
+                a = 1;
+            end
             
             try
                 tic;
@@ -54,24 +58,24 @@ for i = 1:Ns
                 success_LS(i,j,k) = false;
             end
             
-            try
-                tic;
-                [sinv_TR(:,i,j,k),NIter_TR(i,j,k)] = pdf_MF_M2S_TR(d,[],options);
-                time_TR(i,j,k) = toc;
-                error_TR(i,j,k) = max(abs(s(:,i,j,k)-sinv_TR(:,i,j,k)))/...
-                    sqrt(sum(s(:,i,j,k).^2));
-                if sum(isfinite(sinv_TR(:,i,j,k))) < 3
-                    success_TR(i,j,k) = false;
-                end
-            catch
-                success_TR(i,j,k) = false;
-            end
+%             try
+%                 tic;
+%                 [sinv_TR(:,i,j,k),NIter_TR(i,j,k)] = pdf_MF_M2S_TR(d,[],options);
+%                 time_TR(i,j,k) = toc;
+%                 error_TR(i,j,k) = max(abs(s(:,i,j,k)-sinv_TR(:,i,j,k)))/...
+%                     sqrt(sum(s(:,i,j,k).^2));
+%                 if sum(isfinite(sinv_TR(:,i,j,k))) < 3
+%                     success_TR(i,j,k) = false;
+%                 end
+%             catch
+%                 success_TR(i,j,k) = false;
+%             end
         end
     end
 end
 
 % save data
-path = 'D:\result-SO3Euclid\bench_M2S\10-26-2021';
+path = 'D:\result-SO3Euclid\bench_M2S\10-28-2021';
 if ~exist(path,'dir')
     mkdir(path);
 end
