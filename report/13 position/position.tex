@@ -166,10 +166,13 @@ We give some example calculations:
 	\expect{R(0)b_a(0)\nu'^T_{R(0)\delta R}} &= U\expect{QV^T\mu_{b_a}\left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T}\tilde{U}^T \nonumber \\
 	&\quad + U\expect{QV^TP_{b_a}(QS-SQ^T)^\vee \left((Q\tilde{S}^T-\tilde{S}Q^T)^\vee\right)^T} \tilde{U}^T
 \end{align}
-\begin{align}
-	\expect{x(0)\nu'^T_{R(0)(\hat{b}_g(0)-\hat{\mu}_{b_g})\delta R}} &= \expect{x(0)\left( b_g^T(0) - \mu^T_{b_g} \right)V\Gamma_Q^T} \tilde{U}^T \nonumber \\
-	&= \expect{\left( \Sigma_{c,xb_g} + \mu\nu^T_RP_{b_g}^T + P\nu_R\nu_R^TP_{b_g}^T\right)V\Gamma_Q^T} \tilde{U}^T
-\end{align}
+\begin{subequations}
+	\begin{align}
+		(MFGI) \qquad \expect{x(0)\nu'^T_{R(0)(\hat{b}_g(0)-\hat{\mu}_{b_g})\delta R}} &= \expect{x(0)\left( b_g^T(0) - \mu^T_{b_g} \right)V\Gamma_Q^T} \tilde{U}^T \nonumber \\
+		&= \expect{\left( \Sigma_{c,xb_g} + \mu\nu^T_RP_{b_g}^T + P\nu_R\nu_R^TP_{b_g}^T\right)V\Gamma_Q^T} \tilde{U}^T \\
+		(MFGB) \qquad \expect{x(0)\nu'^T_{R(0)(\hat{b}_g(0)-\hat{\mu}_{b_g})\delta R}} &= \expect{x(0)\left( b_g^T(0) - \mu^T_{b_g} \right)V\Gamma_Q^T} \tilde{V}^T
+	\end{align}
+\end{subequations}
 \begin{align}
 	\expect{x(0)\nu'^T_{R(0)((H_{gu}\Delta W_{gu})^\wedge)^2\delta R}} = h\expect{x(0)\nu'^T_{R(0)G_{gu}\delta R}} - \tr{G_{gu}}h\expect{x(0)\nu'^T_{R(0)\delta R}}.
 \end{align}

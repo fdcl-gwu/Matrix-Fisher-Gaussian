@@ -1,4 +1,4 @@
-function [ R, x, MFG, stepT ] = MFGAnalyticIMU( gyro, acce, RMea, pMea, parameters )
+function [ R, x, MFG, stepT ] = MFGAnalyticIMU( gyro, acce, RMea, pMea, defQS, parameters )
 
 N = size(gyro,2);
 dt = parameters.dt;
@@ -61,19 +61,12 @@ stepT = zeros(N-1,1);
 for n = 2:N
     tic;
     
-    try
     % uncertainty propagation
     omega = (gyro(:,n-1)+gyro(:,n))/2;
     a = (acce(:,n-1)+acce(:,n))/2;
-    [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,dt,options);
+    [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,defQS,dt,options);
     
     % update
-     if useGrav
-        grav = acce(:,n)+Miu(10:12);
-        FMea = gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
-        [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,FMea,true);
-    end
-    
     if rem(n,1/dt/sf_GPS)==0
         if hasRMea
             if useGrav
@@ -91,17 +84,13 @@ for n = 2:N
             end
         end
         
-        [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,bool_prog,options);
+        [Miu,Sigma,P,U,S,V] = MFGIMUUpdate(Miu,Sigma,P,U,S,V,FMea,pMea(:,n),posMeaNoise,defQS,bool_prog,options);
     else
         if useGrav
             grav = acce(:,n)+Miu(10:12);
             FMea = gravMeaNoise*[0;0;1]*grav'/sqrt(sum(grav.^2));
-            [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,FMea,true);
+            [Miu,Sigma,P,U,S,V] = MFGMulMF(Miu,Sigma,P,U,S,V,FMea,defQS);
         end
-    end
-    catch
-        save('workspace');
-        error("break");
     end
     
     % record results

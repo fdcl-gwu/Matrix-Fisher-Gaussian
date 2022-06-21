@@ -1,4 +1,4 @@
-function [ Miu, Sigma, P, U, S, V ] = MFGIMUUpdate( Miu1, Sigma1, P1, U1, S1, V1, MF, z, Sigmaz, bool_prog, options )
+function [ Miu, Sigma, P, U, S, V ] = MFGIMUUpdate( Miu1, Sigma1, P1, U1, S1, V1, MF, z, Sigmaz, defQS, bool_prog, options )
 
 H = [zeros(3,3),eye(3),zeros(3,6)];
 
@@ -16,7 +16,11 @@ if ~bool_prog
 
     % reweight
     for i = 1:7
-        vR1 = vee(U1'*R1(:,:,i)*V1*S1-S1*V1'*R1(:,:,i)'*U1,[],false);
+        if defQS
+            vR1 = vee(U1'*R1(:,:,i)*V1*S1-S1*V1'*R1(:,:,i)'*U1,[],false);
+        else
+            vR1 = vee(S1*U1'*R1(:,:,i)*V1-V1'*R1(:,:,i)'*U1*S1,[],false);
+        end
         Miuc = Miu1+P1*vR1;
         expfR1 = exp(-1/2*(H*Miuc-z)'*Sigma_R^-1*(H*Miuc-z));
         w1(i) = w1(i)*expfR1;
@@ -33,7 +37,11 @@ else
     
     while lambda_rem > 0
         for i = 1:7
-            vR1 = vee(U1'*Rp(:,:,i)*V1*S1-S1*V1'*Rp(:,:,i)'*U1,[],false);
+            if defQS
+                vR1 = vee(U1'*Rp(:,:,i)*V1*S1-S1*V1'*Rp(:,:,i)'*U1,[],false);
+            else
+                vR1 = vee(S1*U1'*Rp(:,:,i)*V1-V1'*Rp(:,:,i)'*U1*S1,[],false);
+            end
             Miuc = Miu1+P1*vR1;
             expfR1(i) = exp(-1/2*lambda_rem*(H*Miuc-z)'*Sigma_R^-1*(H*Miuc-z));
         end
@@ -90,38 +98,67 @@ UT = U1'*U;
 VT = V1'*V;
 ST = UT'*S1*VT;
 
-EvR1 = UT*vee(EQ*ST'-ST*EQ',[],false);
+if defQS
+    EvR1 = UT*vee(EQ*ST'-ST*EQ',[],false);
+    
+    EvRTvRT(1,1) = (ST(3,2)^2)*EQQ(5,5)+(-2*ST(2,3)*ST(3,2))*EQQ(5,9)+(ST(2,3)^2)*EQQ(9,9)...
+        +(ST(3,1)^2)*EQQ(2,2)+(ST(2,1)^2)*EQQ(3,3)+(ST(2,2)^2+ST(3,3)^2)*EQQ(6,6)+(-2*ST(2,2)*ST(3,3))*EQQ(6,8);
+    EvRTvRT(2,2) = (ST(3,1)^2)*EQQ(1,1)+(-2*ST(1,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)^2)*EQQ(9,9)...
+        +(ST(3,2)^2)*EQQ(2,2)+(ST(1,1)^2+ST(3,3)^2)*EQQ(3,3)+(-2*ST(1,1)*ST(3,3))*EQQ(3,7)+(ST(1,2)^2)*EQQ(6,6);
+    EvRTvRT(3,3) = (ST(2,1)^2)*EQQ(1,1)+(-2*ST(1,2)*ST(2,1))*EQQ(1,5)+(ST(1,2)^2)*EQQ(5,5)...
+        +(ST(1,1)^2+ST(2,2)^2)*EQQ(2,2)+(-2*ST(1,1)*ST(2,2))*EQQ(2,4)+(ST(2,3)^2)*EQQ(3,3)+(ST(1,3)^2)*EQQ(6,6);
+    EvRTvRT(1,2) = (-ST(3,1)*ST(3,2))*EQQ(1,5)+(ST(2,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)*ST(3,2))*EQQ(5,9)+(-ST(1,3)*ST(2,3))*EQQ(9,9)...
+        +(-ST(3,1)*ST(3,2))*EQQ(2,4)+(-ST(1,1)*ST(2,1))*EQQ(3,3)+(ST(2,1)*ST(3,3))*EQQ(3,7)+(-ST(1,2)*ST(2,2))*EQQ(6,6)+(ST(1,2)*ST(3,3))*EQQ(6,8);
+    EvRTvRT(1,3) = (ST(2,1)*ST(3,2))*EQQ(1,5)+(-ST(2,1)*ST(2,3))*EQQ(1,9)+(-ST(1,2)*ST(3,2))*EQQ(5,5)+(ST(1,2)*ST(2,3))*EQQ(5,9)...
+        +(-ST(1,1)*ST(3,1))*EQQ(2,2)+(ST(2,2)*ST(3,1))*EQQ(2,4)+(-ST(2,1)*ST(2,3))*EQQ(3,7)+(-ST(1,3)*ST(3,3))*EQQ(6,6)+(ST(1,3)*ST(2,2))*EQQ(6,8);
+    EvRTvRT(2,3) = (-ST(2,1)*ST(3,1))*EQQ(1,1)+(ST(1,2)*ST(3,1))*EQQ(1,5)+(ST(1,3)*ST(2,1))*EQQ(1,9)+(-ST(1,2)*ST(1,3))*EQQ(5,9)...
+        +(-ST(2,2)*ST(3,2))*EQQ(2,2)+(ST(1,1)*ST(3,2))*EQQ(2,4)+(-ST(2,3)*ST(3,3))*EQQ(3,3)+(ST(1,1)*ST(2,3))*EQQ(3,7)+(-ST(1,2)*ST(1,3))*EQQ(6,8);
+    EvRTvRT(2,1) = EvRTvRT(1,2);
+    EvRTvRT(3,1) = EvRTvRT(1,3);
+    EvRTvRT(3,2) = EvRTvRT(2,3);
+    EvR1vR1 = UT*EvRTvRT*UT';
+    
+    EvRTvR(1,1) = (ST(2,2)*s(2)+ST(3,3)*s(3))*EQQ(6,6) +(-ST(2,2)*s(3)-ST(3,3)*s(2))*EQQ(6,8);
+    EvRTvR(1,2) = (-ST(2,1)*s(1))*EQQ(3,3) +(ST(2,1)*s(3))*EQQ(3,7);
+    EvRTvR(1,3) = (-ST(3,1)*s(1))*EQQ(2,2) +(ST(3,1)*s(2))*EQQ(2,4);
+    EvRTvR(2,1) = (-ST(1,2)*s(2))*EQQ(6,6) +(ST(1,2)*s(3))*EQQ(6,8);
+    EvRTvR(2,2) = (ST(1,1)*s(1)+ST(3,3)*s(3))*EQQ(3,3) +(-ST(1,1)*s(3)-ST(3,3)*s(1))*EQQ(3,7);
+    EvRTvR(2,3) = (-ST(3,2)*s(2))*EQQ(2,2) +(ST(3,2)*s(1))*EQQ(2,4);
+    EvRTvR(3,1) = (-ST(1,3)*s(3))*EQQ(6,6) +(ST(1,3)*s(2))*EQQ(6,8);
+    EvRTvR(3,2) = (-ST(2,3)*s(3))*EQQ(3,3) +(ST(2,3)*s(1))*EQQ(3,7);
+    EvRTvR(3,3) = (ST(1,1)*s(1)+ST(2,2)*s(2))*EQQ(2,2) +(-ST(1,1)*s(2)-ST(2,2)*s(1))*EQQ(2,4);
+    EvR1vR = UT*EvRTvR;
+else
+    EvR1 = VT*vee(ST'*EQ-EQ'*ST,[],false);
 
-EvRTvRT(1,1) = (ST(3,2)^2)*EQQ(5,5)+(-2*ST(2,3)*ST(3,2))*EQQ(5,9)+(ST(2,3)^2)*EQQ(9,9)...
-    +(ST(3,1)^2)*EQQ(2,2)+(ST(2,1)^2)*EQQ(3,3)+(ST(2,2)^2+ST(3,3)^2)*EQQ(6,6)+(-2*ST(2,2)*ST(3,3))*EQQ(6,8);
-EvRTvRT(2,2) = (ST(3,1)^2)*EQQ(1,1)+(-2*ST(1,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)^2)*EQQ(9,9)...
-    +(ST(3,2)^2)*EQQ(2,2)+(ST(1,1)^2+ST(3,3)^2)*EQQ(3,3)+(-2*ST(1,1)*ST(3,3))*EQQ(3,7)+(ST(1,2)^2)*EQQ(6,6);
-EvRTvRT(3,3) = (ST(2,1)^2)*EQQ(1,1)+(-2*ST(1,2)*ST(2,1))*EQQ(1,5)+(ST(1,2)^2)*EQQ(5,5)...
-    +(ST(1,1)^2+ST(2,2)^2)*EQQ(2,2)+(-2*ST(1,1)*ST(2,2))*EQQ(2,4)+(ST(2,3)^2)*EQQ(3,3)+(ST(1,3)^2)*EQQ(6,6);
-EvRTvRT(1,2) = (-ST(3,1)*ST(3,2))*EQQ(1,5)+(ST(2,3)*ST(3,1))*EQQ(1,9)+(ST(1,3)*ST(3,2))*EQQ(5,9)+(-ST(1,3)*ST(2,3))*EQQ(9,9)...
-    +(-ST(3,1)*ST(3,2))*EQQ(2,4)+(-ST(1,1)*ST(2,1))*EQQ(3,3)+(ST(2,1)*ST(3,3))*EQQ(3,7)+(-ST(1,2)*ST(2,2))*EQQ(6,6)+(ST(1,2)*ST(3,3))*EQQ(6,8);
-EvRTvRT(1,3) = (ST(2,1)*ST(3,2))*EQQ(1,5)+(-ST(2,1)*ST(2,3))*EQQ(1,9)+(-ST(1,2)*ST(3,2))*EQQ(5,5)+(ST(1,2)*ST(2,3))*EQQ(5,9)...
-    +(-ST(1,1)*ST(3,1))*EQQ(2,2)+(ST(2,2)*ST(3,1))*EQQ(2,4)+(-ST(2,1)*ST(2,3))*EQQ(3,7)+(-ST(1,3)*ST(3,3))*EQQ(6,6)+(ST(1,3)*ST(2,2))*EQQ(6,8);
-EvRTvRT(2,3) = (-ST(2,1)*ST(3,1))*EQQ(1,1)+(ST(1,2)*ST(3,1))*EQQ(1,5)+(ST(1,3)*ST(2,1))*EQQ(1,9)+(-ST(1,2)*ST(1,3))*EQQ(5,9)...
-    +(-ST(2,2)*ST(3,2))*EQQ(2,2)+(ST(1,1)*ST(3,2))*EQQ(2,4)+(-ST(2,3)*ST(3,3))*EQQ(3,3)+(ST(1,1)*ST(2,3))*EQQ(3,7)+(-ST(1,2)*ST(1,3))*EQQ(6,8);
-EvRTvRT(2,1) = EvRTvRT(1,2);
-EvRTvRT(3,1) = EvRTvRT(1,3);
-EvRTvRT(3,2) = EvRTvRT(2,3);
+    EvRTvRT(1,1) = (ST(2,3)^2)*EQQ(5,5) +(-2*ST(2,3)*ST(3,2))*EQQ(5,9) +(ST(3,2)^2)*EQQ(9,9)...
+        + (ST(1,3)^2)*EQQ(2,2) +(ST(1,2)^2)*EQQ(3,3) +(ST(2,2)^2+ST(3,3)^2)*EQQ(6,6) +(-2*ST(2,2)*ST(3,3))*EQQ(6,8);
+    EvRTvRT(2,2) = (ST(1,3)^2)*EQQ(1,1) +(-2*ST(1,3)*ST(3,1))*EQQ(1,9) +(ST(3,1)^2)*EQQ(9,9)...
+        + (ST(2,3)^2)*EQQ(2,2) +(ST(1,1)^2+ST(3,3)^2)*EQQ(3,3) +(-2*ST(1,1)*ST(3,3))*EQQ(3,7) +(ST(2,1)^2)*EQQ(6,6);
+    EvRTvRT(3,3) = (ST(1,2)^2)*EQQ(1,1) +(-2*ST(1,2)*ST(2,1))*EQQ(1,5) +(ST(2,1)^2)*EQQ(5,5)...
+        + (ST(1,1)^2+ST(2,2)^2)*EQQ(2,2) +(-2*ST(1,1)*ST(2,2))*EQQ(2,4) +(ST(3,2)^2)*EQQ(3,3) +(ST(3,1)^2)*EQQ(6,6);
+    EvRTvRT(1,2) = (-ST(1,3)*ST(2,3))*EQQ(1,5) +(ST(1,3)*ST(3,2))*EQQ(1,9) +(ST(2,3)*ST(3,1))*EQQ(5,9) +(-ST(3,1)*ST(3,2))*EQQ(9,9)...
+        + (-ST(1,3)*ST(2,3))*EQQ(2,4) +(-ST(1,1)*ST(1,2))*EQQ(3,3) +(ST(1,2)*ST(3,3))*EQQ(3,7) +(-ST(2,1)*ST(2,2))*EQQ(6,6) +(ST(2,1)*ST(3,3))*EQQ(6,8);
+    EvRTvRT(1,3) = (ST(1,2)*ST(2,3))*EQQ(1,5) +(-ST(1,2)*ST(3,2))*EQQ(1,9) +(-ST(2,1)*ST(2,3))*EQQ(5,5) +(ST(2,1)*ST(3,2))*EQQ(5,9)...
+        + (-ST(1,1)*ST(1,3))*EQQ(2,2) +(ST(1,3)*ST(2,2))*EQQ(2,4) +(-ST(1,2)*ST(3,2))*EQQ(3,7) +(-ST(3,1)*ST(3,3))*EQQ(6,6) +(ST(2,2)*ST(3,1))*EQQ(6,8);
+    EvRTvRT(2,3) = (-ST(1,2)*ST(1,3))*EQQ(1,1) +(ST(1,3)*ST(2,1))*EQQ(1,5) +(ST(1,2)*ST(3,1))*EQQ(1,9) +(-ST(2,1)*ST(3,1))*EQQ(5,9)...
+        + (-ST(2,2)*ST(2,3))*EQQ(2,2) +(ST(1,1)*ST(2,3))*EQQ(2,4) +(-ST(3,2)*ST(3,3))*EQQ(3,3) +(ST(1,1)*ST(3,2))*EQQ(3,7) +(-ST(2,1)*ST(3,1))*EQQ(6,8);
+    EvRTvRT(2,1) = EvRTvRT(1,2);
+    EvRTvRT(3,1) = EvRTvRT(1,3);
+    EvRTvRT(3,2) = EvRTvRT(2,3);
+    EvR1vR1 = VT*EvRTvRT*VT';
 
-EvR1vR1 = UT*EvRTvRT*UT';
-
-% EvR1vR
-EvRTvR(1,1) = (ST(2,2)*s(2)+ST(3,3)*s(3))*EQQ(6,6) +(-ST(2,2)*s(3)-ST(3,3)*s(2))*EQQ(6,8);
-EvRTvR(1,2) = (-ST(2,1)*s(1))*EQQ(3,3) +(ST(2,1)*s(3))*EQQ(3,7);
-EvRTvR(1,3) = (-ST(3,1)*s(1))*EQQ(2,2) +(ST(3,1)*s(2))*EQQ(2,4);
-EvRTvR(2,1) = (-ST(1,2)*s(2))*EQQ(6,6) +(ST(1,2)*s(3))*EQQ(6,8);
-EvRTvR(2,2) = (ST(1,1)*s(1)+ST(3,3)*s(3))*EQQ(3,3) +(-ST(1,1)*s(3)-ST(3,3)*s(1))*EQQ(3,7);
-EvRTvR(2,3) = (-ST(3,2)*s(2))*EQQ(2,2) +(ST(3,2)*s(1))*EQQ(2,4);
-EvRTvR(3,1) = (-ST(1,3)*s(3))*EQQ(6,6) +(ST(1,3)*s(2))*EQQ(6,8);
-EvRTvR(3,2) = (-ST(2,3)*s(3))*EQQ(3,3) +(ST(2,3)*s(1))*EQQ(3,7);
-EvRTvR(3,3) = (ST(1,1)*s(1)+ST(2,2)*s(2))*EQQ(2,2) +(-ST(1,1)*s(2)-ST(2,2)*s(1))*EQQ(2,4);
-
-EvR1vR = UT*EvRTvR;
+    EvRTvR(1,1) = (ST(2,2)*s(2)+ST(3,3)*s(3))*EQQ(6,6) +(-ST(2,2)*s(3)-ST(3,3)*s(2))*EQQ(6,8);
+    EvRTvR(1,2) = (-ST(1,2)*s(1))*EQQ(3,3) +(ST(1,2)*s(3))*EQQ(3,7);
+    EvRTvR(1,3) = (-ST(1,3)*s(1))*EQQ(2,2) +(ST(1,3)*s(2))*EQQ(2,4);
+    EvRTvR(2,1) = (-ST(2,1)*s(2))*EQQ(6,6) +(ST(2,1)*s(3))*EQQ(6,8);
+    EvRTvR(2,2) = (ST(1,1)*s(1)+ST(3,3)*s(3))*EQQ(3,3) +(-ST(1,1)*s(3)-ST(3,3)*s(1))*EQQ(3,7);
+    EvRTvR(2,3) = (-ST(2,3)*s(2))*EQQ(2,2) +(ST(2,3)*s(1))*EQQ(2,4);
+    EvRTvR(3,1) = (-ST(3,1)*s(3))*EQQ(6,6) +(ST(3,1)*s(2))*EQQ(6,8);
+    EvRTvR(3,2) = (-ST(3,2)*s(3))*EQQ(3,3) +(ST(3,2)*s(1))*EQQ(3,7);
+    EvRTvR(3,3) = (ST(1,1)*s(1)+ST(2,2)*s(2))*EQQ(2,2) +(-ST(1,1)*s(2)-ST(2,2)*s(1))*EQQ(2,4);
+    EvR1vR = VT*EvRTvR;
+end
 
 % Ex, Exx, ExvR
 IKH = eye(12)-K*H;

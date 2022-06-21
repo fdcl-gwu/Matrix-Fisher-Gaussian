@@ -9,7 +9,7 @@ addpath('../Filter');
 % time parameters
 T = 60;
 sf = 200;
-sf_GPS = 40;
+sf_GPS = 10;
 
 parameters.dt = 1/sf;
 parameters.sf_GPS = sf_GPS;
@@ -19,10 +19,13 @@ parameters.randomWalk = 1*pi/180;
 parameters.biasInstability = 50/3600*pi/180;
 parameters.acceRandomWalk = 0.01;
 parameters.acceBiasInstability = 20/3600;
+parameters.acceDynamics = 0.1^2*sqrt(sf);
 parameters.rotMeaNoise = 0.1^2*eye(3);
 parameters.posMeaNoise = 0.1^2*eye(3);
+parameters.gravMeaNoise = 5^2*eye(3);
 parameters.GaussMea = true;
-parameters.bool_prog = false;
+parameters.useGrav = false;
+parameters.bool_prog = true;
 
 % generate path
 [gyro,acce,RMea,pMea,RTrue,xTrue] = genTrigIMU(T,sf,parameters);
@@ -57,73 +60,44 @@ parameters.xInit = [xTrue(1:3,1);pMea(:,1);xTrue(7:12,1)];
 parameters.initXNoise = [0.01^2*eye(3),zeros(3,9);
     zeros(3,3),parameters.posMeaNoise,zeros(3,6);zeros(6,6),0.01^2*eye(6)];
 
+% parameters.RInit = RTrue(:,:,1);
+% parameters.initRNoise = 0.01^2*eye(3);
+% 
+% parameters.xInit = [xTrue(1:3,1);pMea(:,1);xTrue(7:12,1)];
+% parameters.initXNoise = [0.01^2*eye(3),zeros(3,9);
+%     zeros(3,3),parameters.posMeaNoise,zeros(3,6);zeros(6,6),0.01^2*eye(6)];
+
 % filter
-[RMEKF1,xMEKF1,G1] = MEKFIMU(gyro,acce,[],pMea,parameters);
-
-parameters.initRNoise(3,3) = parameters.initRNoise(1,1);
-[RMEKF2,xMEKF2,G2] = MEKFIMU(gyro,acce,[],pMea,parameters);
-
-parameters.initRNoise(3,3) = 10;
-[RMEKF3,xMEKF3,G3] = MEKFIMU(gyro,acce,[],pMea,parameters);
-
-parameters.initRNoise(3,3) = 100;
-[RMEKF4,xMEKF4,G4] = MEKFIMU(gyro,acce,[],pMea,parameters);
-
 parameters.initRNoise(3,3) = 1000;
-[RMEKF5,xMEKF5,G5] = MEKFIMU(gyro,acce,[],pMea,parameters);
-
-parameters.GaussMea = false;
-parameters.initRNoise = FInit;
-[RMFG,xMFG,MFG] = MFGAnalyticIMU(gyro,acce,[],pMea,parameters);
-
-parameters.bool_prog = true;
-[RMFGp,xMFGp,MFGp] = MFGAnalyticIMU(gyro,acce,[],pMea,parameters);
+[RMEKF,xMEKF,G] = MEKFIMU(gyro,acce,[],pMea,parameters);
+[RMFGI,xMFGI,MFGI] = MFGAnalyticIMU(gyro,acce,[],pMea,true,parameters);
+[RMFGB,xMFGB,MFGB] = MFGAnalyticIMU(gyro,acce,[],pMea,false,parameters);
 
 % plot error
 figure; hold on;
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMEKF1),'v')).^2));
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMEKF2),'v')).^2));
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMEKF3),'v')).^2));
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMEKF4),'v')).^2));
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMEKF5),'v')).^2));
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMFG),'v')).^2));
-plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMFGp),'v')).^2));
+plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMEKF),'v')).^2));
+plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMFGI),'v')).^2));
+plot(sqrt(sum(logRot(mulRot(invRot(RTrue),RMFGB),'v')).^2));
 
 figure; hold on;
-plot(sqrt(sum((xTrue(1:3,:)-xMEKF1(1:3,:)).^2)));
-plot(sqrt(sum((xTrue(1:3,:)-xMEKF2(1:3,:)).^2)));
-plot(sqrt(sum((xTrue(1:3,:)-xMEKF3(1:3,:)).^2)));
-plot(sqrt(sum((xTrue(1:3,:)-xMEKF4(1:3,:)).^2)));
-plot(sqrt(sum((xTrue(1:3,:)-xMEKF5(1:3,:)).^2)));
-plot(sqrt(sum((xTrue(1:3,:)+xMFG(1:3,:)).^2)));
-plot(sqrt(sum((xTrue(1:3,:)+xMFGp(1:3,:)).^2)));
+plot(sqrt(sum((xTrue(1:3,:)-xMEKF(1:3,:)).^2)));
+plot(sqrt(sum((xTrue(1:3,:)-xMFGI(1:3,:)).^2)));
+plot(sqrt(sum((xTrue(1:3,:)-xMFGB(1:3,:)).^2)));
 
 figure; hold on;
-plot(sqrt(sum((xTrue(4:6,:)-xMEKF1(4:6,:)).^2)));
-plot(sqrt(sum((xTrue(4:6,:)-xMEKF2(4:6,:)).^2)));
-plot(sqrt(sum((xTrue(4:6,:)-xMEKF3(4:6,:)).^2)));
-plot(sqrt(sum((xTrue(4:6,:)-xMEKF4(4:6,:)).^2)));
-plot(sqrt(sum((xTrue(4:6,:)-xMEKF5(4:6,:)).^2)));
-plot(sqrt(sum((xTrue(4:6,:)-xMFG(4:6,:)).^2)));
-plot(sqrt(sum((xTrue(4:6,:)-xMFGp(4:6,:)).^2)));
+plot(sqrt(sum((xTrue(4:6,:)-xMEKF(4:6,:)).^2)));
+plot(sqrt(sum((xTrue(4:6,:)-xMFGI(4:6,:)).^2)));
+plot(sqrt(sum((xTrue(4:6,:)-xMFGB(4:6,:)).^2)));
 
 figure; hold on;
-plot(sqrt(sum((xTrue(7:9,:)-xMEKF1(7:9,:)).^2)));
-plot(sqrt(sum((xTrue(7:9,:)-xMEKF2(7:9,:)).^2)));
-plot(sqrt(sum((xTrue(7:9,:)-xMEKF3(7:9,:)).^2)));
-plot(sqrt(sum((xTrue(7:9,:)-xMEKF4(7:9,:)).^2)));
-plot(sqrt(sum((xTrue(7:9,:)-xMEKF5(7:9,:)).^2)));
-plot(sqrt(sum((xTrue(7:9,:)-xMFG(7:9,:)).^2)));
-plot(sqrt(sum((xTrue(7:9,:)-xMFGp(7:9,:)).^2)));
+plot(sqrt(sum((xTrue(7:9,:)-xMEKF(7:9,:)).^2)));
+plot(sqrt(sum((xTrue(7:9,:)-xMFGI(7:9,:)).^2)));
+plot(sqrt(sum((xTrue(7:9,:)-xMFGB(7:9,:)).^2)));
 
 figure; hold on;
-plot(sqrt(sum((xTrue(10:12,:)-xMEKF1(10:12,:)).^2)));
-plot(sqrt(sum((xTrue(10:12,:)-xMEKF2(10:12,:)).^2)));
-plot(sqrt(sum((xTrue(10:12,:)-xMEKF3(10:12,:)).^2)));
-plot(sqrt(sum((xTrue(10:12,:)-xMEKF4(10:12,:)).^2)));
-plot(sqrt(sum((xTrue(10:12,:)-xMEKF5(10:12,:)).^2)));
-plot(sqrt(sum((xTrue(10:12,:)+xMFG(10:12,:)).^2)));
-plot(sqrt(sum((xTrue(10:12,:)+xMFGp(10:12,:)).^2)));
+plot(sqrt(sum((xTrue(10:12,:)-xMEKF(10:12,:)).^2)));
+plot(sqrt(sum((xTrue(10:12,:)-xMFGI(10:12,:)).^2)));
+plot(sqrt(sum((xTrue(10:12,:)-xMFGB(10:12,:)).^2)));
 
 rmpath('../../rotation3d');
 rmpath('../Generate-Path');
