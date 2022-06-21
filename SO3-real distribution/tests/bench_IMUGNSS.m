@@ -85,7 +85,7 @@ parfor i = 1:N
     sigma = eig(SigmaRInit);
     parameters.initRNoise = diag([mean(sigma(1:2)),mean(sigma(1:2)),sigma(3)]);
 
-    parameters.xInit = [xTrue(1:3,1);pMea(:,1);xTrue(7:12,1)];
+    parameters.xInit = [zeros(3,1);pMea(:,1);zeros(6,1)];
     parameters.initXNoise = [0.01^2*eye(3),zeros(3,9);
         zeros(3,3),parameters.posMeaNoise,zeros(3,6);zeros(6,6),0.01^2*eye(6)];
     
@@ -105,7 +105,6 @@ parfor i = 1:N
     end
     
     try
-        parameters.useGrav = true;
         [RMFGB,xMFGB,MFGB,tMFGB] = MFGAnalyticIMU(gyro,acce,[],pMea,false,parameters);
     catch
         RMFGB = repmat(eye(3),1,1,T*sf+1);
