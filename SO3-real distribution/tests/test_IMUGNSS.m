@@ -21,7 +21,7 @@ parameters.acceRandomWalk = 0.01;
 parameters.acceBiasInstability = 20/3600;
 parameters.acceDynamics = 0.1^2*sqrt(sf);
 parameters.rotMeaNoise = 0.1^2*eye(3);
-parameters.posMeaNoise = 0.1^2*eye(3);
+parameters.posMeaNoise = 1^2*eye(3);
 parameters.gravMeaNoise = 5^2*eye(3);
 parameters.GaussMea = true;
 parameters.useGrav = false;
@@ -70,6 +70,9 @@ parameters.initXNoise = [0.01^2*eye(3),zeros(3,9);
 % filter
 parameters.initRNoise(3,3) = 1000;
 [RMEKF,xMEKF,G] = MEKFIMU(gyro,acce,[],pMea,parameters);
+
+parameters.GaussMea = false;
+parameters.initRNoise = FInit;
 [RMFGI,xMFGI,MFGI] = MFGAnalyticIMU(gyro,acce,[],pMea,true,parameters);
 [RMFGB,xMFGB,MFGB] = MFGAnalyticIMU(gyro,acce,[],pMea,false,parameters);
 

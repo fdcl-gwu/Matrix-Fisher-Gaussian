@@ -6,7 +6,7 @@ N = length(time);
 % motion parameters
 E.fr = 0.35; E.fp = 0.35; E.fh = 0.35;
 E.magr = pi; E.magp = pi/2; E.magh = pi;
-E.radius = 5;
+E.radius = 20;
 E.fs = 0.2;
 E.mags = 5;
 E.meds = 5;
