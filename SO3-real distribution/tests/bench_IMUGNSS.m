@@ -20,8 +20,8 @@ parfor n = 1:16
 end
 
 % time parameters
-T = 60;
-sf = 200;
+T = 300;
+sf = 100;
 sf_GPS = 10;
 
 parameters_base.dt = 1/sf;
@@ -36,11 +36,12 @@ parameters_base.rotMeaNoise = 0.1^2*eye(3);
 parameters_base.posMeaNoise = 1^2*eye(3);
 parameters_base.gravMeaNoise = 6^2*eye(3);
 parameters_base.GaussMea = true;
+parameters_base.noGPS = [200,15000];
 parameters_base.useGrav = false;
 parameters_base.bool_prog = true;
 
 % path
-path = 'D:\result-SO3Euclid\bench_IMUGNSS\6-21-2022';
+path = 'D:\result-SO3Euclid\bench_IMUGNSS\6-21-2022-3';
 if ~exist(path,'dir')
     mkdir(path);
 end
@@ -60,41 +61,43 @@ parfor i = 1:N
     % initial parameters
     parameters = parameters_base;
     
-    g = [0;0;9.8];
-    r = cross(acce(:,1),g);
-    theta = asin(sqrt(sum(r.^2))/sqrt(sum(acce(:,1).^2))/sqrt(sum(g.^2)));
-    r = r/sqrt(sum(r.^2));
-    parameters.RInit = expRot([0;0;pi])*expRot(theta*hat(r));
+%     g = [0;0;9.8];
+%     r = cross(acce(:,1),g);
+%     theta = asin(sqrt(sum(r.^2))/sqrt(sum(acce(:,1).^2))/sqrt(sum(g.^2)));
+%     r = r/sqrt(sum(r.^2));
+%     parameters.RInit = expRot([0;0;pi])*expRot(theta*hat(r));
+% 
+%     Ns = 100000;
+%     aInit_rand = RTrue(:,:,1)'*g + randn(3,Ns)*parameters.acceRandomWalk*sqrt(sf);
+%     r = cross(aInit_rand,repmat(g,1,Ns));
+%     theta = asin(sqrt(sum(r.^2))./sqrt(sum(aInit_rand.^2))/sqrt(sum(g.^2)));
+%     r = r./sqrt(sum(r.^2));
+%     RInit_rand = expRot(theta.*r);
+%     RInit_rand = mulRot(expRot([zeros(2,Ns);(rand(1,Ns)-0.5)*2*pi]),RInit_rand);
+%     RInit_error = mulRot(parameters.RInit',RInit_rand);
+% 
+%     ERInit_error = mean(RInit_error,3);
+%     [UInit,DInit,VInit] = psvd(ERInit_error);
+%     SInit = diag(pdf_MF_M2S(diag(DInit)));
+%     FInit = parameters.RInit*(UInit*VInit')'*UInit*SInit*VInit';
+% 
+%     rv = logRot(RInit_error,'v');
+%     SigmaRInit = cov(rv');
+%     sigma = eig(SigmaRInit);
+%     parameters.initRNoise = diag([mean(sigma(1:2)),mean(sigma(1:2)),sigma(3)]);
 
-    Ns = 100000;
-    aInit_rand = RTrue(:,:,1)'*g + randn(3,Ns)*parameters.acceRandomWalk*sqrt(sf);
-    r = cross(aInit_rand,repmat(g,1,Ns));
-    theta = asin(sqrt(sum(r.^2))./sqrt(sum(aInit_rand.^2))/sqrt(sum(g.^2)));
-    r = r./sqrt(sum(r.^2));
-    RInit_rand = expRot(theta.*r);
-    RInit_rand = mulRot(expRot([zeros(2,Ns);(rand(1,Ns)-0.5)*2*pi]),RInit_rand);
-    RInit_error = mulRot(parameters.RInit',RInit_rand);
-
-    ERInit_error = mean(RInit_error,3);
-    [UInit,DInit,VInit] = psvd(ERInit_error);
-    SInit = diag(pdf_MF_M2S(diag(DInit)));
-    FInit = parameters.RInit*(UInit*VInit')'*UInit*SInit*VInit';
-
-    rv = logRot(RInit_error,'v');
-    SigmaRInit = cov(rv');
-    sigma = eig(SigmaRInit);
-    parameters.initRNoise = diag([mean(sigma(1:2)),mean(sigma(1:2)),sigma(3)]);
+    parameters.RInit = RTrue(:,:,1)*expRot(0.1*randn(3,1));
+    parameters.initRNoise = 0.1^2*eye(3);
 
     parameters.xInit = [zeros(3,1);pMea(:,1);zeros(6,1)];
     parameters.initXNoise = [0.01^2*eye(3),zeros(3,9);
         zeros(3,3),parameters.posMeaNoise,zeros(3,6);zeros(6,6),0.01^2*eye(6)];
     
     % filter
-    parameters.initRNoise(3,3) = 1000;
     [RMEKF,xMEKF,G,tMEKF] = MEKFIMU(gyro,acce,[],pMea,parameters);
     
     parameters.GaussMea = false;
-    parameters.initRNoise = FInit;
+    parameters.initRNoise = 50*eye(3)*parameters.RInit;
     try
         [RMFGI,xMFGI,MFGI,tMFGI] = MFGAnalyticIMU(gyro,acce,[],pMea,true,parameters);
     catch

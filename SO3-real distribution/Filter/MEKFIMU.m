@@ -21,6 +21,8 @@ posMeaNoise = parameters.posMeaNoise;
 hasRMea = ~isempty(RMea);
 useGrav = parameters.useGrav;
 
+noGPS = parameters.noGPS;
+
 % initialize distribution
 if parameters.GaussMea
     initRNoise = parameters.initRNoise;
@@ -75,7 +77,7 @@ for n = 2:N
     Sigma = F*Sigma*F'+Q;
     
     % update
-    if rem(n,1/dt/sf_GPS)==0
+    if rem(n,1/dt/sf_GPS)==0 && (isempty(noGPS) || n<noGPS(1) || n>noGPS(2))
         if hasRMea
             if useGrav
                 y = [pMea(:,n)-xp(4:6);logRot(Rp'*RMea(:,:,n),'v');...

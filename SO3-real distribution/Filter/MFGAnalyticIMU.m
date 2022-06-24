@@ -29,6 +29,8 @@ H.Hav = acceBiasInstability*eye(3);
 hasRMea = ~isempty(RMea);
 bool_prog = parameters.bool_prog;
 
+noGPS = parameters.noGPS;
+
 % options for lsqlin
 options = optimoptions('lsqlin','display','off','algorithm','active-set');
 
@@ -67,7 +69,7 @@ for n = 2:N
     [Miu,Sigma,P,U,S,V] = MFGIMUProp(omega,a,Miu,Sigma,P,U,S,V,H,defQS,dt,options);
     
     % update
-    if rem(n,1/dt/sf_GPS)==0
+    if rem(n,1/dt/sf_GPS)==0 && (isempty(noGPS) || n<noGPS(1) || n>noGPS(2))
         if hasRMea
             if useGrav
                 grav = acce(:,n)+Miu(10:12);

@@ -31,7 +31,7 @@ if ~bool_prog
     ER = sum(R1.*permute(w1,[2,3,1]),3);
 else
     lambda_rem = 1;
-    expfR1 = zeros(7,1);
+    fR1 = zeros(7,1);
     
     [Rp,wp] = pdf_MF_unscented_transform2(U1*S1*V1'+MF);
     
@@ -43,22 +43,19 @@ else
                 vR1 = vee(S1*U1'*Rp(:,:,i)*V1-V1'*Rp(:,:,i)'*U1*S1,[],false);
             end
             Miuc = Miu1+P1*vR1;
-            expfR1(i) = exp(-1/2*lambda_rem*(H*Miuc-z)'*Sigma_R^-1*(H*Miuc-z));
+            fR1(i) = -1/2*lambda_rem*(H*Miuc-z)'*Sigma_R^-1*(H*Miuc-z);
         end
         
-        r = min(expfR1)/max(expfR1);
-        if r == 0
-            break;
-        end
-        
-        if r < tau
-            k = log(tau)/log(r);
-            lambda = lambda_rem*log(tau)/log(r);
+        res = min(fR1)-max(fR1);
+        if res < log(tau)
+            k = log(tau)/res;
+            lambda = lambda_rem*k;
             lambda_rem = lambda_rem-lambda;
-
-            expfR1 = expfR1.^k;
+    
+            expfR1 = exp((fR1-min(fR1)).*k);
         else
             lambda_rem = 0;
+            expfR1 = exp(fR1-min(fR1));
         end
         
         wp = wp.*expfR1;
